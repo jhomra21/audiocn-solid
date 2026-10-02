@@ -1,9 +1,10 @@
-import { createEffect, createMemo, onCleanup } from "solid-js";
+import { createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
 import { omitProps } from "@/lib/props";
+import { createCompatEffect } from "@/lib/solid-effect";
 import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
@@ -202,42 +203,58 @@ export const DbReadout = (props: DbReadoutProps) => {
     }
   );
 
-  createEffect(() => {
-    const source = props.source;
-    const cadence = intervalMs();
-
-    if (!source) {
-      return;
-    }
-
-    shown = null;
-    const ticker = createTicker(() => {
-      const changed = write(peak);
-
-      if (holdMs() === 0) {
-        peak = SILENCE_DB;
+  createCompatEffect(
+    () => ({
+      source: props.source,
+      cadence: intervalMs(),
+    }),
+    ({ source, cadence }) => {
+      if (!source) {
+        return;
       }
 
-      const hadFreshFrame = fresh;
-      fresh = false;
-      return changed || hadFreshFrame;
-    }, cadence);
-
-    wake = ticker.wake;
-    ticker.wake();
-
-    onCleanup(() => {
-      wake = noop;
-      ticker.stop();
-    });
-  }, undefined);
-
-  createEffect(() => {
-    if (!props.source) {
       shown = null;
-      write(initialDb());
+      const ticker = createTicker(() => {
+        const changed = write(peak);
+
+        if (holdMs() === 0) {
+          peak = SILENCE_DB;
+        }
+
+        const hadFreshFrame = fresh;
+        fresh = false;
+        return changed || hadFreshFrame;
+      }, cadence);
+
+      wake = ticker.wake;
+      ticker.wake();
+
+      return () => {
+        wake = noop;
+        ticker.stop();
+      };
     }
-  }, undefined);
+  );
+
+  createCompatEffect(
+    () => {
+      const db = initialDb();
+
+      // Track every formatting input in the compute phase so Solid 2 reruns
+      // the imperative write when declarative presentation props change.
+      renderDb(db);
+      zones();
+      floorDb();
+
+      return { source: props.source, db };
+    },
+    ({ source, db }) => {
+      if (!source) {
+        shown = null;
+        write(db);
+      }
+    }
+  );
 
   const style = createMemo<StyleValue>(() => {
     const width = `${widest()}ch`;
