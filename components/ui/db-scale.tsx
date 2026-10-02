@@ -5,6 +5,7 @@ import { DEFAULT_MAX_DB, DEFAULT_MIN_DB, formatDb } from "@/lib/audio/decibels";
 import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
 import type { RefTarget } from "@/lib/ref";
+import { provideContext } from "@/lib/solid-context";
 import { createCompatEffect } from "@/lib/solid-effect";
 import { resolveTaper } from "@/lib/audio/taper";
 import type { TaperInput } from "@/lib/audio/taper";
@@ -282,28 +283,26 @@ export const DbScale = (props: DbScaleProps) => {
     setRefValue(props.ref, node);
   };
 
-  return (
-    <DbScaleContext.Provider value={context}>
-      <div
-        {...rest}
-        aria-hidden
-        class={cn(
-          "text-muted-foreground relative shrink-0 text-[0.625rem] leading-none tabular-nums select-none",
-          orientation() === "horizontal" ? "h-4 w-full" : "h-full w-7",
-          props.class,
-          props.className
-        )}
-        data-orientation={orientation()}
-        data-side={side()}
-        data-slot="db-scale"
-        ref={setScaleRef}
-      >
-        {props.children ?? (
-          <For each={values()}>
-            {(tick) => <DbScaleTick value={tick} />}
-          </For>
-        )}
-      </div>
-    </DbScaleContext.Provider>
-  );
+  return provideContext(DbScaleContext, context, () => (
+    <div
+      {...rest}
+      aria-hidden
+      class={cn(
+        "text-muted-foreground relative shrink-0 text-[0.625rem] leading-none tabular-nums select-none",
+        orientation() === "horizontal" ? "h-4 w-full" : "h-full w-7",
+        props.class,
+        props.className
+      )}
+      data-orientation={orientation()}
+      data-side={side()}
+      data-slot="db-scale"
+      ref={setScaleRef}
+    >
+      {props.children ?? (
+        <For each={values()}>
+          {(tick) => <DbScaleTick value={tick} />}
+        </For>
+      )}
+    </div>
+  ));
 };

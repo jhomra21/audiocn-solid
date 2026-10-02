@@ -2,6 +2,7 @@ import { createContext, useContext } from "solid-js";
 
 import type { BallisticsInput } from "@/lib/audio/ballistics";
 import type { MeterZone, Orientation } from "@/lib/audio/types";
+import { provideContext } from "@/lib/solid-context";
 
 export type AudioSize = "sm" | "default" | "lg";
 
@@ -57,11 +58,7 @@ export const AudioConfigProvider = (props: AudioConfigProviderProps) => {
     },
   };
 
-  return (
-    <AudioConfigContext.Provider value={merged}>
-      {props.children}
-    </AudioConfigContext.Provider>
-  );
+  return provideContext(AudioConfigContext, merged, () => props.children);
 };
 
 export const useAudioConfig = (): AudioConfig => useContext(AudioConfigContext);
