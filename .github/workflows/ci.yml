@@ -36,5 +36,5 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
-      - run: bun add --no-save solid-js@next
-      - run: bunx tsc -p tsconfig.library.json --noEmit
+      - run: bun add --no-save solid-js@next @solidjs/web@next
+      - run: bunx tsc -p tsconfig.solid2.json --noEmit
