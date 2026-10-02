@@ -1,0 +1,30 @@
+{
+  "name": "audiocn-solid",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run build",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "cn": "^0.4.0",
+    "solid-js": "^1.9.15"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.19.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vite-plugin-solid": "^2.11.14"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.9.15 <3"
+  }
+}
