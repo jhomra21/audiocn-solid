@@ -1,9 +1,9 @@
-import { createEffect, createMemo, mergeProps, onCleanup, splitProps } from "solid-js";
-import type { JSX } from "solid-js";
+import { createEffect, createMemo, onCleanup } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
+import { omitProps } from "@/lib/props";
 import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
@@ -11,8 +11,38 @@ const DEFAULT_INTERVAL_MS = 250;
 const DEFAULT_FLOOR_DB = -60;
 const WIDEST_MAGNITUDE_DB = 88.8;
 
-type Ref<T> = T | ((element: T) => void) | undefined;
-type SpanProps = Omit<JSX.HTMLAttributes<HTMLSpanElement>, "children" | "ref">;
+type Ref<T> = T | ((element: T) => void) | Ref<T>[] | undefined;
+type StyleValue = string | Record<string, string | number | undefined>;
+
+interface SpanProps {
+  id?: string;
+  class?: string;
+  className?: string;
+  style?: StyleValue;
+  title?: string;
+  role?: string;
+  tabIndex?: number;
+  ref?: Ref<HTMLSpanElement>;
+  [key: string]: unknown;
+}
+
+const OWN_PROPS = [
+  "ref",
+  "class",
+  "className",
+  "style",
+  "value",
+  "source",
+  "measure",
+  "channel",
+  "intervalMs",
+  "holdMs",
+  "decimals",
+  "unit",
+  "floorDb",
+  "zones",
+  "format",
+] as const;
 
 const noop = () => {};
 
@@ -40,18 +70,27 @@ const createTicker = (step: () => boolean, intervalMs: number) => {
 };
 
 export interface DbReadoutProps extends SpanProps {
-  ref?: Ref<HTMLSpanElement>;
-  className?: string;
+  /** A level in dB, for declarative use. */
   value?: number;
+  /** A meter source; the readout updates itself without rerendering Solid. */
   source?: FrameSource<MeterFrame> | null;
+  /** Which measurement to show. Default `peak`. */
   measure?: "peak" | "rms";
+  /** A channel index, or `max` for the loudest channel. Default `max`. */
   channel?: number | "max";
+  /** How often the text changes. Default 250 ms. */
   intervalMs?: number;
+  /** Show the highest value seen within this window. Default 0. */
   holdMs?: number;
+  /** Digits after the decimal point. Default 1. */
   decimals?: number;
+  /** Append " dB". Default true. */
   unit?: boolean;
+  /** At or below this level, show "−∞". Default −60. */
   floorDb?: number;
+  /** Zones used for `data-zone`. */
   zones?: MeterZone[];
+  /** Replaces all formatting. */
   format?: (db: number) => string;
 }
 
@@ -80,37 +119,15 @@ export const readChannel = (
 };
 
 export const DbReadout = (props: DbReadoutProps) => {
-  const merged = mergeProps(
-    {
-      measure: "peak" as const,
-      channel: "max" as const,
-      intervalMs: DEFAULT_INTERVAL_MS,
-      holdMs: 0,
-      decimals: 1,
-      unit: true,
-      floorDb: DEFAULT_FLOOR_DB,
-      zones: DEFAULT_ZONES,
-    },
-    props
-  );
-
-  const [local, rest] = splitProps(merged, [
-    "ref",
-    "class",
-    "className",
-    "style",
-    "value",
-    "source",
-    "measure",
-    "channel",
-    "intervalMs",
-    "holdMs",
-    "decimals",
-    "unit",
-    "floorDb",
-    "zones",
-    "format",
-  ]);
+  const rest = omitProps(props, OWN_PROPS);
+  const measure = () => props.measure ?? "peak";
+  const channel = () => props.channel ?? "max";
+  const intervalMs = () => props.intervalMs ?? DEFAULT_INTERVAL_MS;
+  const holdMs = () => props.holdMs ?? 0;
+  const decimals = () => props.decimals ?? 1;
+  const unit = () => props.unit ?? true;
+  const floorDb = () => props.floorDb ?? DEFAULT_FLOOR_DB;
+  const zones = () => props.zones ?? DEFAULT_ZONES;
 
   let element: HTMLSpanElement | undefined;
   let peak = SILENCE_DB;
@@ -120,19 +137,21 @@ export const DbReadout = (props: DbReadoutProps) => {
   let wake = noop;
 
   const renderDb = (db: number) =>
-    local.format
-      ? local.format(db)
+    props.format
+      ? props.format(db)
       : formatDb(db, {
-          decimals: local.decimals,
-          floorDb: local.floorDb,
-          unit: local.unit,
+          decimals: decimals(),
+          floorDb: floorDb(),
+          unit: unit(),
         });
 
-  const initialDb = createMemo(() => local.value ?? SILENCE_DB);
+  const initialDb = createMemo(() => props.value ?? SILENCE_DB);
 
   const widest = createMemo(() => {
-    const justAboveFloor = Number.isFinite(local.floorDb)
-      ? local.floorDb + 10 ** -local.decimals
+    const floor = floorDb();
+    const precision = decimals();
+    const justAboveFloor = Number.isFinite(floor)
+      ? floor + 10 ** -precision
       : -WIDEST_MAGNITUDE_DB;
 
     return Math.max(
@@ -160,20 +179,20 @@ export const DbReadout = (props: DbReadoutProps) => {
       } else {
         element.textContent = text;
       }
-      element.dataset.zone = zoneForDb(db, local.zones);
-      element.toggleAttribute("data-silent", db <= local.floorDb);
+      element.dataset.zone = zoneForDb(db, zones());
+      element.toggleAttribute("data-silent", db <= floorDb());
     }
 
     return changed;
   };
 
   useFrameSource(
-    () => local.source,
+    () => props.source,
     (frame) => {
-      const db = readChannel(frame, local.measure, local.channel);
+      const db = readChannel(frame, measure(), channel());
       const now = performance.now();
 
-      if (db >= peak || now - peakAt > local.holdMs) {
+      if (db >= peak || now - peakAt > holdMs()) {
         peak = db;
         peakAt = now;
       }
@@ -184,8 +203,8 @@ export const DbReadout = (props: DbReadoutProps) => {
   );
 
   createEffect(() => {
-    const source = local.source;
-    const intervalMs = local.intervalMs;
+    const source = props.source;
+    const cadence = intervalMs();
 
     if (!source) {
       return;
@@ -195,14 +214,14 @@ export const DbReadout = (props: DbReadoutProps) => {
     const ticker = createTicker(() => {
       const changed = write(peak);
 
-      if (local.holdMs === 0) {
+      if (holdMs() === 0) {
         peak = SILENCE_DB;
       }
 
       const hadFreshFrame = fresh;
       fresh = false;
       return changed || hadFreshFrame;
-    }, intervalMs);
+    }, cadence);
 
     wake = ticker.wake;
     ticker.wake();
@@ -211,33 +230,42 @@ export const DbReadout = (props: DbReadoutProps) => {
       wake = noop;
       ticker.stop();
     });
-  });
+  }, undefined);
 
   createEffect(() => {
-    if (!local.source) {
+    if (!props.source) {
       shown = null;
       write(initialDb());
     }
-  });
+  }, undefined);
 
-  const style = createMemo<JSX.CSSProperties | string>(() => {
+  const style = createMemo<StyleValue>(() => {
     const width = `${widest()}ch`;
 
-    if (typeof local.style === "string") {
-      return `--db-readout-width:${width};${local.style}`;
+    if (typeof props.style === "string") {
+      return `--db-readout-width:${width};${props.style}`;
     }
 
     return {
       "--db-readout-width": width,
-      ...(local.style ?? {}),
-    } as JSX.CSSProperties;
+      ...(props.style ?? {}),
+    };
   });
 
   const setRef = (node: HTMLSpanElement) => {
     element = node;
-    if (typeof local.ref === "function") {
-      local.ref(node);
-    }
+
+    const apply = (ref: Ref<HTMLSpanElement>) => {
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (Array.isArray(ref)) {
+        for (const item of ref) {
+          apply(item);
+        }
+      }
+    };
+
+    apply(props.ref);
   };
 
   return (
@@ -245,12 +273,12 @@ export const DbReadout = (props: DbReadoutProps) => {
       {...rest}
       class={cn(
         "inline-block min-w-(--db-readout-width) text-end font-mono tabular-nums",
-        local.class,
-        local.className
+        props.class,
+        props.className
       )}
-      data-silent={initialDb() <= local.floorDb ? "" : undefined}
+      data-silent={initialDb() <= floorDb() ? "" : undefined}
       data-slot="db-readout"
-      data-zone={zoneForDb(initialDb(), local.zones)}
+      data-zone={zoneForDb(initialDb(), zones())}
       ref={setRef}
       style={style()}
     >
