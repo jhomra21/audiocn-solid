@@ -1,7 +1,7 @@
-import { createEffect, onCleanup } from "solid-js";
 import type { Accessor } from "solid-js";
 
 import type { FrameSource } from "@/lib/audio/types";
+import { createCompatEffect } from "@/lib/solid-effect";
 
 export interface UseFrameSourceOptions {
   /** Pause the subscription without unmounting. Default true. */
@@ -22,15 +22,18 @@ export const useFrameSource = <T>(
   onFrame: (frame: T) => void,
   options: MaybeAccessor<UseFrameSourceOptions> = {}
 ): void => {
-  createEffect(() => {
-    const current = read(source);
-    const { enabled = true } = read(options);
+  createCompatEffect(
+    () => {
+      const current = read(source);
+      const { enabled = true } = read(options);
+      return { current, enabled };
+    },
+    ({ current, enabled }) => {
+      if (!(current && enabled)) {
+        return;
+      }
 
-    if (!(current && enabled)) {
-      return;
+      return current.subscribe(onFrame);
     }
-
-    const unsubscribe = current.subscribe(onFrame);
-    onCleanup(unsubscribe);
-  }, undefined);
+  );
 };
