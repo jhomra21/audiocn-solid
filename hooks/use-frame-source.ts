@@ -32,5 +32,5 @@ export const useFrameSource = <T>(
 
     const unsubscribe = current.subscribe(onFrame);
     onCleanup(unsubscribe);
-  });
+  }, undefined);
 };
