@@ -13,7 +13,6 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "strict": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
