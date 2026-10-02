@@ -476,7 +476,7 @@ export const LevelMeterTrack = (props: DivProps) => {
     >
       {context.variant() === "segmented" ? (
         <div
-          aria-hidden="true"
+          aria-hidden={"true"}
           class="absolute inset-0 bg-(image:--meter-fill) mask-(--meter-mask) opacity-20"
           data-slot="level-meter-segments"
         />
@@ -501,7 +501,7 @@ export const LevelMeterBar = (props: LevelMeterBarProps) => {
   return (
     <div
       {...rest}
-      aria-hidden="true"
+      aria-hidden={"true"}
       class={cn(
         "absolute inset-0 overflow-hidden",
         measure() === "rms"
@@ -540,7 +540,7 @@ export const LevelMeterHold = (props: DivProps) => {
   return (
     <div
       {...rest}
-      aria-hidden="true"
+      aria-hidden={"true"}
       class={cn(
         "pointer-events-none absolute inset-0 opacity-[calc(var(--meter-hold)_*_50)]",
         horizontal()
