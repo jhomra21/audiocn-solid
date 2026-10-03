@@ -129,7 +129,11 @@ export const runParitySuite = ({
     const valueClass = page.locator(
       '[data-contract="value-class"] [data-slot="db-readout"]'
     );
-    await expect(valueClass).toHaveClass("text-sm");
+    await expect(valueClass).toHaveClass(/(?:^|\s)text-sm(?:\s|$)/);
+    await expect(valueClass).not.toHaveClass(/(?:^|\s)text-xs(?:\s|$)/);
+    await expect(valueClass).not.toHaveClass(
+      /(?:^|\s)text-muted-foreground(?:\s|$)/
+    );
 
     const tick = page.locator('[data-contract="scale-style"] [data-slot="db-scale-tick"]');
     await expect
