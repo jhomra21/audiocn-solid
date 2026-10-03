@@ -1,11 +1,16 @@
-import type { Context, JSX } from "solid-js";
+import type { Context } from "solid-js";
 
 type Provider<T> = (props: {
   value: T;
-  readonly children?: JSX.Element;
-}) => JSX.Element;
+  readonly children?: any;
+}) => any;
 
 type CompatContext<T> = Context<T> | Provider<T>;
+
+const hasProvider = <T>(
+  context: CompatContext<T>
+): context is Context<T> & { Provider: Provider<T> } =>
+  "Provider" in context;
 
 /**
  * Provides a context value across Solid 1 and Solid 2.
@@ -16,8 +21,8 @@ type CompatContext<T> = Context<T> | Provider<T>;
 export const provideContext = <T>(
   context: CompatContext<T>,
   value: T,
-  children: () => JSX.Element
-): JSX.Element => {
+  children: () => any
+) => {
   const props = {
     value,
     get children() {
@@ -25,7 +30,7 @@ export const provideContext = <T>(
     },
   };
 
-  if ("Provider" in context) {
+  if (hasProvider(context)) {
     return context.Provider(props);
   }
 

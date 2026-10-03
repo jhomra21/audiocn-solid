@@ -1,6 +1,6 @@
-import type { ComponentProps } from "solid-js";
+import type { SvgDOMProps } from "@/lib/dom-props";
 
-type IconProps = ComponentProps<"svg">;
+type IconProps = SvgDOMProps;
 
 const baseProps = {
   fill: "currentColor",

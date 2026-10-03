@@ -1,5 +1,4 @@
 import { createSignal } from "solid-js";
-import type { ComponentProps } from "solid-js";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
 import type {
@@ -119,19 +118,18 @@ export const ContractApp = () => {
 
       <section data-contract="custom-render">
         <ClipIndicator
-          render={(renderProps, state) => {
-            const { children, type: _type, ...buttonProps } = renderProps;
-            const forwarded: ComponentProps<"div"> = buttonProps;
-
-            return (
-              <div
-                {...forwarded}
-                data-render-state={state.clipping ? "clip" : "idle"}
-              >
-                {children}
-              </div>
-            );
-          }}
+          render={(renderProps, state) => (
+            <div
+              aria-label={renderProps["aria-label"]}
+              class={renderProps.class}
+              data-clipping={renderProps["data-clipping"]}
+              data-render-state={state.clipping ? "clip" : "idle"}
+              data-slot={renderProps["data-slot"]}
+              onClick={renderProps.onClick}
+            >
+              {renderProps.children}
+            </div>
+          )}
         />
       </section>
 

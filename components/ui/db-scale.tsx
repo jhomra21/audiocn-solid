@@ -1,7 +1,7 @@
 import { For, createContext, createMemo, createSignal, useContext } from "solid-js";
-import type { ComponentProps } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
+import type { GlobalDOMProps } from "@/lib/dom-props";
 import { DEFAULT_MAX_DB, DEFAULT_MIN_DB, formatDb } from "@/lib/audio/decibels";
 import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
@@ -126,15 +126,10 @@ const markClass = (horizontal: boolean, major: boolean) => {
   return major ? "h-px w-1.5" : "h-px w-1";
 };
 
-type DivElementProps = Omit<
-  ComponentProps<"div">,
-  "children" | "class" | "className" | "ref" | "style"
->;
-
-type DivProps = DivElementProps & {
+type DivProps = GlobalDOMProps & {
   class?: string;
   className?: string;
-  children?: ComponentProps<"div">["children"];
+  children?: any;
   style?: StyleValue;
   ref?: RefTarget<HTMLDivElement>;
 };

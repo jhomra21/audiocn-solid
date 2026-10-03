@@ -1,4 +1,3 @@
-import type { ComponentProps } from "solid-js";
 import {
   For,
   createContext,
@@ -11,6 +10,7 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
+import type { GlobalDOMProps } from "@/lib/dom-props";
 import type { ClipIndicatorProps } from "@/components/ui/clip-indicator";
 import { DbReadout, readChannel } from "@/components/ui/db-readout";
 import type { DbReadoutProps } from "@/components/ui/db-readout";
@@ -22,7 +22,7 @@ import { useFrameSource } from "@/hooks/use-frame-source";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useVisibility } from "@/hooks/use-visibility";
 import { createBallistics, resolveBallistics } from "@/lib/audio/ballistics";
-import type { Ballistics } from "@/lib/audio/ballistics";
+import type { Ballistics, BallisticsInput } from "@/lib/audio/ballistics";
 import {
   DEFAULT_MAX_DB,
   DEFAULT_MIN_DB,
@@ -423,15 +423,10 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
   };
 };
 
-type DivElementProps = Omit<
-  ComponentProps<"div">,
-  "children" | "class" | "className" | "ref" | "style"
->;
-
-type DivProps = DivElementProps & {
+type DivProps = GlobalDOMProps & {
   class?: string;
   className?: string;
-  children?: ComponentProps<"div">["children"];
+  children?: any;
   style?: StyleValue;
   ref?: RefTarget<HTMLDivElement>;
 };
