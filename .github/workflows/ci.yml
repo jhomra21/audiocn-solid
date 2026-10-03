@@ -16,6 +16,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
+      - run: bun run lint
       - run: bun run check
       - run: bunx playwright install --with-deps chromium
       - run: bun run test:e2e
