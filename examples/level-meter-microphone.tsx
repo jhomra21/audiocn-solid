@@ -19,7 +19,7 @@ export const LevelMeterMicrophone = () => {
   const listening = () => microphone.status === "active";
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
+    <div class="flex w-full max-w-md flex-col gap-4">
       <LevelMeter aria-label="Microphone level" source={analyser.meter}>
         <LevelMeterChannels>
           <LevelMeterChannel>
@@ -30,7 +30,7 @@ export const LevelMeterMicrophone = () => {
         <LevelMeterClip />
       </LevelMeter>
       <Button
-        className="self-start"
+        class="self-start"
         onClick={() => {
           if (listening()) microphone.stop();
           else void microphone.start();
