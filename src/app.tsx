@@ -72,12 +72,12 @@ export interface AppProps {
 
 export const App = (props: AppProps) => (
   <main
-    className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8"
+    class="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8"
     data-runtime={props.runtime ?? "solid-1"}
   >
-    <header className="mb-12 grid gap-2">
-      <h1 className="font-heading text-3xl font-semibold">audiocn Solid</h1>
-      <p className="text-muted-foreground max-w-2xl text-sm">
+    <header class="mb-12 grid gap-2">
+      <h1 class="font-heading text-3xl font-semibold">audiocn Solid</h1>
+      <p class="text-muted-foreground max-w-2xl text-sm">
         Solid ports rendered through the same examples used by the upstream
         audiocn component docs.
       </p>
@@ -85,12 +85,12 @@ export const App = (props: AppProps) => (
 
     <For each={groups}>
       {(group) => (
-        <section className="mb-14" data-example-group={group.title}>
-          <h2 className="font-heading text-2xl font-semibold">{group.title}</h2>
+        <section class="mb-14" data-example-group={group.title}>
+          <h2 class="font-heading text-2xl font-semibold">{group.title}</h2>
           <For each={group.examples}>
             {([name, render]) => (
               <article data-example={name}>
-                <h3 className="text-muted-foreground mt-6 font-mono text-xs">
+                <h3 class="text-muted-foreground mt-6 font-mono text-xs">
                   {name}
                 </h3>
                 <ComponentPreview code={codeFor(name)}>
