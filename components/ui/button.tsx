@@ -3,6 +3,7 @@ import type { VariantProps } from "class-variance-authority";
 
 import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
+import { createCompatEffect } from "@/lib/solid-effect";
 import type { RefTarget } from "@/lib/ref";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,16 @@ const OWN_PROPS = [
 
 export const Button = (props: ButtonProps) => {
   const rest = omitProps(props, OWN_PROPS);
+  let element: HTMLButtonElement | undefined;
+
+  createCompatEffect(
+    () => props.tabIndex ?? 0,
+    (tabIndex) => {
+      if (element) {
+        element.tabIndex = tabIndex;
+      }
+    }
+  );
 
   return (
     <button
@@ -77,8 +88,11 @@ export const Button = (props: ButtonProps) => {
         })
       )}
       data-slot="button"
-      ref={(node) => setRefValue(props.ref, node)}
-      attr:tabindex={props.tabIndex ?? 0}
+      ref={(node) => {
+        element = node;
+        node.tabIndex = props.tabIndex ?? 0;
+        setRefValue(props.ref, node);
+      }}
       type={props.type ?? "button"}
       {...rest}
     >
