@@ -1,4 +1,30 @@
 /**
+ * Copies enumerable string props as live getters without carrying framework
+ * symbols across a DOM boundary.
+ */
+export const forwardProps = (
+  target: object,
+  source: object,
+  omitted: ReadonlySet<PropertyKey> = new Set()
+): void => {
+  // SAFETY: Object.keys only returns enumerable string keys, so this view
+  // cannot expose Solid's internal symbol markers.
+  const readable = source as Record<string, unknown>;
+
+  for (const key of Object.keys(source)) {
+    if (omitted.has(key)) {
+      continue;
+    }
+
+    Object.defineProperty(target, key, {
+      configurable: true,
+      enumerable: true,
+      get: () => readable[key],
+    });
+  }
+};
+
+/**
  * Returns a reactive plain-object view of `props` without the listed keys.
  *
  * Solid 2 marks its props objects with internal symbols. A Proxy forwards
@@ -13,17 +39,7 @@ export const omitProps = <T extends object, K extends keyof T>(
   const omitted = new Set<PropertyKey>(keys);
   const rest = {} as Omit<T, K>;
 
-  for (const key of Reflect.ownKeys(props)) {
-    if (typeof key === "symbol" || omitted.has(key)) {
-      continue;
-    }
-
-    Object.defineProperty(rest, key, {
-      configurable: true,
-      enumerable: true,
-      get: () => Reflect.get(props, key),
-    });
-  }
+  forwardProps(rest, props, omitted);
 
   return rest;
 };

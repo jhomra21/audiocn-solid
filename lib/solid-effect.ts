@@ -11,6 +11,9 @@ type Solid2CreateEffect = <T>(
 
 const hasTwoPhaseEffects = "onSettled" in Solid;
 
+// SAFETY: the runtime feature check below selects the matching call contract.
+const createEffect = Solid.createEffect as Solid1CreateEffect & Solid2CreateEffect;
+
 /**
  * Runs a tracked compute phase followed by an untracked imperative apply phase.
  *
@@ -23,7 +26,7 @@ export const createCompatEffect = <T>(
   apply: (value: T) => Cleanup
 ): void => {
   if (hasTwoPhaseEffects) {
-    (Solid.createEffect as unknown as Solid2CreateEffect)(
+    createEffect(
       compute,
       (value) => Solid.untrack(() => apply(value))
     );
@@ -31,7 +34,7 @@ export const createCompatEffect = <T>(
     return;
   }
 
-  (Solid.createEffect as unknown as Solid1CreateEffect)(() => {
+  createEffect(() => {
     const value = compute();
     const cleanup = Solid.untrack(() => apply(value));
 

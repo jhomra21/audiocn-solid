@@ -3,7 +3,7 @@ import { createMemo, untrack } from "solid-js";
 import { useClipHold } from "@/hooks/use-clip-hold";
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { SILENCE_DB } from "@/lib/audio/decibels";
-import { omitProps } from "@/lib/props";
+import { forwardProps, omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
 import type { RefTarget } from "@/lib/ref";
 import { createCompatEffect } from "@/lib/solid-effect";
@@ -188,13 +188,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     },
   };
 
-  for (const key of Object.keys(rest)) {
-    Object.defineProperty(renderProps, key, {
-      configurable: true,
-      enumerable: true,
-      get: () => Reflect.get(rest, key),
-    });
-  }
+  forwardProps(renderProps, rest);
 
   const state: ClipIndicatorState = {
     get clipping() {
