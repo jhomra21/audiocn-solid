@@ -54,7 +54,7 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
           <div class="flex-1 text-sm outline-none" data-slot="tabs-content">
             <div
               class={cn(
-                "bg-background flex min-h-72 w-full justify-center rounded-xl border p-4 sm:p-10",
+                "bg-background text-foreground/90 flex min-h-72 w-full justify-center rounded-xl border p-4 sm:p-10",
                 align() === "center" && "items-center",
                 align() === "start" && "items-start",
                 align() === "end" && "items-end",
