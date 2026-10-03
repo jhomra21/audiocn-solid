@@ -61,6 +61,7 @@ const OWN_PROPS = [
   "onClippingChange",
   "showCount",
   "actionsRef",
+  "class",
   "className",
   "children",
   "ref",
@@ -159,6 +160,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
       (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator"),
     class: cn(
       "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
+      props.class,
       props.className
     ),
     "data-clipping": clipping() ? "" : undefined,
