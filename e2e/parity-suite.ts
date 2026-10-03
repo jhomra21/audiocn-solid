@@ -199,6 +199,7 @@ export const runParitySuite = ({
     const customRender = page.locator(
       '[data-contract="custom-render"] [data-render-state="idle"]'
     );
+
     await expect(customRender).toHaveAttribute("data-slot", "clip-indicator");
     await expect(customRender).toHaveAttribute("data-extra", "forwarded");
     await expect(customRender).toHaveAttribute("title", "Custom clip");
