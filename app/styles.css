@@ -4,11 +4,9 @@
 @import "tailwindcss";
 
 @source "../components";
-@source "../examples";
 @source "../hooks";
 @source "../lib";
-@source "../src";
-@source "../solid2";
+@source "../app";
 
 @custom-variant dark (&:is(.dark *));
 

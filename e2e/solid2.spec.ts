@@ -1,4 +1,4 @@
-import { runParitySuite } from "../e2e/parity-suite";
+import { runParitySuite } from "./parity-suite";
 
 runParitySuite({
   artifactDir: "test-results/solid2-artifacts",

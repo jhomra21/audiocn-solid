@@ -1,8 +1,8 @@
 import { render } from "@solidjs/web";
 
-import { App } from "@/src/app";
-import { ContractApp } from "@/src/contracts";
-import "../src/styles.css";
+import { App } from "@/app/gallery";
+import { ContractApp } from "@/app/contracts";
+import "../styles.css";
 
 const root = document.getElementById("root");
 
