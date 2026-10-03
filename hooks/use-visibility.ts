@@ -1,6 +1,6 @@
 import type { Accessor } from "solid-js";
 
-import { createCompatEffect } from "@/lib/solid-effect";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export interface VisibilityRef {
   current: boolean;

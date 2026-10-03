@@ -1,7 +1,7 @@
 import type { FrameSource } from "@/lib/audio/types";
-import { readMaybeAccessor } from "@/lib/accessor";
-import type { MaybeAccessor } from "@/lib/accessor";
-import { createCompatEffect } from "@/lib/solid-effect";
+import { readMaybeAccessor } from "@/lib/solid/accessor";
+import type { MaybeAccessor } from "@/lib/solid/accessor";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export interface UseFrameSourceOptions {
   /** Pause the subscription without unmounting. Default true. */

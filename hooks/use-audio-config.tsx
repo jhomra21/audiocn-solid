@@ -2,7 +2,7 @@ import { createContext, useContext } from "solid-js";
 
 import type { BallisticsInput } from "@/lib/audio/ballistics";
 import type { MeterZone, Orientation } from "@/lib/audio/types";
-import { provideContext } from "@/lib/solid-context";
+import { provideContext } from "@/lib/solid/context";
 
 export type AudioSize = "sm" | "default" | "lg";
 

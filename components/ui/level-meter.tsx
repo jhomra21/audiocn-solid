@@ -47,13 +47,13 @@ import {
   DEFAULT_ZONES,
   zoneForDb,
 } from "@/lib/audio/zones";
-import { omitProps } from "@/lib/props";
-import { setRefValue } from "@/lib/ref";
-import type { MutableRef, RefTarget } from "@/lib/ref";
-import { provideContext } from "@/lib/solid-context";
-import { createCompatEffect } from "@/lib/solid-effect";
-import { mergeStyleVars } from "@/lib/style";
-import type { StyleValue } from "@/lib/style";
+import { omitProps } from "@/lib/solid/props";
+import { setRefValue } from "@/lib/solid/ref";
+import type { MutableRef, RefTarget } from "@/lib/solid/ref";
+import { provideContext } from "@/lib/solid/context";
+import { createCompatEffect } from "@/lib/solid/effect";
+import { mergeStyleVars } from "@/lib/solid/style";
+import type { StyleValue } from "@/lib/solid/style";
 import { cn } from "@/lib/utils";
 
 const ARIA_INTERVAL_MS = 250;

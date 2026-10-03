@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, untrack } from "solid-js";
 
-import { createCompatEffect } from "@/lib/solid-effect";
+import { createCompatEffect } from "@/lib/solid/effect";
 import { CLIP_HOLD_MS, CLIP_THRESHOLD_DB } from "@/lib/audio/zones";
 
 export interface UseClipHoldOptions {

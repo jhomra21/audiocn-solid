@@ -1,13 +1,13 @@
 import { useAudioContext } from "@/hooks/use-audio-context";
-import { readMaybeAccessor } from "@/lib/accessor";
-import type { MaybeAccessor } from "@/lib/accessor";
+import { readMaybeAccessor } from "@/lib/solid/accessor";
+import type { MaybeAccessor } from "@/lib/solid/accessor";
 import { bandsFromSpectrum, logBandEdges } from "@/lib/audio/bands";
 import { dbToLevel, peakDb, rmsDb } from "@/lib/audio/decibels";
 import { subscribeFrame } from "@/lib/audio/frame-loop";
 import { createFrameRelay } from "@/lib/audio/frame-source";
 import { appendHistory } from "@/lib/audio/history";
 import type { FrameSource, MeterFrame, VisualFrame } from "@/lib/audio/types";
-import { createCompatEffect } from "@/lib/solid-effect";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export type AnalyserInput = MediaStream | HTMLMediaElement | AudioNode | null;
 
