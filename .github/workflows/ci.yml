@@ -49,3 +49,23 @@ jobs:
             test-results/solid2-artifacts
             playwright-report
           if-no-files-found: ignore
+
+  site-spike-1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: cd site && bunx playwright install --with-deps chromium
+      - run: bun run site:spike:1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solid-2-site-spike-1
+          path: |
+            site/artifacts/spike-1.json
+            site/test-results
+            site/playwright-report
+          if-no-files-found: ignore

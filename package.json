@@ -12,7 +12,8 @@
     "check": "bun run typecheck && bun run build",
     "test:e2e": "bun run test:e2e:solid1",
     "test:e2e:solid1": "playwright test",
-    "test:e2e:solid2": "playwright test --config playwright.solid2.config.ts"
+    "test:e2e:solid2": "playwright test --config playwright.solid2.config.ts",
+    "site:spike:1": "cd site && bun run spike:1"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
@@ -35,5 +36,8 @@
   },
   "peerDependencies": {
     "solid-js": ">=1.9.15 <3"
-  }
+  },
+  "workspaces": [
+    "site"
+  ]
 }
