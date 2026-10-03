@@ -10,7 +10,7 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
-import type { GlobalDOMProps } from "@/lib/dom-props";
+import type { DivDOMProps } from "@compat/jsx-types";
 import type { ClipIndicatorProps } from "@/components/ui/clip-indicator";
 import { DbReadout, readChannel } from "@/components/ui/db-readout";
 import type { DbReadoutProps } from "@/components/ui/db-readout";
@@ -423,10 +423,13 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
   };
 };
 
-type DivProps = GlobalDOMProps & {
+type DivProps = Omit<
+  DivDOMProps,
+  "children" | "class" | "className" | "ref" | "style"
+> & {
   class?: string;
   className?: string;
-  children?: any;
+  children?: DivDOMProps["children"];
   style?: StyleValue;
   ref?: RefTarget<HTMLDivElement>;
 };

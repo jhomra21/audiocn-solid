@@ -1,7 +1,7 @@
 import { For, createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
-import type { GlobalDOMProps } from "@/lib/dom-props";
+import type { SpanDOMProps } from "@compat/jsx-types";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
 import { omitProps } from "@/lib/props";
@@ -19,7 +19,10 @@ const DEFAULT_FLOOR_DB = -60;
 
 const WIDEST_MAGNITUDE_DB = 88.8;
 
-type SpanProps = GlobalDOMProps & {
+type SpanProps = Omit<
+  SpanDOMProps,
+  "class" | "className" | "ref" | "style"
+> & {
   class?: string;
   className?: string;
   style?: StyleValue;

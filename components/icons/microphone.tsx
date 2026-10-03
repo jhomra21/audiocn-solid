@@ -1,4 +1,4 @@
-import type { SvgDOMProps } from "@/lib/dom-props";
+import type { SvgDOMProps } from "@compat/jsx-types";
 
 type IconProps = SvgDOMProps;
 

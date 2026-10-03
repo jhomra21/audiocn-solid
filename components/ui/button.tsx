@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
-import type { ButtonDOMProps } from "@/lib/dom-props";
+import type { ButtonDOMProps } from "@compat/jsx-types";
 import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
 import { createCompatEffect } from "@/lib/solid-effect";
@@ -43,11 +43,14 @@ export const buttonVariants = cva(
   }
 );
 
-type ButtonProps = Omit<ButtonDOMProps, "onClick" | "tabIndex"> &
+type ButtonProps = Omit<
+  ButtonDOMProps,
+  "children" | "class" | "className" | "onClick" | "ref" | "tabIndex" | "type"
+> &
   VariantProps<typeof buttonVariants> & {
     class?: string;
     className?: string;
-    children?: any;
+    children?: ButtonDOMProps["children"];
     ref?: RefTarget<HTMLButtonElement>;
     type?: "button" | "submit" | "reset";
     onClick?: (event: MouseEvent) => void;

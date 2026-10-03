@@ -1,6 +1,14 @@
 {
   "extends": "./tsconfig.library.json",
   "compilerOptions": {
-    "jsxImportSource": "@solidjs/web"
+    "jsxImportSource": "@solidjs/web",
+    "paths": {
+      "@compat/jsx-types": [
+        "./compat/solid2/jsx-types.ts"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    }
   }
 }

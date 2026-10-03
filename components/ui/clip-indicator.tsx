@@ -1,7 +1,7 @@
 import { createMemo, untrack } from "solid-js";
 
 import { useClipHold } from "@/hooks/use-clip-hold";
-import type { ButtonDOMProps } from "@/lib/dom-props";
+import type { ButtonDOMProps, JSXElement } from "@compat/jsx-types";
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { SILENCE_DB } from "@/lib/audio/decibels";
 import { forwardProps, omitProps } from "@/lib/props";
@@ -27,15 +27,17 @@ export interface ClipIndicatorClickEvent extends MouseEvent {
   readonly baseUIHandlerPrevented?: boolean;
 }
 
-export type ClipIndicatorRenderProps = Omit<
+type NativeClipButtonProps = Omit<
   ButtonDOMProps,
-  "onClick" | "tabIndex"
-> & {
+  "children" | "class" | "className" | "onClick" | "ref" | "tabIndex" | "type"
+>;
+
+export type ClipIndicatorRenderProps = NativeClipButtonProps & {
   "aria-label": string;
   class: string;
   "data-clipping"?: string;
   "data-slot": "clip-indicator";
-  children: any;
+  children: ButtonDOMProps["children"];
   onClick: (event: MouseEvent) => void;
   type: "button" | "submit" | "reset";
 };
@@ -43,12 +45,12 @@ export type ClipIndicatorRenderProps = Omit<
 export type ClipIndicatorRender = (
   props: ClipIndicatorRenderProps,
   state: ClipIndicatorState
-) => any;
+) => JSXElement;
 
-type ButtonProps = Omit<ButtonDOMProps, "onClick" | "tabIndex"> & {
+type ButtonProps = NativeClipButtonProps & {
   class?: string;
   className?: string;
-  children?: any;
+  children?: ButtonDOMProps["children"];
   ref?: RefTarget<HTMLButtonElement>;
   onClick?: (event: ClipIndicatorClickEvent) => void;
   type?: "button" | "submit" | "reset";
