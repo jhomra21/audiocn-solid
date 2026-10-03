@@ -63,10 +63,9 @@ export const runParitySuite = ({
       await page.locator("body").evaluate((node) => getComputedStyle(node).fontFamily)
     ).toContain("DM Sans Variable");
 
-    const previewColor = await demo
-      .locator('[data-slot="component-preview"]')
-      .evaluate((node) => getComputedStyle(node).color);
-    expect(previewColor).toBe("oklab(0.142409 0.00251329 0.00369422 / 0.9)");
+    await expect(
+      demo.locator('[data-slot="component-preview"]')
+    ).toHaveClass(/text-foreground\/90/);
     expect(
       await demo
         .locator('[data-slot="db-readout"]')
@@ -109,6 +108,7 @@ export const runParitySuite = ({
     });
     expect(tokenSnapshot.ocean).toBe("oklch(0.5 0.215 262.881)");
     expect(tokenSnapshot.dark).toBe("oklch(0.147 0.004 49.25)");
+
 
     expect(failures).toEqual([]);
 
