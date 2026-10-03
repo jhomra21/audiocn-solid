@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { Show, createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
