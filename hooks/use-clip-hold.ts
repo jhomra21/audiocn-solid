@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from "solid-js";
+import { createSignal, onCleanup, untrack } from "solid-js";
 
 import { createCompatEffect } from "@/lib/solid-effect";
 import { CLIP_HOLD_MS, CLIP_THRESHOLD_DB } from "@/lib/audio/zones";
@@ -32,7 +32,7 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
     }
     clippingCurrent = next;
     setClipping(next);
-    options.onClippingChange?.(next);
+    untrack(() => options.onClippingChange)?.(next);
   };
 
   const clearTimer = () => {
@@ -44,7 +44,7 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
 
   const scheduleRelease = () => {
     clearTimer();
-    const holdMs = options.holdMs ?? CLIP_HOLD_MS;
+    const holdMs = untrack(() => options.holdMs) ?? CLIP_HOLD_MS;
     if (Number.isFinite(holdMs)) {
       timer = setTimeout(() => {
         timer = null;
@@ -54,7 +54,8 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
   };
 
   const report = (db: number) => {
-    const isAbove = db >= (options.thresholdDb ?? CLIP_THRESHOLD_DB);
+    const isAbove =
+      db >= (untrack(() => options.thresholdDb) ?? CLIP_THRESHOLD_DB);
     const wasAbove = above;
     above = isAbove;
 
