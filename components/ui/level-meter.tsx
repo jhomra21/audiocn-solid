@@ -1,4 +1,11 @@
-import { For, createContext, createMemo, createSignal, useContext } from "solid-js";
+import {
+  For,
+  createContext,
+  createMemo,
+  createSignal,
+  untrack,
+  useContext,
+} from "solid-js";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
@@ -385,7 +392,7 @@ interface DivProps {
   [key: string]: unknown;
 }
 
-const DIV_OWN = ["class", "className", "children", "style", "ref"] as const;
+const DIV_OWN = ["className", "children", "style", "ref"] as const;
 
 export const LevelMeterChannels = (props: DivProps) => {
   const context = useLevelMeter("LevelMeterChannels");
@@ -393,19 +400,18 @@ export const LevelMeterChannels = (props: DivProps) => {
 
   return (
     <div
-      {...rest}
       class={cn(
         "relative flex min-h-0 min-w-0 flex-1 gap-(--meter-gap)",
         context.orientation() === "horizontal"
           ? "flex-col"
           : "h-full flex-row",
-        props.class,
         props.className
       )}
       data-orientation={context.orientation()}
       data-slot="level-meter-channels"
       ref={(node) => setRefValue(props.ref, node)}
       style={props.style}
+      {...rest}
     >
       {props.children}
     </div>
@@ -444,11 +450,9 @@ export const LevelMeterChannel = (props: LevelMeterChannelProps) => {
 
   return (
     <div
-      {...rest}
       class={cn(
         "flex min-h-0 min-w-0 [--meter-hold:0] [--meter-level:0] [--meter-rms:0]",
         context.orientation() === "horizontal" ? "w-full" : "h-full",
-        props.class,
         props.className
       )}
       data-index={index()}
@@ -456,6 +460,7 @@ export const LevelMeterChannel = (props: LevelMeterChannelProps) => {
       data-slot="level-meter-channel"
       ref={setRef}
       style={props.style}
+      {...rest}
     >
       {props.children}
     </div>
@@ -469,19 +474,18 @@ export const LevelMeterTrack = (props: DivProps) => {
 
   return (
     <div
-      {...rest}
       class={cn(
         "bg-muted relative overflow-hidden rounded-full",
         horizontal()
           ? "h-(--meter-thickness) w-full"
           : "h-full w-(--meter-thickness)",
-        props.class,
         props.className
       )}
       data-orientation={context.orientation()}
       data-slot="level-meter-track"
       ref={(node) => setRefValue(props.ref, node)}
       style={props.style}
+      {...rest}
     >
       {context.variant() === "segmented" ? (
         <div
@@ -509,7 +513,6 @@ export const LevelMeterBar = (props: LevelMeterBarProps) => {
 
   return (
     <div
-      {...rest}
       aria-hidden={"true"}
       class={cn(
         "absolute inset-0 overflow-hidden",
@@ -519,13 +522,13 @@ export const LevelMeterBar = (props: LevelMeterBarProps) => {
         horizontal()
           ? "translate-x-[calc((var(--meter-bar-level)_-_1)_*_100%)]"
           : "translate-y-[calc((1_-_var(--meter-bar-level))_*_100%)]",
-        props.class,
         props.className
       )}
       data-measure={measure()}
       data-slot="level-meter-bar"
       ref={(node) => setRefValue(props.ref, node)}
       style={props.style}
+      {...rest}
     >
       <div
         class={cn(
@@ -536,7 +539,6 @@ export const LevelMeterBar = (props: LevelMeterBarProps) => {
         )}
         data-slot="level-meter-fill"
       />
-      {props.children}
     </div>
   );
 };
@@ -548,7 +550,6 @@ export const LevelMeterHold = (props: DivProps) => {
 
   return (
     <div
-      {...rest}
       aria-hidden={"true"}
       class={cn(
         "pointer-events-none absolute inset-0 opacity-[calc(var(--meter-hold)_*_50)]",
@@ -559,16 +560,15 @@ export const LevelMeterHold = (props: DivProps) => {
       data-slot="level-meter-hold"
       ref={(node) => setRefValue(props.ref, node)}
       style={props.style}
+      {...rest}
     >
       <div
         class={cn(
           "bg-foreground/80 absolute",
           horizontal() ? "inset-y-0 right-0 w-0.5" : "inset-x-0 top-0 h-0.5",
-          props.class,
           props.className
         )}
       />
-      {props.children}
     </div>
   );
 };
@@ -585,17 +585,15 @@ export const LevelMeterScale = (props: LevelMeterScaleProps) => {
 
   return (
     <DbScale
-      {...props}
-      class={cn(
+      className={cn(
         context.orientation() === "horizontal" &&
-          "absolute top-[calc(100%+var(--meter-gap))] left-0 h-(--meter-scale-size)",
-        props.class,
-        props.className
+          "absolute top-[calc(100%+var(--meter-gap))] left-0 h-(--meter-scale-size)"
       )}
       maxDb={context.maxDb()}
       minDb={context.minDb()}
       orientation={context.orientation()}
       taper={context.taper()}
+      {...props}
     />
   );
 };
@@ -620,11 +618,11 @@ export const LevelMeterValue = (props: LevelMeterValueProps) => {
 
   return (
     <DbReadout
-      {...props}
-      class={cn("text-muted-foreground text-xs", props.class, props.className)}
+      className="text-muted-foreground text-xs"
       floorDb={context.minDb()}
       source={context.declared() ? null : context.frames}
       value={value()}
+      {...props}
     />
   );
 };
@@ -635,7 +633,7 @@ export interface LevelMeterClipProps extends ClipIndicatorProps {
 
 export const LevelMeterClip = (props: LevelMeterClipProps) => {
   const context = useLevelMeter("LevelMeterClip");
-  return <ClipIndicator {...props} source={context.frames} />;
+  return <ClipIndicator source={context.frames} {...props} />;
 };
 
 export const levelMeterVariants = cva(
@@ -830,7 +828,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
         latest: latestRef,
         reducedMotion: reduce,
         root: rootRef,
-        scale: scale(),
+        scale: untrack(scale),
         visible: visibleRef,
       });
       const task = createFrameTask(nextPainter.paint);
@@ -903,13 +901,11 @@ export const LevelMeter = (props: LevelMeterProps) => {
 
   return provideContext(LevelMeterContext, context, () => (
     <div
-      {...rest}
       aria-valuemax={maxDb()}
       aria-valuemin={minDb()}
       aria-valuenow={minDb()}
       class={cn(
         levelMeterVariants({ orientation: orientation(), size: size() }),
-        props.class,
         props.className
       )}
       data-dimmed={dimmed() ? "" : undefined}
@@ -920,6 +916,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
       ref={setRootRef}
       role="meter"
       style={styleWithMeterVars(props.style, zoneFill(), segmentMask())}
+      {...rest}
     >
       {props.children ?? (
         <LevelMeterChannels>
