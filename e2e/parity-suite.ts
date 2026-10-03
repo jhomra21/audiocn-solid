@@ -126,6 +126,11 @@ export const runParitySuite = ({
     await expect(override).toHaveAttribute("data-slot", "custom-readout");
     await expect(override).toHaveAttribute("data-zone", "mine");
 
+    const valueClass = page.locator(
+      '[data-contract="value-class"] [data-slot="db-readout"]'
+    );
+    await expect(valueClass).toHaveClass("text-sm");
+
     const tick = page.locator('[data-contract="scale-style"] [data-slot="db-scale-tick"]');
     await expect
       .poll(async () => tick.getAttribute("style"))
@@ -137,6 +142,9 @@ export const runParitySuite = ({
     const ignored = page.locator('[data-contract="ignored-children"]');
     await expect(ignored).not.toContainText("BAR-CHILD");
     await expect(ignored).not.toContainText("HOLD-CHILD");
+    const hold = ignored.locator('[data-slot="level-meter-hold"]');
+    await expect(hold).not.toHaveClass(/hold-x/);
+    await expect(hold.locator(".hold-x")).toHaveCount(1);
 
     const customMeter = page.locator('[data-contract="meter-overrides"] [data-slot="custom-meter"]');
     await expect(customMeter).toHaveAttribute("role", "progressbar");
