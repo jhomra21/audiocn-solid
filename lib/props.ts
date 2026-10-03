@@ -1,29 +1,29 @@
 /**
- * Returns a reactive view of `props` without the listed keys.
+ * Returns a reactive plain-object view of `props` without the listed keys.
  *
- * A proxy keeps Solid prop getters live instead of copying their current values.
- * This is intentionally renderer-agnostic so component source works in Solid 1
- * and Solid 2, whose public prop helper surfaces differ.
+ * Solid 2 marks its props objects with internal symbols. A Proxy forwards
+ * those symbols and lets DOM spread unwrap the original props, which leaks
+ * component-only fields as attributes. Copying only string keys as getters
+ * keeps values live without carrying framework internals across the boundary.
  */
 export const omitProps = <T extends object, K extends keyof T>(
   props: T,
   keys: readonly K[]
 ): Omit<T, K> => {
   const omitted = new Set<PropertyKey>(keys);
+  const rest = {} as Omit<T, K>;
 
-  return new Proxy({} as Omit<T, K>, {
-    get: (_, key) => (omitted.has(key) ? undefined : Reflect.get(props, key)),
-    has: (_, key) => !omitted.has(key) && Reflect.has(props, key),
-    ownKeys: () => Reflect.ownKeys(props).filter((key) => !omitted.has(key)),
-    getOwnPropertyDescriptor: (_, key) => {
-      if (omitted.has(key)) {
-        return undefined;
-      }
+  for (const key of Reflect.ownKeys(props)) {
+    if (typeof key === "symbol" || omitted.has(key)) {
+      continue;
+    }
 
-      const descriptor = Reflect.getOwnPropertyDescriptor(props, key);
-      return descriptor
-        ? { ...descriptor, configurable: true }
-        : { configurable: true, enumerable: true };
-    },
-  });
+    Object.defineProperty(rest, key, {
+      configurable: true,
+      enumerable: true,
+      get: () => Reflect.get(props, key),
+    });
+  }
+
+  return rest;
 };

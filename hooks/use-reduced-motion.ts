@@ -5,9 +5,12 @@ import { createCompatEffect } from "@/lib/solid-effect";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 
+const getSnapshot = () =>
+  typeof window !== "undefined" && Boolean(window.matchMedia?.(QUERY).matches);
+
 /** Reactive preference for reduced motion. */
 export const useReducedMotion = (): Accessor<boolean> => {
-  const [reducedMotion, setReducedMotion] = createSignal(false);
+  const [reducedMotion, setReducedMotion] = createSignal(getSnapshot());
 
   createCompatEffect(
     () =>

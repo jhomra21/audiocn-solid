@@ -10,11 +10,11 @@ type Solid2CreateEffect = <T>(
 const hasTwoPhaseEffects = "onSettled" in Solid;
 
 /**
- * Runs one reactive compute with an imperative apply phase.
+ * Runs a tracked compute phase followed by an untracked imperative apply phase.
  *
- * Solid 2 provides this contract directly. Solid 1 runs both phases inside
- * its single effect callback, so we register any returned cleanup on that
- * effect owner.
+ * Solid 2 provides this contract directly. Solid 1 needs `untrack` around the
+ * apply callback so reads performed by painters, DOM writers, and subscriptions
+ * do not become accidental effect dependencies.
  */
 export const createCompatEffect = <T>(
   compute: () => T,
@@ -26,7 +26,8 @@ export const createCompatEffect = <T>(
   }
 
   (Solid.createEffect as unknown as Solid1CreateEffect)(() => {
-    const cleanup = apply(compute());
+    const value = compute();
+    const cleanup = Solid.untrack(() => apply(value));
     if (cleanup) {
       Solid.onCleanup(cleanup);
     }
