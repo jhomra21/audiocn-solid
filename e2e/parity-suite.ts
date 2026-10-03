@@ -76,6 +76,15 @@ export const runParitySuite = ({
       page.locator("[source], [floordb], [mindb], [maxdb], [taper]")
     ).toHaveCount(0);
 
+    const variants = page.locator('[data-example="level-meter-variants"]');
+    const variantMeters = variants.locator('[data-slot="level-meter"]');
+    await expect(variantMeters).toHaveCount(3);
+    for (let index = 0; index < 3; index += 1) {
+      await expect(
+        variantMeters.nth(index).locator('[data-slot="level-meter-channel"]')
+      ).toHaveCount(2);
+    }
+
     const codeButton = demo.getByRole("button", { name: "Code" });
     await codeButton.click();
     await expect(demo.locator("code")).toContainText("LevelMeterDemo");
