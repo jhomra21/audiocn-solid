@@ -49,6 +49,7 @@ interface ButtonProps extends VariantProps<typeof buttonVariants> {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   onClick?: (event: MouseEvent) => void;
+  tabIndex?: number;
   [key: string]: unknown;
 }
 
@@ -58,6 +59,8 @@ const OWN_PROPS = [
   "children",
   "ref",
   "size",
+  "tabIndex",
+  "type",
   "variant",
 ] as const;
 
@@ -75,6 +78,8 @@ export const Button = (props: ButtonProps) => {
       )}
       data-slot="button"
       ref={(node) => setRefValue(props.ref, node)}
+      tabIndex={props.tabIndex ?? 0}
+      type={props.type ?? "button"}
       {...rest}
     >
       {props.children}
