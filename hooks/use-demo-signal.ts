@@ -341,7 +341,7 @@ export const createDemoSignal = (
 
 /** A synthetic signal for previews, prototypes and browser acceptance. */
 export const useDemoSignal = (options: DemoSignalOptions = {}): DemoSignal => {
-  const signal = createDemoSignal();
+  const signal = createDemoSignal(options);
 
   createCompatEffect(
     () => ({

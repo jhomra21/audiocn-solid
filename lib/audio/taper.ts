@@ -94,8 +94,10 @@ export const logTaper = (min: number, max: number): Taper => {
 
 export type TaperInput = "linear" | "audio" | "log" | Taper;
 
-const isTaper = (taper: TaperInput): taper is Taper =>
-  taper instanceof Object;
+type TaperName = Exclude<TaperInput, Taper>;
+
+const isTaperName = (taper: TaperInput): taper is TaperName =>
+  typeof taper === "string";
 
 /** Resolves a taper name or object for a range. */
 export const resolveTaper = (
@@ -103,7 +105,7 @@ export const resolveTaper = (
   min: number,
   max: number
 ): Taper => {
-  if (isTaper(taper)) {
+  if (!isTaperName(taper)) {
     return taper;
   }
 

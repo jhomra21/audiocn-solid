@@ -22,18 +22,18 @@ export type BallisticsPreset = keyof typeof BALLISTICS;
 
 export type BallisticsInput = BallisticsPreset | Partial<BallisticsOptions>;
 
-const isBallisticsOptions = (
+const isBallisticsPreset = (
   input: BallisticsInput
-): input is Partial<BallisticsOptions> => input instanceof Object;
+): input is BallisticsPreset => typeof input === "string";
 
 export const resolveBallistics = (
   input: BallisticsInput = "peak"
 ): BallisticsOptions => {
-  if (isBallisticsOptions(input)) {
-    return { ...BALLISTICS.peak, ...input };
+  if (isBallisticsPreset(input)) {
+    return BALLISTICS[input];
   }
 
-  return BALLISTICS[input];
+  return { ...BALLISTICS.peak, ...input };
 };
 
 export interface BallisticsState {

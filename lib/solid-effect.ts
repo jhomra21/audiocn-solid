@@ -2,52 +2,38 @@ import * as Solid from "solid-js";
 
 type Cleanup = void | (() => void);
 
+type EffectPayload<T> = () => T;
+
 const hasTwoPhaseEffects = "onSettled" in Solid;
-
-function invokeEffect(fn: () => void): void;
-function invokeEffect<T>(
-  compute: () => T,
-  apply: (value: T) => Cleanup
-): void;
-function invokeEffect<T>(
-  compute: () => T,
-  apply?: (value: T) => Cleanup
-): void {
-  if (apply) {
-    Function.prototype.call.call(Solid.createEffect, undefined, compute, apply);
-
-    return;
-  }
-
-  Function.prototype.call.call(Solid.createEffect, undefined, compute);
-}
 
 /**
  * Runs a tracked compute phase followed by an untracked imperative apply phase.
  *
- * Solid 2 provides this contract directly. Solid 1 needs `untrack` around the
- * apply callback so reads performed by painters, DOM writers, and subscriptions
- * do not become accidental effect dependencies.
+ * Both Solid versions accept this two-argument call. Solid 1 treats the second
+ * function as the initial previous value, while Solid 2 treats it as the apply
+ * phase. Solid 1 therefore applies inside the tracked callback after compute;
+ * Solid 2 applies through its native second phase.
  */
 export const createCompatEffect = <T>(
   compute: () => T,
   apply: (value: T) => Cleanup
 ): void => {
-  if (hasTwoPhaseEffects) {
-    invokeEffect(
-      compute,
-      (value) => Solid.untrack(() => apply(value))
-    );
-
-    return;
-  }
-
-  invokeEffect(() => {
+  const computePayload = (): EffectPayload<T> => {
     const value = compute();
-    const cleanup = Solid.untrack(() => apply(value));
 
-    if (cleanup) {
-      Solid.onCleanup(cleanup);
+    if (!hasTwoPhaseEffects) {
+      const cleanup = Solid.untrack(() => apply(value));
+
+      if (cleanup) {
+        Solid.onCleanup(cleanup);
+      }
     }
-  });
+
+    return () => value;
+  };
+
+  const applyPayload = (payload: EffectPayload<T>): Cleanup =>
+    Solid.untrack(() => apply(payload()));
+
+  Solid.createEffect(computePayload, applyPayload);
 };

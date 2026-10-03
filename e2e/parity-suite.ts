@@ -196,9 +196,12 @@ export const runParitySuite = ({
     ).toHaveText("1");
     await expect(preventedClip).toHaveAttribute("data-clipping", "");
 
-    await expect(
-      page.locator('[data-contract="custom-render"] [data-render-state="idle"]')
-    ).toHaveAttribute("data-slot", "clip-indicator");
+    const customRender = page.locator(
+      '[data-contract="custom-render"] [data-render-state="idle"]'
+    );
+    await expect(customRender).toHaveAttribute("data-slot", "clip-indicator");
+    await expect(customRender).toHaveAttribute("data-extra", "forwarded");
+    await expect(customRender).toHaveAttribute("title", "Custom clip");
 
     const readoutSwitch = page.locator('[data-contract="readout-switch"]');
     const liveReadout = readoutSwitch.locator('[data-slot="db-readout"]');

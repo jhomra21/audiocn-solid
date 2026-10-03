@@ -118,18 +118,20 @@ export const ContractApp = () => {
 
       <section data-contract="custom-render">
         <ClipIndicator
-          render={(renderProps, state) => (
-            <div
-              aria-label={renderProps["aria-label"]}
-              class={renderProps.class}
-              data-clipping={renderProps["data-clipping"]}
-              data-render-state={state.clipping ? "clip" : "idle"}
-              data-slot={renderProps["data-slot"]}
-              onClick={renderProps.onClick}
-            >
-              {renderProps.children}
-            </div>
-          )}
+          data-extra="forwarded"
+          title="Custom clip"
+          render={(renderProps, state) => {
+            const { children, ...buttonProps } = renderProps;
+
+            return (
+              <button
+                {...buttonProps}
+                data-render-state={state.clipping ? "clip" : "idle"}
+              >
+                {children}
+              </button>
+            );
+          }}
         />
       </section>
 

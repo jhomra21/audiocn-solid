@@ -2,6 +2,9 @@ export type StyleObject = Record<string, string | number | undefined>;
 
 export type StyleValue = string | StyleObject;
 
+const isStyleString = (style: StyleValue): style is string =>
+  typeof style === "string";
+
 /** Prepends component CSS variables while preserving user style precedence. */
 export const mergeStyleVars = (
   style: StyleValue | undefined,
@@ -11,7 +14,7 @@ export const mergeStyleVars = (
     return vars;
   }
 
-  if (style instanceof Object) {
+  if (!isStyleString(style)) {
     return { ...vars, ...style };
   }
 
