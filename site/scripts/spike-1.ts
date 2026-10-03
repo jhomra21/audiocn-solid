@@ -114,12 +114,23 @@ const assertHtml = async (
     throw new Error(`Prerendered ${route} is missing LevelMeter markup.`);
   }
 
+  const headStart = html.indexOf("<head");
+  const headEnd = html.indexOf("</head>");
+  const head =
+    headStart === -1 || headEnd === -1
+      ? "(missing head)"
+      : html.slice(headStart, headEnd + "</head>".length);
+
   if (!html.includes(`<title>${title}</title>`)) {
-    throw new Error(`Prerendered ${route} is missing its title.`);
+    throw new Error(
+      `Prerendered ${route} is missing its title. Head: ${head}`
+    );
   }
 
   if (!html.includes(description)) {
-    throw new Error(`Prerendered ${route} is missing its description.`);
+    throw new Error(
+      `Prerendered ${route} is missing its description. Head: ${head}`
+    );
   }
 
   return path.slice(siteRoot.length + 1);
