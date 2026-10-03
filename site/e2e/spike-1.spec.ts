@@ -26,9 +26,9 @@ const cases = [
   },
   {
     description:
-      "LevelMeter for Solid with live peak, RMS, hold, scale, and clip indication.",
+      "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
     path: "/docs/components/level-meter",
-    title: "LevelMeter for Solid - audiocn Solid",
+    title: "Level Meter for Solid - audiocn Solid",
   },
 ] as const;
 

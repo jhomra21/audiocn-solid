@@ -163,8 +163,8 @@ try {
     ),
     levelMeter: await assertHtml(
       "/docs/components/level-meter",
-      "LevelMeter for Solid - audiocn Solid",
-      "LevelMeter for Solid with live peak, RMS, hold, scale, and clip indication."
+      "Level Meter for Solid - audiocn Solid",
+      "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light."
     ),
   };
 
@@ -185,7 +185,7 @@ try {
 
   stage = "hydration";
 
-  run(stage, "bunx", ["playwright", "test"]);
+  run(stage, "bunx", ["playwright", "test", "e2e/spike-1.spec.ts"]);
 
   await writeResult({
     pass: true,

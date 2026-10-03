@@ -1,0 +1,65 @@
+---
+title: MDX Component Fixture
+description: Build-time fixture for the Solid 2 MDX docs pipeline.
+---
+
+# MDX Component Fixture
+
+## Contents
+
+## Callout
+
+<Callout title="Heads up">Callout content</Callout>
+
+## Steps
+
+<Steps>
+  <Step>First step</Step>
+  <Step>Second step</Step>
+</Steps>
+
+## Tabs
+
+<Tabs>
+  <Tab value="solid-1">Solid 1 content</Tab>
+  <Tab value="solid-2">Solid 2 content</Tab>
+</Tabs>
+
+## Preview
+
+<ComponentPreview name="level-meter-demo" />
+
+## Source
+
+<ComponentSource path="components/ui/level-meter.tsx" title="LevelMeter source" />
+
+## Install
+
+```npm
+npx shadcn@latest add @audiocn-solid/level-meter
+```
+
+## Props
+
+<PropsTable
+  rows={[
+    ["peakDb", "number", null, "Peak level."],
+  ]}
+/>
+
+## Types
+
+<TypeTable
+  type={{
+    MeterFrame: {
+      type: "{ channels: ChannelLevel[] }",
+      description: "One meter frame.",
+    },
+  }}
+/>
+
+## Shiki
+
+```tsx
+const meter = <LevelMeter peakDb={-12} />;
+```

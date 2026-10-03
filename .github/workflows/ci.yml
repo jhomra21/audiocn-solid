@@ -50,7 +50,7 @@ jobs:
             playwright-report
           if-no-files-found: ignore
 
-  site-spike-1:
+  site-spikes:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,12 +60,14 @@ jobs:
       - run: bun install
       - run: cd site && bunx playwright install --with-deps chromium
       - run: bun run site:spike:1
+      - run: cd site && bun run spike:2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: solid-2-site-spike-1
+          name: solid-2-site-spikes
           path: |
             site/artifacts/spike-1.json
+            site/artifacts/spike-2.json
             site/dist/client
             site/test-results
             site/playwright-report
