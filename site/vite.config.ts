@@ -13,7 +13,7 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkToc from "remark-toc";
 import { defineConfig } from "vite";
 
-import { remarkInstallCommand } from "./lib/docs/remark-install-command";
+import { remarkInstallCommand } from "./lib/docs/remark-install-command.ts";
 
 export default defineConfig({
   plugins: [
