@@ -1,5 +1,5 @@
 import { Errored, For } from "solid-js";
-import type { JSX } from "@solidjs/web";
+import type { ComponentProps, JSX } from "@solidjs/web";
 
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
 import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
@@ -12,6 +12,57 @@ import { LevelMeterValues } from "@/components/examples/level-meter-values";
 import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
 import levelMeterSource from "@/components/ui/level-meter.tsx?raw";
+
+
+export const MdxA = (props: ComponentProps<"a">) => <a {...props} />;
+
+export const MdxBlockquote = (props: ComponentProps<"blockquote">) => (
+  <blockquote {...props} />
+);
+
+export const MdxCode = (props: ComponentProps<"code">) => <code {...props} />;
+
+export const MdxEm = (props: ComponentProps<"em">) => <em {...props} />;
+
+export const MdxH1 = (props: ComponentProps<"h1">) => <h1 {...props} />;
+
+export const MdxH2 = (props: ComponentProps<"h2">) => <h2 {...props} />;
+
+export const MdxH3 = (props: ComponentProps<"h3">) => <h3 {...props} />;
+
+export const MdxH4 = (props: ComponentProps<"h4">) => <h4 {...props} />;
+
+export const MdxHr = (props: ComponentProps<"hr">) => <hr {...props} />;
+
+export const MdxImg = (props: ComponentProps<"img">) => <img {...props} />;
+
+export const MdxLi = (props: ComponentProps<"li">) => <li {...props} />;
+
+export const MdxOl = (props: ComponentProps<"ol">) => <ol {...props} />;
+
+export const MdxP = (props: ComponentProps<"p">) => <p {...props} />;
+
+export const MdxPre = (props: ComponentProps<"pre">) => <pre {...props} />;
+
+export const MdxSpan = (props: ComponentProps<"span">) => <span {...props} />;
+
+export const MdxStrong = (props: ComponentProps<"strong">) => (
+  <strong {...props} />
+);
+
+export const MdxTable = (props: ComponentProps<"table">) => <table {...props} />;
+
+export const MdxTbody = (props: ComponentProps<"tbody">) => <tbody {...props} />;
+
+export const MdxTd = (props: ComponentProps<"td">) => <td {...props} />;
+
+export const MdxTh = (props: ComponentProps<"th">) => <th {...props} />;
+
+export const MdxThead = (props: ComponentProps<"thead">) => <thead {...props} />;
+
+export const MdxTr = (props: ComponentProps<"tr">) => <tr {...props} />;
+
+export const MdxUl = (props: ComponentProps<"ul">) => <ul {...props} />;
 
 interface ChildrenProps {
   children?: JSX.Element;
