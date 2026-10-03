@@ -79,6 +79,12 @@ export const ContractApp = () => {
         <DbReadout data-slot="custom-readout" data-zone="mine" role="status" value={-6} />
       </section>
 
+      <section data-contract="value-class">
+        <LevelMeter peakDb={-20}>
+          <LevelMeterValue class="text-sm" />
+        </LevelMeter>
+      </section>
+
       <section data-contract="scale-style">
         <DbScale>
           <DbScaleTick style="color: red" value={-6} />
@@ -91,7 +97,7 @@ export const ContractApp = () => {
             <LevelMeterChannel>
               <LevelMeterTrack>
                 <LevelMeterBar>BAR-CHILD</LevelMeterBar>
-                <LevelMeterHold>HOLD-CHILD</LevelMeterHold>
+                <LevelMeterHold class="hold-x">HOLD-CHILD</LevelMeterHold>
               </LevelMeterTrack>
             </LevelMeterChannel>
           </LevelMeterChannels>
