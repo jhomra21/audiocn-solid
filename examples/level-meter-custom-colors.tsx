@@ -11,10 +11,10 @@ export const LevelMeterCustomColors = () => {
   const signal = useDemoSignal({ kind: "music", seed: 9 });
 
   return (
-    <div className="grid w-full max-w-md gap-5">
+    <div class="grid w-full max-w-md gap-5">
       <LevelMeter
         aria-label="Monochrome meter"
-        className="[--meter-clip:var(--foreground)] [--meter-ok:var(--muted-foreground)] [--meter-warn:var(--foreground)]"
+        class="[--meter-clip:var(--foreground)] [--meter-ok:var(--muted-foreground)] [--meter-warn:var(--foreground)]"
         size="lg"
         source={signal.meter}
         variant="segmented"
