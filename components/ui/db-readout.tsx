@@ -240,25 +240,6 @@ export const DbReadout = (props: DbReadoutProps) => {
     }
   );
 
-  createCompatEffect(
-    () => {
-      const db = initialDb();
-
-      // Track every formatting input in the compute phase so Solid 2 reruns
-      // the imperative write when declarative presentation props change.
-      renderDb(db);
-      zones();
-      floorDb();
-
-      return { source: props.source, db };
-    },
-    ({ source, db }) => {
-      if (!source) {
-        shown = null;
-        write(db);
-      }
-    }
-  );
 
   const style = createMemo<StyleValue>(() => {
     const width = `${widest()}ch`;
@@ -289,7 +270,7 @@ export const DbReadout = (props: DbReadoutProps) => {
     apply(props.ref);
   };
 
-  return (
+  const span = () => (
     <span
       class={cn(
         "inline-block min-w-(--db-readout-width) text-end font-mono tabular-nums",
@@ -305,5 +286,11 @@ export const DbReadout = (props: DbReadoutProps) => {
     >
       {renderDb(initialDb())}
     </span>
+  );
+
+  return (
+    <Show when={Boolean(props.source)} keyed fallback={span()}>
+      {span}
+    </Show>
   );
 };
