@@ -16,14 +16,30 @@ export interface ClipIndicatorActions {
   reset: () => void;
 }
 
+export interface ClipIndicatorState {
+  readonly clipping: boolean;
+  readonly slot: "clip-indicator";
+}
+
+export interface ClipIndicatorClickEvent extends MouseEvent {
+  preventBaseUIHandler: () => void;
+  readonly baseUIHandlerPrevented?: boolean;
+}
+
+type ClipIndicatorRender = (
+  props: Record<string, unknown>,
+  state: ClipIndicatorState
+) => any;
+
 interface ButtonProps {
   class?: string;
   className?: string;
   children?: any;
   ref?: RefTarget<HTMLButtonElement>;
-  onClick?: (event: MouseEvent) => void;
+  onClick?: (event: ClipIndicatorClickEvent) => void;
   type?: "button" | "submit" | "reset";
   "aria-label"?: string;
+  render?: ClipIndicatorRender;
   [key: string]: unknown;
 }
 
@@ -45,13 +61,13 @@ const OWN_PROPS = [
   "onClippingChange",
   "showCount",
   "actionsRef",
-  "class",
   "className",
   "children",
   "ref",
   "onClick",
   "type",
   "aria-label",
+  "render",
 ] as const;
 
 const loudestPeak = (frame: MeterFrame) => {
@@ -95,27 +111,31 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     }
   );
 
-  return (
-    <button
-      {...rest}
-      aria-label={
-        props["aria-label"] ??
-        (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator")
-      }
-      class={cn(
-        "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
-        props.class,
-        props.className
-      )}
-      data-clipping={clipping() ? "" : undefined}
-      data-slot="clip-indicator"
-      onClick={(event) => {
-        hold.reset();
-        props.onClick?.(event);
-      }}
-      ref={(node) => setRefValue(props.ref, node)}
-      type={props.type ?? "button"}
-    >
+  const onClick = (event: MouseEvent) => {
+    let prevented = false;
+    const baseEvent = event as ClipIndicatorClickEvent;
+
+    Object.defineProperties(baseEvent, {
+      baseUIHandlerPrevented: {
+        configurable: true,
+        get: () => prevented,
+      },
+      preventBaseUIHandler: {
+        configurable: true,
+        value: () => {
+          prevented = true;
+        },
+      },
+    });
+
+    props.onClick?.(baseEvent);
+    if (!prevented) {
+      hold.reset();
+    }
+  };
+
+  const content = () => (
+    <>
       {props.children ?? (
         <span
           class="bg-muted-foreground/30 group-data-clipping/clip-indicator:bg-meter-clip size-2 shrink-0 rounded-full transition-colors"
@@ -130,6 +150,46 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
       <span aria-live="polite" class="sr-only">
         {clipping() ? "Clipping" : ""}
       </span>
+    </>
+  );
+
+  const renderProps = () => ({
+    "aria-label":
+      props["aria-label"] ??
+      (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator"),
+    class: cn(
+      "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
+      props.className
+    ),
+    "data-clipping": clipping() ? "" : undefined,
+    "data-slot": "clip-indicator",
+    onClick,
+    type: props.type ?? "button",
+    ...rest,
+    children: content(),
+  });
+
+  const state: ClipIndicatorState = {
+    get clipping() {
+      return clipping();
+    },
+    slot: "clip-indicator",
+  };
+
+  if (props.render) {
+    return props.render(renderProps(), state);
+  }
+
+  const buttonProps = renderProps();
+  const children = buttonProps.children;
+  delete buttonProps.children;
+
+  return (
+    <button
+      {...buttonProps}
+      ref={(node) => setRefValue(props.ref, node)}
+    >
+      {children}
     </button>
   );
 };
