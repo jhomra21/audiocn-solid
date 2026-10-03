@@ -123,7 +123,7 @@ const assertHtml = async (
       ? "(missing head)"
       : html.slice(headStart, headEnd + "</head>".length);
 
-  if (!html.includes(`<title>${title}</title>`)) {
+  if (!head.includes("<title") || !head.includes(`>${title}</title>`)) {
     throw new Error(
       `Prerendered ${route} is missing its title. Head: ${head}`
     );
