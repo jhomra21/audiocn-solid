@@ -1,4 +1,5 @@
 import { For, createMemo } from "solid-js";
+import type { ComponentProps } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
@@ -7,6 +8,8 @@ import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
 import type { RefTarget } from "@/lib/ref";
 import { createCompatEffect } from "@/lib/solid-effect";
+import { mergeStyleVars } from "@/lib/style";
+import type { StyleValue } from "@/lib/style";
 import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
@@ -16,19 +19,17 @@ const DEFAULT_FLOOR_DB = -60;
 
 const WIDEST_MAGNITUDE_DB = 88.8;
 
-type StyleValue = string | Record<string, string | number | undefined>;
+type SpanElementProps = Omit<
+  ComponentProps<"span">,
+  "class" | "className" | "ref" | "style"
+>;
 
-interface SpanProps {
-  id?: string;
+type SpanProps = SpanElementProps & {
   class?: string;
   className?: string;
   style?: StyleValue;
-  title?: string;
-  role?: string;
-  tabIndex?: number;
   ref?: RefTarget<HTMLSpanElement>;
-  [key: string]: unknown;
-}
+};
 
 const OWN_PROPS = [
   "ref",
@@ -253,18 +254,11 @@ export const DbReadout = (props: DbReadoutProps) => {
   );
 
 
-  const style = createMemo<StyleValue>(() => {
-    const width = `${widest()}ch`;
-
-    if (typeof props.style === "string") {
-      return `--db-readout-width:${width};${props.style}`;
-    }
-
-    return {
-      "--db-readout-width": width,
-      ...(props.style ?? {}),
-    };
-  });
+  const style = createMemo<StyleValue>(() =>
+    mergeStyleVars(props.style, {
+      "--db-readout-width": `${widest()}ch`,
+    })
+  );
 
   const setRef = (node: HTMLSpanElement) => {
     element = node;

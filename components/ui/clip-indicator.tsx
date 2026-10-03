@@ -1,4 +1,5 @@
 import { createMemo, untrack } from "solid-js";
+import type { ComponentProps, JSX } from "solid-js";
 
 import { useClipHold } from "@/hooks/use-clip-hold";
 import { useFrameSource } from "@/hooks/use-frame-source";
@@ -26,24 +27,38 @@ export interface ClipIndicatorClickEvent extends MouseEvent {
   readonly baseUIHandlerPrevented?: boolean;
 }
 
-type ClipIndicatorRender = (
-  props: Record<string, unknown>,
-  state: ClipIndicatorState
-) => any;
+type ButtonElementProps = Omit<
+  ComponentProps<"button">,
+  "aria-label" | "children" | "class" | "className" | "onClick" | "ref" | "type"
+>;
 
-interface ButtonProps {
+export type ClipIndicatorRenderProps = ButtonElementProps & {
+  "aria-label": string;
+  class: string;
+  "data-clipping"?: string;
+  "data-slot": "clip-indicator";
+  children: JSX.Element;
+  onClick: (event: MouseEvent) => void;
+  type: "button" | "submit" | "reset";
+};
+
+export type ClipIndicatorRender = (
+  props: ClipIndicatorRenderProps,
+  state: ClipIndicatorState
+) => JSX.Element;
+
+type ButtonProps = ButtonElementProps & {
   class?: string;
   className?: string;
-  children?: any;
+  children?: JSX.Element;
   ref?: RefTarget<HTMLButtonElement>;
   onClick?: (event: ClipIndicatorClickEvent) => void;
   type?: "button" | "submit" | "reset";
   "aria-label"?: string;
   render?: ClipIndicatorRender;
-  [key: string]: unknown;
-}
+};
 
-export interface ClipIndicatorProps extends ButtonProps {
+export type ClipIndicatorProps = ButtonProps & {
   clipping?: boolean;
   source?: FrameSource<MeterFrame> | null;
   thresholdDb?: number;
@@ -51,7 +66,7 @@ export interface ClipIndicatorProps extends ButtonProps {
   onClippingChange?: (clipping: boolean) => void;
   showCount?: boolean;
   actionsRef?: RefTarget<ClipIndicatorActions>;
-}
+};
 
 const OWN_PROPS = [
   "clipping",
@@ -161,7 +176,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     </>
   );
 
-  const renderProps: Record<string, unknown> = {
+  const renderProps: ClipIndicatorRenderProps = {
     get "aria-label"() {
       return (
         props["aria-label"] ??

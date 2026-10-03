@@ -1,3 +1,4 @@
+import type { ComponentProps } from "solid-js";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
@@ -42,17 +43,21 @@ export const buttonVariants = cva(
   }
 );
 
-interface ButtonProps extends VariantProps<typeof buttonVariants> {
-  class?: string;
-  className?: string;
-  children?: any;
-  ref?: RefTarget<HTMLButtonElement>;
-  type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-  onClick?: (event: MouseEvent) => void;
-  tabIndex?: number;
-  [key: string]: unknown;
-}
+type ButtonElementProps = Omit<
+  ComponentProps<"button">,
+  "children" | "class" | "className" | "onClick" | "ref" | "tabIndex" | "type"
+>;
+
+type ButtonProps = ButtonElementProps &
+  VariantProps<typeof buttonVariants> & {
+    class?: string;
+    className?: string;
+    children?: ComponentProps<"button">["children"];
+    ref?: RefTarget<HTMLButtonElement>;
+    type?: "button" | "submit" | "reset";
+    onClick?: (event: MouseEvent) => void;
+    tabIndex?: number;
+  };
 
 const OWN_PROPS = [
   "class",

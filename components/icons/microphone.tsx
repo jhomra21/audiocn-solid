@@ -1,9 +1,6 @@
-interface IconProps {
-  class?: string;
-  className?: string;
-  "data-icon"?: string;
-  [key: string]: unknown;
-}
+import type { ComponentProps } from "solid-js";
+
+type IconProps = ComponentProps<"svg">;
 
 const baseProps = {
   fill: "currentColor",

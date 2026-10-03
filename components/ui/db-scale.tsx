@@ -1,4 +1,5 @@
 import { For, createContext, createMemo, createSignal, useContext } from "solid-js";
+import type { ComponentProps } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import { DEFAULT_MAX_DB, DEFAULT_MIN_DB, formatDb } from "@/lib/audio/decibels";
@@ -7,6 +8,8 @@ import { setRefValue } from "@/lib/ref";
 import type { RefTarget } from "@/lib/ref";
 import { provideContext } from "@/lib/solid-context";
 import { createCompatEffect } from "@/lib/solid-effect";
+import { mergeStyleVars } from "@/lib/style";
+import type { StyleValue } from "@/lib/style";
 import { resolveTaper } from "@/lib/audio/taper";
 import type { TaperInput } from "@/lib/audio/taper";
 import type { Orientation, Taper } from "@/lib/audio/types";
@@ -123,14 +126,18 @@ const markClass = (horizontal: boolean, major: boolean) => {
   return major ? "h-px w-1.5" : "h-px w-1";
 };
 
-interface DivProps {
+type DivElementProps = Omit<
+  ComponentProps<"div">,
+  "children" | "class" | "className" | "ref" | "style"
+>;
+
+type DivProps = DivElementProps & {
   class?: string;
   className?: string;
-  children?: any;
-  style?: string | Record<string, string | number | undefined>;
+  children?: ComponentProps<"div">["children"];
+  style?: StyleValue;
   ref?: RefTarget<HTMLDivElement>;
-  [key: string]: unknown;
-}
+};
 
 export interface DbScaleTickProps extends DivProps {
   value: number;
@@ -156,18 +163,11 @@ export const DbScaleTick = (props: DbScaleTickProps) => {
   const major = () => props.major ?? true;
   const reversed = () => context.side() === "start";
 
-  const style = createMemo(() => {
-    const tickPosition = `--tick-position:${position() * 100}%;`;
-
-    if (typeof props.style === "string") {
-      return `${tickPosition}${props.style}`;
-    }
-
-    return {
+  const style = createMemo(() =>
+    mergeStyleVars(props.style, {
       "--tick-position": `${position() * 100}%`,
-      ...(props.style ?? {}),
-    };
-  });
+    })
+  );
 
   return (
     <div

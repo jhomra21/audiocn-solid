@@ -1,3 +1,4 @@
+import type { ComponentProps } from "solid-js";
 import {
   For,
   createContext,
@@ -48,9 +49,11 @@ import {
 } from "@/lib/audio/zones";
 import { omitProps } from "@/lib/props";
 import { setRefValue } from "@/lib/ref";
-import type { RefTarget } from "@/lib/ref";
+import type { MutableRef, RefTarget } from "@/lib/ref";
 import { provideContext } from "@/lib/solid-context";
 import { createCompatEffect } from "@/lib/solid-effect";
+import { mergeStyleVars } from "@/lib/style";
+import type { StyleValue } from "@/lib/style";
 import { cn } from "@/lib/utils";
 
 const ARIA_INTERVAL_MS = 250;
@@ -189,10 +192,6 @@ const parseLevels = (key: string): MeterFrame | null => {
     }),
   };
 };
-
-interface MutableRef<T> {
-  current: T;
-}
 
 interface ChannelState {
   element: HTMLElement;
@@ -424,14 +423,18 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
   };
 };
 
-interface DivProps {
+type DivElementProps = Omit<
+  ComponentProps<"div">,
+  "children" | "class" | "className" | "ref" | "style"
+>;
+
+type DivProps = DivElementProps & {
   class?: string;
   className?: string;
-  children?: any;
-  style?: string | Record<string, string | number | undefined>;
+  children?: ComponentProps<"div">["children"];
+  style?: StyleValue;
   ref?: RefTarget<HTMLDivElement>;
-  [key: string]: unknown;
-}
+};
 
 const DIV_OWN = ["class", "className", "children", "style", "ref"] as const;
 
@@ -754,17 +757,11 @@ const styleWithMeterVars = (
   style: DivProps["style"],
   fill: string,
   mask: string
-): DivProps["style"] => {
-  if (typeof style === "string") {
-    return `--meter-fill:${fill};--meter-mask:${mask};${style}`;
-  }
-
-  return {
+): StyleValue =>
+  mergeStyleVars(style, {
     "--meter-fill": fill,
     "--meter-mask": mask,
-    ...(style ?? {}),
-  };
-};
+  });
 
 export const LevelMeter = (props: LevelMeterProps) => {
   const config = useAudioConfig();

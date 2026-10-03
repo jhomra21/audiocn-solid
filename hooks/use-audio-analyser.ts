@@ -1,6 +1,6 @@
-import type { Accessor } from "solid-js";
-
 import { useAudioContext } from "@/hooks/use-audio-context";
+import { readMaybeAccessor } from "@/lib/accessor";
+import type { MaybeAccessor } from "@/lib/accessor";
 import { bandsFromSpectrum, logBandEdges } from "@/lib/audio/bands";
 import { dbToLevel, peakDb, rmsDb } from "@/lib/audio/decibels";
 import { subscribeFrame } from "@/lib/audio/frame-loop";
@@ -273,11 +273,6 @@ export const createAnalyserTap = (
  * Turns a `MediaStream`, media element or `AudioNode` into meter and visual
  * frame sources. The sources stay the same when the input changes.
  */
-type MaybeAccessor<T> = T | Accessor<T>;
-
-const read = <T>(value: MaybeAccessor<T>): T =>
-  typeof value === "function" ? (value as Accessor<T>)() : value;
-
 /**
  * Turns a MediaStream, media element or AudioNode into stable meter and visual
  * frame sources. Pass an accessor when the input can change.
@@ -302,7 +297,7 @@ export const useAudioAnalyser = (
       fftSize: options.fftSize,
       historyIntervalMs: options.historyIntervalMs,
       historySize: options.historySize,
-      input: read(input),
+      input: readMaybeAccessor(input),
       intervalMs: options.intervalMs,
       maxHz: options.maxHz,
       minHz: options.minHz,
@@ -351,7 +346,7 @@ export const useAudioAnalyser = (
   return {
     meter: relays.meter,
     get status() {
-      const current = read(input);
+      const current = readMaybeAccessor(input);
 
       if (current === null || (options.enabled ?? true) === false) {
         return "idle";

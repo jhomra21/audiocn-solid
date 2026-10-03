@@ -1,17 +1,12 @@
-import type { Accessor } from "solid-js";
-
 import type { FrameSource } from "@/lib/audio/types";
+import { readMaybeAccessor } from "@/lib/accessor";
+import type { MaybeAccessor } from "@/lib/accessor";
 import { createCompatEffect } from "@/lib/solid-effect";
 
 export interface UseFrameSourceOptions {
   /** Pause the subscription without unmounting. Default true. */
   enabled?: boolean;
 }
-
-type MaybeAccessor<T> = T | Accessor<T>;
-
-const read = <T>(value: MaybeAccessor<T>): T =>
-  typeof value === "function" ? (value as Accessor<T>)() : value;
 
 /**
  * Subscribes `onFrame` to a frame source and releases the subscription when
@@ -24,8 +19,8 @@ export const useFrameSource = <T>(
 ): void => {
   createCompatEffect(
     () => {
-      const current = read(source);
-      const { enabled = true } = read(options);
+      const current = readMaybeAccessor(source);
+      const { enabled = true } = readMaybeAccessor(options);
 
       return { current, enabled };
     },
