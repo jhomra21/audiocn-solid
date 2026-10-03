@@ -39,5 +39,9 @@
     "vite.config.ts",
     "playwright.config.ts",
     "test"
+  ],
+  "exclude": [
+    "app/solid2",
+    "lib/solid/compat/solid2"
   ]
 }
