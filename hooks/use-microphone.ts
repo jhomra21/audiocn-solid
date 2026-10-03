@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal, untrack } from "solid-js";
 
 import { createCompatEffect } from "@/lib/solid-effect";
 
@@ -126,7 +126,7 @@ export const useMicrophone = (
 
       void navigator.mediaDevices
         .getUserMedia({
-          audio: JSON.parse(current.key) as MediaTrackConstraints,
+          audio: untrack(constraints),
         })
         .then((stream) => {
           if (cancelled) {

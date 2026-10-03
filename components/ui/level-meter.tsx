@@ -21,7 +21,7 @@ import { useFrameSource } from "@/hooks/use-frame-source";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useVisibility } from "@/hooks/use-visibility";
 import { createBallistics, resolveBallistics } from "@/lib/audio/ballistics";
-import type { Ballistics, BallisticsInput } from "@/lib/audio/ballistics";
+import type { Ballistics } from "@/lib/audio/ballistics";
 import {
   DEFAULT_MAX_DB,
   DEFAULT_MIN_DB,
@@ -860,12 +860,10 @@ export const LevelMeter = (props: LevelMeterProps) => {
     wake();
   };
 
+  const resolvedBallistics = createMemo(() => resolveBallistics(ballistics()));
+
   const ballisticsKey = createMemo(() =>
-    JSON.stringify(
-      typeof ballistics() === "string"
-        ? ballistics()
-        : resolveBallistics(ballistics())
-    )
+    JSON.stringify(resolvedBallistics())
   );
 
   const scale = createMemo<MeterScale>(() => ({
@@ -882,9 +880,9 @@ export const LevelMeter = (props: LevelMeterProps) => {
       ballisticsKey: ballisticsKey(),
       reducedMotion: reducedMotion(),
     }),
-    ({ ballisticsKey: serializedBallistics, reducedMotion: reduce }) => {
+    ({ ballisticsKey: _ballisticsKey, reducedMotion: reduce }) => {
       const nextPainter = createMeterPainter({
-        ballistics: JSON.parse(serializedBallistics) as BallisticsInput,
+        ballistics: untrack(resolvedBallistics),
         channels: channelsRef,
         latest: latestRef,
         reducedMotion: reduce,
