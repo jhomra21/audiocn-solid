@@ -18,7 +18,7 @@ export const LevelMeterVertical = () => {
   const signal = useDemoSignal({ channels: 2, kind: "music", seed: 4 });
 
   return (
-    <LevelMeter aria-label="Program level" className="h-56" orientation="vertical" size="lg" source={signal.meter}>
+    <LevelMeter aria-label="Program level" class="h-56" orientation="vertical" size="lg" source={signal.meter}>
       <LevelMeterChannels>
         <For each={channels}>
           {(index) => (
