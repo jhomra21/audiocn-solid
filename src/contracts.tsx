@@ -27,7 +27,7 @@ const ReadoutSwitch = () => {
   return (
     <section data-contract="readout-switch">
       <DbReadout
-        holdMs={1000}
+        holdMs={Number.POSITIVE_INFINITY}
         intervalMs={25}
         source={mode() === "source" ? source : null}
         value={mode() === "value" ? -6 : undefined}
