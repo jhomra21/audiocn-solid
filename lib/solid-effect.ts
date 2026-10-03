@@ -21,7 +21,10 @@ export const createCompatEffect = <T>(
   apply: (value: T) => Cleanup
 ): void => {
   if (hasTwoPhaseEffects) {
-    (Solid.createEffect as unknown as Solid2CreateEffect)(compute, apply);
+    (Solid.createEffect as unknown as Solid2CreateEffect)(
+      compute,
+      (value) => Solid.untrack(() => apply(value))
+    );
     return;
   }
 
