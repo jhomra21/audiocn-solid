@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@source "../components";
+@source "../hooks";
+@source "../lib";
+@source "../src";
+@source "../solid2";
+
 :root {
   color-scheme: light dark;
   --background: oklch(0.985 0 0);
