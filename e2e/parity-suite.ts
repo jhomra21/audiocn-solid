@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -7,9 +8,9 @@ interface ParitySuiteOptions {
   artifactDir: string;
 }
 
-const captureConsoleFailures = (page: Parameters<typeof test>[0] extends never ? never : any) => {
+const captureConsoleFailures = (page: Page) => {
   const failures: string[] = [];
-  page.on("console", (message: any) => {
+  page.on("console", (message) => {
     if (message.type() === "warning" || message.type() === "error") {
       failures.push(`${message.type()}: ${message.text()}`);
     }
