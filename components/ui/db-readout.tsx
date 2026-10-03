@@ -4,6 +4,8 @@ import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
 import { omitProps } from "@/lib/props";
+import { setRefValue } from "@/lib/ref";
+import type { RefTarget } from "@/lib/ref";
 import { createCompatEffect } from "@/lib/solid-effect";
 import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
@@ -13,8 +15,6 @@ const DEFAULT_INTERVAL_MS = 250;
 const DEFAULT_FLOOR_DB = -60;
 
 const WIDEST_MAGNITUDE_DB = 88.8;
-
-type Ref<T> = T | ((element: T) => void) | Ref<T>[] | undefined;
 
 type StyleValue = string | Record<string, string | number | undefined>;
 
@@ -26,7 +26,7 @@ interface SpanProps {
   title?: string;
   role?: string;
   tabIndex?: number;
-  ref?: Ref<HTMLSpanElement>;
+  ref?: RefTarget<HTMLSpanElement>;
   [key: string]: unknown;
 }
 
@@ -268,18 +268,7 @@ export const DbReadout = (props: DbReadoutProps) => {
 
   const setRef = (node: HTMLSpanElement) => {
     element = node;
-
-    const apply = (ref: Ref<HTMLSpanElement>) => {
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (Array.isArray(ref)) {
-        for (const item of ref) {
-          apply(item);
-        }
-      }
-    };
-
-    apply(props.ref);
+    setRefValue(props.ref, node);
   };
 
   const span = () => (

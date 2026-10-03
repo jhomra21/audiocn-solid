@@ -44,18 +44,14 @@ const stopStream = (stream: MediaStream | null) => {
   }
 };
 
-const statusForError = (caught: unknown): MicrophoneStatus => {
-  if (!(caught instanceof DOMException)) {
-    return "error";
-  }
-
-  if (caught.name === "NotAllowedError" || caught.name === "SecurityError") {
+const statusForError = (error: DOMException): MicrophoneStatus => {
+  if (error.name === "NotAllowedError" || error.name === "SecurityError") {
     return "denied";
   }
 
   if (
-    caught.name === "NotFoundError" ||
-    caught.name === "OverconstrainedError"
+    error.name === "NotFoundError" ||
+    error.name === "OverconstrainedError"
   ) {
     return "unavailable";
   }
@@ -172,7 +168,8 @@ export const useMicrophone = (
             failure:
               caught instanceof Error ? caught : new Error(String(caught)),
             key: current.key,
-            status: statusForError(caught),
+            status:
+              caught instanceof DOMException ? statusForError(caught) : "error",
             stream: null,
           });
         });

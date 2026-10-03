@@ -1,3 +1,7 @@
+export interface MutableRef<T> {
+  current: T;
+}
+
 export type RefTarget<T> =
   | ((value: T | null) => void)
   | { current: T | null }
@@ -11,12 +15,6 @@ export const setRefValue = <T>(ref: RefTarget<T>, value: T | null): void => {
     return;
   }
 
-  if (typeof ref === "function") {
-    ref(value);
-
-    return;
-  }
-
   if (Array.isArray(ref)) {
     for (const item of ref) {
       setRefValue(item, value);
@@ -25,5 +23,11 @@ export const setRefValue = <T>(ref: RefTarget<T>, value: T | null): void => {
     return;
   }
 
-  ref.current = value;
+  if ("current" in ref) {
+    ref.current = value;
+
+    return;
+  }
+
+  ref(value);
 };

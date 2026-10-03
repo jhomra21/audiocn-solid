@@ -77,11 +77,16 @@ export const getMediaElementSource = (
   return node;
 };
 
+export interface InputNode {
+  node: AudioNode;
+  owned: boolean;
+}
+
 /** Turns any analyser input into an audio node, and says whether you own it. */
 export const createInputNode = (
   context: AudioContext,
   input: Exclude<AnalyserInput, null>
-): { node: AudioNode; owned: boolean } => {
+): InputNode => {
   if (input instanceof MediaStream) {
     return { node: context.createMediaStreamSource(input), owned: true };
   }

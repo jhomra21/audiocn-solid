@@ -13,12 +13,6 @@ let ticking = false;
 
 const hasListeners = () => listeners.update.size + listeners.paint.size > 0;
 
-const reportError = (error: unknown) => {
-  queueMicrotask(() => {
-    throw error;
-  });
-};
-
 const tick = (nowMs: number) => {
   handle = null;
   ticking = true;
@@ -28,7 +22,9 @@ const tick = (nowMs: number) => {
       try {
         listener(nowMs);
       } catch (error) {
-        reportError(error);
+        queueMicrotask(() => {
+          throw error;
+        });
       }
     }
   }
@@ -54,7 +50,7 @@ export const subscribeFrame = (
   if (
     handle === null &&
     !ticking &&
-    typeof requestAnimationFrame === "function"
+    "requestAnimationFrame" in globalThis
   ) {
     handle = requestAnimationFrame(tick);
   }

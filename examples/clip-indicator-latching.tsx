@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ClipIndicator } from "@/components/ui/clip-indicator";
 import type { ClipIndicatorActions } from "@/components/ui/clip-indicator";
+import type { MutableRef } from "@/lib/ref";
 
 export const ClipIndicatorLatching = () => {
-  const clip = { current: null as ClipIndicatorActions | null };
+  const clip: MutableRef<ClipIndicatorActions | null> = { current: null };
 
   return (
     <div class="flex items-center gap-4">

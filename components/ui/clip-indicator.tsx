@@ -119,6 +119,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
 
   const onClick = (event: MouseEvent) => {
     let prevented = false;
+    // SAFETY: both ClipIndicatorClickEvent additions are defined immediately below.
     const baseEvent = event as ClipIndicatorClickEvent;
 
     Object.defineProperties(baseEvent, {
@@ -207,7 +208,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
   if (customRender) {
     const rendered = createMemo(() => customRender(renderProps, state));
 
-    return rendered as unknown as any;
+    return <>{rendered()}</>;
   }
 
   return (

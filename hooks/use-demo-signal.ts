@@ -77,7 +77,7 @@ const speechAmplitude = (seed: number, seconds: number) => {
 
   const syllableRate = 5;
   const syllable = Math.floor(seconds * syllableRate);
-  const shape = Math.sin(Math.PI * fract(seconds * syllableRate)) ** 1.5;
+  const envelope = Math.sin(Math.PI * fract(seconds * syllableRate)) ** 1.5;
   const chance = hash(seed + 3, syllable);
   let syllableDb = -18 + 12 * hash(seed, syllable);
 
@@ -87,7 +87,7 @@ const speechAmplitude = (seed: number, seconds: number) => {
     syllableDb = -4;
   }
 
-  return room + dbToGain(syllableDb) * shape;
+  return room + dbToGain(syllableDb) * envelope;
 };
 
 const musicAmplitude = (seed: number, seconds: number) => {

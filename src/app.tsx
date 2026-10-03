@@ -18,11 +18,11 @@ import { LevelMeterValues } from "@/examples/level-meter-values";
 import { LevelMeterVariants } from "@/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/examples/level-meter-vertical";
 
-const sources = import.meta.glob("../examples/*.tsx", {
+const sources = import.meta.glob<string>("../examples/*.tsx", {
   eager: true,
   import: "default",
   query: "?raw",
-}) as Record<string, string>;
+});
 
 const codeFor = (name: string) =>
   sources[`../examples/${name}.tsx`] ?? `// ${name}.tsx`;
