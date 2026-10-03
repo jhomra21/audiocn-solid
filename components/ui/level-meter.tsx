@@ -392,7 +392,7 @@ interface DivProps {
   [key: string]: unknown;
 }
 
-const DIV_OWN = ["className", "children", "style", "ref"] as const;
+const DIV_OWN = ["class", "className", "children", "style", "ref"] as const;
 
 export const LevelMeterChannels = (props: DivProps) => {
   const context = useLevelMeter("LevelMeterChannels");
@@ -405,6 +405,7 @@ export const LevelMeterChannels = (props: DivProps) => {
         context.orientation() === "horizontal"
           ? "flex-col"
           : "h-full flex-row",
+        props.class,
         props.className
       )}
       data-orientation={context.orientation()}
@@ -453,6 +454,7 @@ export const LevelMeterChannel = (props: LevelMeterChannelProps) => {
       class={cn(
         "flex min-h-0 min-w-0 [--meter-hold:0] [--meter-level:0] [--meter-rms:0]",
         context.orientation() === "horizontal" ? "w-full" : "h-full",
+        props.class,
         props.className
       )}
       data-index={index()}
@@ -479,6 +481,7 @@ export const LevelMeterTrack = (props: DivProps) => {
         horizontal()
           ? "h-(--meter-thickness) w-full"
           : "h-full w-(--meter-thickness)",
+        props.class,
         props.className
       )}
       data-orientation={context.orientation()}
@@ -522,6 +525,7 @@ export const LevelMeterBar = (props: LevelMeterBarProps) => {
         horizontal()
           ? "translate-x-[calc((var(--meter-bar-level)_-_1)_*_100%)]"
           : "translate-y-[calc((1_-_var(--meter-bar-level))_*_100%)]",
+        props.class,
         props.className
       )}
       data-measure={measure()}
@@ -566,6 +570,7 @@ export const LevelMeterHold = (props: DivProps) => {
         class={cn(
           "bg-foreground/80 absolute",
           horizontal() ? "inset-y-0 right-0 w-0.5" : "inset-x-0 top-0 h-0.5",
+          props.class,
           props.className
         )}
       />
@@ -582,18 +587,21 @@ export interface LevelMeterScaleProps extends DbScaleProps {
 
 export const LevelMeterScale = (props: LevelMeterScaleProps) => {
   const context = useLevelMeter("LevelMeterScale");
+  const rest = omitProps(props, ["class", "className"] as const);
 
   return (
     <DbScale
-      className={cn(
+      class={cn(
         context.orientation() === "horizontal" &&
-          "absolute top-[calc(100%+var(--meter-gap))] left-0 h-(--meter-scale-size)"
+          "absolute top-[calc(100%+var(--meter-gap))] left-0 h-(--meter-scale-size)",
+        props.class,
+        props.className
       )}
       maxDb={context.maxDb()}
       minDb={context.minDb()}
       orientation={context.orientation()}
       taper={context.taper()}
-      {...props}
+      {...rest}
     />
   );
 };
@@ -605,6 +613,7 @@ export interface LevelMeterValueProps extends DbReadoutProps {
 
 export const LevelMeterValue = (props: LevelMeterValueProps) => {
   const context = useLevelMeter("LevelMeterValue");
+  const rest = omitProps(props, ["class", "className"] as const);
   const value = createMemo(() => {
     const declared = context.declared();
     return declared
@@ -618,11 +627,11 @@ export const LevelMeterValue = (props: LevelMeterValueProps) => {
 
   return (
     <DbReadout
-      className="text-muted-foreground text-xs"
+      class={props.class ?? props.className ?? "text-muted-foreground text-xs"}
       floorDb={context.minDb()}
       source={context.declared() ? null : context.frames}
       value={value()}
-      {...props}
+      {...rest}
     />
   );
 };
@@ -906,6 +915,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
       aria-valuenow={minDb()}
       class={cn(
         levelMeterVariants({ orientation: orientation(), size: size() }),
+        props.class,
         props.className
       )}
       data-dimmed={dimmed() ? "" : undefined}
