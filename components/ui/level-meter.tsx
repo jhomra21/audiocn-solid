@@ -564,10 +564,12 @@ export const LevelMeterHold = (props: DivProps) => {
   );
 };
 
-export type LevelMeterScaleProps = Omit<
-  DbScaleProps,
-  "minDb" | "maxDb" | "taper" | "orientation"
->;
+export interface LevelMeterScaleProps extends DbScaleProps {
+  minDb?: never;
+  maxDb?: never;
+  taper?: never;
+  orientation?: never;
+}
 
 export const LevelMeterScale = (props: LevelMeterScaleProps) => {
   const context = useLevelMeter("LevelMeterScale");
@@ -589,7 +591,10 @@ export const LevelMeterScale = (props: LevelMeterScaleProps) => {
   );
 };
 
-export type LevelMeterValueProps = Omit<DbReadoutProps, "source" | "value">;
+export interface LevelMeterValueProps extends DbReadoutProps {
+  source?: never;
+  value?: never;
+}
 
 export const LevelMeterValue = (props: LevelMeterValueProps) => {
   const context = useLevelMeter("LevelMeterValue");
@@ -615,7 +620,9 @@ export const LevelMeterValue = (props: LevelMeterValueProps) => {
   );
 };
 
-export type LevelMeterClipProps = Omit<ClipIndicatorProps, "source">;
+export interface LevelMeterClipProps extends ClipIndicatorProps {
+  source?: never;
+}
 
 export const LevelMeterClip = (props: LevelMeterClipProps) => {
   const context = useLevelMeter("LevelMeterClip");
