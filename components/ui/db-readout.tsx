@@ -29,7 +29,6 @@ interface SpanProps {
 
 const OWN_PROPS = [
   "ref",
-  "class",
   "className",
   "style",
   "value",
@@ -214,6 +213,10 @@ export const DbReadout = (props: DbReadoutProps) => {
       }
 
       shown = null;
+      peak = SILENCE_DB;
+      peakAt = 0;
+      fresh = false;
+      write(initialDb());
       const ticker = createTicker(() => {
         const changed = write(peak);
 
@@ -287,10 +290,8 @@ export const DbReadout = (props: DbReadoutProps) => {
 
   return (
     <span
-      {...rest}
       class={cn(
         "inline-block min-w-(--db-readout-width) text-end font-mono tabular-nums",
-        props.class,
         props.className
       )}
       data-silent={initialDb() <= floorDb() ? "" : undefined}
@@ -298,6 +299,7 @@ export const DbReadout = (props: DbReadoutProps) => {
       data-zone={zoneForDb(initialDb(), zones())}
       ref={setRef}
       style={style()}
+      {...rest}
     >
       {renderDb(initialDb())}
     </span>
