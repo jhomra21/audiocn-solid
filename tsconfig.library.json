@@ -5,5 +5,8 @@
     "hooks",
     "lib",
     "test"
+  ],
+  "exclude": [
+    "lib/solid/compat/solid2"
   ]
 }
