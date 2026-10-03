@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, untrack } from "solid-js";
 
 import { useClipHold } from "@/hooks/use-clip-hold";
 import { useFrameSource } from "@/hooks/use-frame-source";
@@ -129,7 +129,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
       },
     });
 
-    props.onClick?.(baseEvent);
+    untrack(() => props.onClick)?.(baseEvent);
     if (!prevented) {
       hold.reset();
     }
@@ -154,30 +154,40 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     </>
   );
 
-  const renderedContent = content();
-  const renderProps = {
+  const renderProps: Record<string, unknown> = {
     get "aria-label"() {
       return (
         props["aria-label"] ??
         (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator")
       );
     },
-    class: cn(
-      "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
-      props.class,
-      props.className
-    ),
+    get class() {
+      return cn(
+        "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
+        props.class,
+        props.className
+      );
+    },
     get "data-clipping"() {
       return clipping() ? "" : undefined;
     },
     "data-slot": "clip-indicator",
     get children() {
-      return renderedContent;
+      return content();
     },
     onClick,
-    type: props.type ?? "button",
-    ...rest,
+    get type() {
+      return props.type ?? "button";
+    },
   };
+
+  for (const key of Object.keys(rest)) {
+    Object.defineProperty(renderProps, key, {
+      configurable: true,
+      enumerable: true,
+      get: () => Reflect.get(rest, key),
+    });
+  }
 
   const state: ClipIndicatorState = {
     get clipping() {
@@ -186,22 +196,31 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     slot: "clip-indicator",
   };
 
-  if (props.render) {
-    return props.render(renderProps, state);
+  const customRender = untrack(() => props.render);
+  if (customRender) {
+    const rendered = createMemo(() => customRender(renderProps, state));
+    return rendered as unknown as any;
   }
 
   return (
     <button
-      aria-label={renderProps["aria-label"]}
-      class={renderProps.class}
-      data-clipping={renderProps["data-clipping"]}
+      aria-label={
+        props["aria-label"] ??
+        (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator")
+      }
+      class={cn(
+        "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
+        props.class,
+        props.className
+      )}
+      data-clipping={clipping() ? "" : undefined}
       data-slot="clip-indicator"
       onClick={onClick}
       ref={(node) => setRefValue(props.ref, node)}
       type={props.type ?? "button"}
       {...rest}
     >
-      {renderedContent}
+      {content()}
     </button>
   );
 };
