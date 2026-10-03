@@ -6,28 +6,23 @@ export type AriaAttributes = {
   [Key in `aria-${string}`]?: string | number | boolean | undefined;
 };
 
+export type AriaRole =
+  | "button"
+  | "meter"
+  | "none"
+  | "presentation"
+  | "progressbar"
+  | "status";
+
 export type GlobalDOMProps = DataAttributes &
   AriaAttributes & {
     id?: string;
-    role?: string;
+    role?: AriaRole;
     title?: string;
     hidden?: boolean;
     tabIndex?: number;
     dir?: "ltr" | "rtl" | "auto";
     lang?: string;
-    draggable?: boolean;
-    onBlur?: (event: FocusEvent) => void;
-    onClick?: (event: MouseEvent) => void;
-    onDoubleClick?: (event: MouseEvent) => void;
-    onFocus?: (event: FocusEvent) => void;
-    onKeyDown?: (event: KeyboardEvent) => void;
-    onKeyUp?: (event: KeyboardEvent) => void;
-    onMouseDown?: (event: MouseEvent) => void;
-    onMouseEnter?: (event: MouseEvent) => void;
-    onMouseLeave?: (event: MouseEvent) => void;
-    onMouseUp?: (event: MouseEvent) => void;
-    onPointerDown?: (event: PointerEvent) => void;
-    onPointerUp?: (event: PointerEvent) => void;
   };
 
 export type ButtonDOMProps = GlobalDOMProps & {
@@ -43,7 +38,7 @@ export type SvgDOMProps = DataAttributes &
     className?: string;
     fill?: string;
     height?: string | number;
-    role?: string;
+    role?: AriaRole;
     viewBox?: string;
     width?: string | number;
     xmlns?: string;

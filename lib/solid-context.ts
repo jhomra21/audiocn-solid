@@ -1,9 +1,11 @@
 import type { Context } from "solid-js";
 
-type Provider<T> = (props: {
+interface ProviderProps<T> {
   value: T;
   readonly children?: any;
-}) => any;
+}
+
+type Provider<T> = (props: ProviderProps<T>) => any;
 
 type CompatContext<T> = Context<T> | Provider<T>;
 
@@ -11,6 +13,10 @@ const hasProvider = <T>(
   context: CompatContext<T>
 ): context is Context<T> & { Provider: Provider<T> } =>
   "Provider" in context;
+
+const isProvider = <T>(
+  context: CompatContext<T>
+): context is Provider<T> => context instanceof Function;
 
 /**
  * Provides a context value across Solid 1 and Solid 2.
@@ -23,7 +29,7 @@ export const provideContext = <T>(
   value: T,
   children: () => any
 ) => {
-  const props = {
+  const props: ProviderProps<T> = {
     value,
     get children() {
       return children();
@@ -34,5 +40,9 @@ export const provideContext = <T>(
     return context.Provider(props);
   }
 
-  return context(props);
+  if (isProvider(context)) {
+    return context(props);
+  }
+
+  throw new Error("Unsupported Solid context shape.");
 };

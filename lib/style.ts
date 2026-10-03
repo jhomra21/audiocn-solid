@@ -15,10 +15,13 @@ export const mergeStyleVars = (
     return { ...vars, ...style };
   }
 
-  const prefix = Object.entries(vars)
-    .filter(([, value]) => value !== undefined)
-    .map(([property, value]) => `${property}:${String(value)};`)
-    .join("");
+  let prefix = "";
+
+  for (const [property, value] of Object.entries(vars)) {
+    if (value !== undefined) {
+      prefix += `${property}:${String(value)};`;
+    }
+  }
 
   return `${prefix}${style}`;
 };
