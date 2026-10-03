@@ -25,8 +25,14 @@ export const App = () => {
       const peakDb = -30 + Math.sin(elapsed * 2.2) * 18;
       source.emit({ channels: [{ peakDb, rmsDb: peakDb - 4 }] });
     }, 50);
+    const clipTimer = setTimeout(() => {
+      source.emit({ channels: [{ peakDb: 0, rmsDb: -4 }] });
+    }, 250);
 
-    onCleanup(() => clearInterval(timer));
+    onCleanup(() => {
+      clearInterval(timer);
+      clearTimeout(clipTimer);
+    });
   });
 
   return (
@@ -67,7 +73,7 @@ export const App = () => {
               </LevelMeterChannel>
             </LevelMeterChannels>
             <LevelMeterValue intervalMs={100} />
-            <LevelMeterClip showCount />
+            <LevelMeterClip aria-label="Meter clip status" showCount type="reset" />
             <LevelMeterScale labels={false} />
           </LevelMeter>
         </div>
