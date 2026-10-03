@@ -115,7 +115,9 @@ const assertHtml = async (
   }
 
   const headStart = html.indexOf("<head");
+
   const headEnd = html.indexOf("</head>");
+
   const head =
     headStart === -1 || headEnd === -1
       ? "(missing head)"
