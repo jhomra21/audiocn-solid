@@ -78,7 +78,7 @@ export const Button = (props: ButtonProps) => {
       )}
       data-slot="button"
       ref={(node) => setRefValue(props.ref, node)}
-      tabIndex={props.tabIndex ?? 0}
+      attr:tabindex={props.tabIndex ?? 0}
       type={props.type ?? "button"}
       {...rest}
     >
