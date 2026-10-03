@@ -1,4 +1,4 @@
-import { Show, createMemo } from "solid-js";
+import { createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
@@ -288,9 +288,5 @@ export const DbReadout = (props: DbReadoutProps) => {
     </span>
   );
 
-  return (
-    <Show when={props.source} keyed fallback={span()}>
-      {() => span()}
-    </Show>
-  );
+  return span();
 };
