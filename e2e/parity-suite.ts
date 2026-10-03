@@ -84,7 +84,7 @@ export const runParitySuite = ({
       "1"
     );
     await expect(clip).toHaveAttribute("data-clipping", "");
-    await latching.getByRole("button", { name: "Reset" }).click();
+    await latching.getByRole("button", { name: "Reset", exact: true }).click();
     await expect(clip.locator('[data-slot="clip-indicator-count"]')).toHaveText(
       "0"
     );
