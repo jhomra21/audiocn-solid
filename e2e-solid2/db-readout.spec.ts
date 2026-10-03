@@ -22,7 +22,13 @@ test("shared readout and level meter run under Solid 2", async ({ page }) => {
   await expect(meter.locator('[data-slot="level-meter-segments"]')).toHaveCount(1);
   await expect(meter.locator('[data-slot="level-meter-bar"]')).toHaveCount(2);
   await expect(meter.locator('[data-slot="db-scale"]')).toHaveCount(1);
-  await expect(meter.locator('[data-slot="clip-indicator"]')).toHaveCount(1);
+  const clip = meter.locator('[data-slot="clip-indicator"]');
+  await expect(clip).toHaveCount(1);
+  await expect(clip).toHaveAttribute("aria-label", "Meter clip status");
+  await expect(clip).toHaveAttribute("type", "reset");
+  await expect
+    .poll(async () => clip.locator('[data-slot="clip-indicator-count"]').textContent())
+    .toBe("1");
 
   const channel = meter.locator('[data-slot="level-meter-channel"]');
   await expect
