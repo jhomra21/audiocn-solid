@@ -3,7 +3,11 @@
     "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
@@ -13,13 +17,29 @@
     "jsx": "preserve",
     "jsxImportSource": "@solidjs/web",
     "strict": true,
-    "baseUrl": ".",
     "paths": {
-      "@compat/jsx-types": ["../lib/solid/compat/solid2/jsx-types.ts"],
-      "@/*": ["../*"]
+      "@compat/jsx-types": [
+        "../lib/solid/compat/solid2/jsx-types.ts"
+      ],
+      "@/*": [
+        "../*"
+      ]
     },
-    "types": ["vite/client", "filesystem-routing/types", "node"]
+    "types": [
+      "vite/client",
+      "filesystem-routing/types",
+      "node"
+    ]
   },
-  "include": ["src", "e2e", "scripts", "../components", "../hooks", "../lib"],
-  "exclude": ["../lib/solid/compat/solid1"]
+  "include": [
+    "src",
+    "e2e",
+    "scripts",
+    "../components",
+    "../hooks",
+    "../lib"
+  ],
+  "exclude": [
+    "../lib/solid/compat/solid1"
+  ]
 }
