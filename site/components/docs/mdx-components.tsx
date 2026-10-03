@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { Errored, For } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
@@ -97,7 +97,19 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
       data-docs-component="component-preview"
       data-example={props.name}
     >
-      <Example />
+      <Errored
+        fallback={(error) => {
+          const current = error();
+
+          return (
+            <div data-docs-ssr-error={props.name}>
+              {current instanceof Error ? current.message : String(current)}
+            </div>
+          );
+        }}
+      >
+        <Example />
+      </Errored>
     </section>
   );
 };
