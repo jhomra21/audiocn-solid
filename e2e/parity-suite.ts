@@ -87,6 +87,21 @@ export const runParitySuite = ({
       ).toHaveCount(2);
     }
 
+    await variants.scrollIntoViewIfNeeded();
+    const variantChannels = variants.locator('[data-slot="level-meter-channel"]');
+
+    await expect
+      .poll(async () =>
+        variantChannels.evaluateAll((nodes) =>
+          nodes.filter(
+            (node) =>
+              node instanceof HTMLElement &&
+              node.style.getPropertyValue("--meter-level") !== ""
+          ).length
+        )
+      )
+      .toBe(6);
+
     const codeButton = demo.getByRole("button", { name: "Code" });
     await codeButton.click();
     await expect(demo.locator("code")).toContainText("LevelMeterDemo");

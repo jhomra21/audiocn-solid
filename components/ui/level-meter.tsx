@@ -798,7 +798,10 @@ export const LevelMeter = (props: LevelMeterProps) => {
   const accept = (frame: MeterFrame) => {
     latestRef.current = frame;
     frames.emit(frame);
-    wake();
+
+    if (visibleRef.current) {
+      wake();
+    }
   };
 
   const acceptAndCount = (frame: MeterFrame) => {
