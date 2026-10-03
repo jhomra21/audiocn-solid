@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { For, createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
@@ -288,5 +288,5 @@ export const DbReadout = (props: DbReadoutProps) => {
     </span>
   );
 
-  return span();
+  return <For each={[Boolean(props.source)]}>{() => span()}</For>;
 };
