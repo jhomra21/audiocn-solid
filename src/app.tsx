@@ -1,6 +1,17 @@
 import { onCleanup, onMount } from "solid-js";
 
 import { DbReadout } from "@/components/ui/db-readout";
+import {
+  LevelMeter,
+  LevelMeterBar,
+  LevelMeterChannel,
+  LevelMeterChannels,
+  LevelMeterClip,
+  LevelMeterHold,
+  LevelMeterScale,
+  LevelMeterTrack,
+  LevelMeterValue,
+} from "@/components/ui/level-meter";
 import { createFrameEmitter } from "@/lib/audio/frame-source";
 import type { MeterFrame } from "@/lib/audio/types";
 
@@ -20,11 +31,11 @@ export const App = () => {
 
   return (
     <main class="mx-auto flex min-h-screen max-w-3xl items-center justify-center p-8">
-      <section class="grid w-full gap-6 rounded-2xl border bg-card p-8 text-card-foreground shadow-sm">
+      <section class="grid w-full gap-8 rounded-2xl border bg-card p-8 text-card-foreground shadow-sm">
         <header class="grid gap-1">
           <h1 class="text-xl font-semibold">audiocn Solid</h1>
           <p class="text-sm text-muted-foreground">
-            First source-backed Solid port: frame sources and dB readout.
+            Source-backed Solid ports running against one live meter source.
           </p>
         </header>
 
@@ -37,6 +48,28 @@ export const App = () => {
             <span class="text-sm text-muted-foreground">Live source</span>
             <DbReadout source={source} intervalMs={100} />
           </div>
+        </div>
+
+        <div class="grid gap-3">
+          <span class="text-sm text-muted-foreground">Level meter</span>
+          <LevelMeter
+            aria-label="Live level meter"
+            source={source}
+            variant="segmented"
+          >
+            <LevelMeterChannels>
+              <LevelMeterChannel>
+                <LevelMeterTrack>
+                  <LevelMeterBar measure="rms" />
+                  <LevelMeterBar />
+                  <LevelMeterHold />
+                </LevelMeterTrack>
+              </LevelMeterChannel>
+            </LevelMeterChannels>
+            <LevelMeterValue intervalMs={100} />
+            <LevelMeterClip showCount />
+            <LevelMeterScale labels={false} />
+          </LevelMeter>
         </div>
       </section>
     </main>

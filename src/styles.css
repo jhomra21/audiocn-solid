@@ -6,8 +6,17 @@
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
+  --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --border: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --meter-ok: oklch(0.696 0.17 162.48);
+  --meter-warn: oklch(0.795 0.184 86.047);
+  --meter-clip: var(--destructive);
+  --meter-ok-foreground: color-mix(in oklch, var(--meter-ok), black 40%);
+  --meter-warn-foreground: color-mix(in oklch, var(--meter-warn), black 40%);
+  --meter-clip-foreground: color-mix(in oklch, var(--meter-clip), black 40%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,8 +25,17 @@
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
     --card-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
     --border: oklch(1 0 0 / 10%);
+    --ring: oklch(0.556 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --meter-ok: oklch(0.765 0.177 163.223);
+    --meter-warn: oklch(0.852 0.199 91.936);
+    --meter-clip: var(--destructive);
+    --meter-ok-foreground: var(--meter-ok);
+    --meter-warn-foreground: var(--meter-warn);
+    --meter-clip-foreground: var(--meter-clip);
   }
 }
 
@@ -26,8 +44,16 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-meter-ok: var(--meter-ok);
+  --color-meter-warn: var(--meter-warn);
+  --color-meter-clip: var(--meter-clip);
+  --color-meter-ok-foreground: var(--meter-ok-foreground);
+  --color-meter-warn-foreground: var(--meter-warn-foreground);
+  --color-meter-clip-foreground: var(--meter-clip-foreground);
 }
 
 * {
