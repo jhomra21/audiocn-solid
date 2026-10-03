@@ -112,7 +112,7 @@ interface DivProps {
   class?: string;
   className?: string;
   children?: any;
-  style?: Record<string, string | number | undefined>;
+  style?: string | Record<string, string | number | undefined>;
   ref?: RefTarget<HTMLDivElement>;
   [key: string]: unknown;
 }
@@ -126,7 +126,6 @@ export interface DbScaleTickProps extends DivProps {
 const TICK_OWN_PROPS = [
   "value",
   "major",
-  "class",
   "className",
   "children",
   "style",
@@ -141,9 +140,21 @@ export const DbScaleTick = (props: DbScaleTickProps) => {
   const major = () => props.major ?? true;
   const reversed = () => context.side() === "start";
 
+  const style = createMemo(() => {
+    const tickPosition = `--tick-position:${position() * 100}%;`;
+
+    if (typeof props.style === "string") {
+      return `${tickPosition}${props.style}`;
+    }
+
+    return {
+      "--tick-position": `${position() * 100}%`,
+      ...(props.style ?? {}),
+    };
+  });
+
   return (
     <div
-      {...rest}
       class={cn(
         "absolute flex items-center gap-0.5",
         horizontal()
@@ -151,17 +162,14 @@ export const DbScaleTick = (props: DbScaleTickProps) => {
           : "bottom-(--tick-position) left-0 w-full flex-row",
         reversed() && (horizontal() ? "flex-col-reverse" : "flex-row-reverse"),
         alignClass(context.orientation(), position()),
-        props.class,
         props.className
       )}
       data-major={major() ? "" : undefined}
       data-slot="db-scale-tick"
       data-value={props.value}
       ref={(node) => setRefValue(props.ref, node)}
-      style={{
-        "--tick-position": `${position() * 100}%`,
-        ...(props.style ?? {}),
-      }}
+      style={style()}
+      {...rest}
     >
       <span
         class={cn("bg-border shrink-0", markClass(horizontal(), major()))}
@@ -202,7 +210,6 @@ const SCALE_OWN_PROPS = [
   "side",
   "labels",
   "format",
-  "class",
   "className",
   "children",
   "ref",
@@ -285,18 +292,17 @@ export const DbScale = (props: DbScaleProps) => {
 
   return provideContext(DbScaleContext, context, () => (
     <div
-      {...rest}
-        aria-hidden={"true"}
+      aria-hidden={"true"}
       class={cn(
         "text-muted-foreground relative shrink-0 text-[0.625rem] leading-none tabular-nums select-none",
         orientation() === "horizontal" ? "h-4 w-full" : "h-full w-7",
-        props.class,
         props.className
       )}
       data-orientation={orientation()}
       data-side={side()}
       data-slot="db-scale"
       ref={setScaleRef}
+      {...rest}
     >
       {props.children ?? (
         <For each={values()}>
