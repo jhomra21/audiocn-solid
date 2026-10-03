@@ -286,7 +286,7 @@ export const DbScale = (props: DbScaleProps) => {
   return provideContext(DbScaleContext, context, () => (
     <div
       {...rest}
-      aria-hidden
+        aria-hidden={"true"}
       class={cn(
         "text-muted-foreground relative shrink-0 text-[0.625rem] leading-none tabular-nums select-none",
         orientation() === "horizontal" ? "h-4 w-full" : "h-full w-7",
