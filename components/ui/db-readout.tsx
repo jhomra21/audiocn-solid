@@ -289,8 +289,8 @@ export const DbReadout = (props: DbReadoutProps) => {
   );
 
   return (
-    <Show when={Boolean(props.source)} keyed fallback={span()}>
-      {span}
+    <Show when={props.source} keyed fallback={span()}>
+      {() => span()}
     </Show>
   );
 };
