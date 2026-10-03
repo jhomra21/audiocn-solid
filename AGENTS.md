@@ -10,6 +10,12 @@ Prefer the most concise and elegant solutions that changes or adds as little cod
 Review your implementations before stopping. Check whether there is a better or simpler approach, whether any redundant code remains, whether duplicate logic was introduced, and whether any dead or unused code was left behind. If you find issues, fix them now; if not, briefly confirm the implementation is clean.
 ## Reference codebases
 
+### audiocn/ui (primary upstream)
+
+**Repository:** `audiocn/ui`
+
+Primary reference for public component behavior, API shape, visual parity, examples, and file placement. Keep corresponding ports in the same ownership areas where practical: `components/ui`, `components/examples`, `hooks`, and `lib/audio`. Diverge only where Solid lifecycle or cross-version compatibility requires it.
+
 Use these projects to understand patterns and tradeoffs, not as templates to copy.
 
 ### OpenCode v2
@@ -53,6 +59,25 @@ Reference for explicit command/result contracts, keyboard and interaction owners
 **Repository:** `jhomra21/daw-browser-convex`
 
 Reference for browser/runtime boundaries, worker architecture, performance-sensitive state, and editor-style interaction systems.
+
+## Repository ownership
+
+Keep the repository shallow and close to upstream audiocn.
+
+- `components/ui/`: public Solid components. Keep component-specific behavior here.
+- `components/examples/`: upstream-parity examples. Do not use examples as reusable library modules.
+- `components/docs/`: gallery/docs presentation helpers only.
+- `hooks/`: Solid lifecycle and Web Audio integrations that are reusable across components.
+- `lib/audio/`: framework-neutral audio primitives. It must not depend on Solid or app code.
+- `lib/solid/`: Solid-specific compatibility and DOM/reactivity helpers, including Solid 1/2 seams.
+- `app/`: development and acceptance harness only. Library code must not depend on it.
+- `e2e/`: browser acceptance shared by runtime configurations.
+- `test/`: non-browser tests and compile-time contracts. Prefer colocating future unit tests beside their source when that improves ownership, as upstream audiocn and DialKit do.
+- `tools/`: development tooling that is not part of the shipped library.
+
+Do not create a `packages/` monorepo merely for organization. OpenCode, Pi, Diffusion Studio, Solid Primitives, OpenTUI, and DAW Browser Convex use package boundaries for independently owned runtimes or distributable domains. Introduce one here only when this repository has the same need.
+
+Avoid barrel files. Import from the owning module directly.
 
 ## Engineering review skills
 

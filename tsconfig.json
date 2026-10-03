@@ -19,7 +19,7 @@
     "strict": true,
     "paths": {
       "@compat/jsx-types": [
-        "./compat/solid1/jsx-types.ts"
+        "./lib/solid/compat/solid1/jsx-types.ts"
       ],
       "@/*": [
         "./*"

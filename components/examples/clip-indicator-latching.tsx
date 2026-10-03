@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ClipIndicator } from "@/components/ui/clip-indicator";
 import type { ClipIndicatorActions } from "@/components/ui/clip-indicator";
-import type { MutableRef } from "@/lib/ref";
+import type { MutableRef } from "@/lib/solid/ref";
 
 export const ClipIndicatorLatching = () => {
   const clip: MutableRef<ClipIndicatorActions | null> = { current: null };
