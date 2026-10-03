@@ -62,6 +62,11 @@ export const runParitySuite = ({
     expect(
       await page.locator("body").evaluate((node) => getComputedStyle(node).fontFamily)
     ).toContain("DM Sans Variable");
+
+    const previewColor = await demo
+      .locator('[data-slot="component-preview"]')
+      .evaluate((node) => getComputedStyle(node).color);
+    expect(previewColor).toBe("oklab(0.142409 0.00251329 0.00369422 / 0.9)");
     expect(
       await demo
         .locator('[data-slot="db-readout"]')
@@ -79,7 +84,10 @@ export const runParitySuite = ({
 
     const latching = page.locator('[data-example="clip-indicator-latching"]');
     const clip = latching.locator('[data-slot="clip-indicator"]');
-    await latching.getByRole("button", { name: "Simulate a clip" }).click();
+    const simulate = latching.getByRole("button", { name: "Simulate a clip" });
+    await expect(simulate).toHaveAttribute("type", "button");
+    await expect(simulate).toHaveAttribute("tabindex", "0");
+    await simulate.click();
     await expect(clip.locator('[data-slot="clip-indicator-count"]')).toHaveText(
       "1"
     );
@@ -185,6 +193,14 @@ export const runParitySuite = ({
     await expect(
       page.locator("[source], [floordb], [mindb], [maxdb], [taper], [render]")
     ).toHaveCount(0);
+
+    const microphoneIcon = page
+      .locator('[data-example="level-meter-microphone"] svg')
+      .first();
+    await expect(microphoneIcon).toHaveAttribute(
+      "xmlns",
+      "http://www.w3.org/2000/svg"
+    );
     expect(failures).toEqual([]);
   });
 };
