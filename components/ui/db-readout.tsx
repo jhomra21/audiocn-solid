@@ -29,6 +29,7 @@ interface SpanProps {
 
 const OWN_PROPS = [
   "ref",
+  "class",
   "className",
   "style",
   "value",
@@ -292,6 +293,7 @@ export const DbReadout = (props: DbReadoutProps) => {
     <span
       class={cn(
         "inline-block min-w-(--db-readout-width) text-end font-mono tabular-nums",
+        props.class,
         props.className
       )}
       data-silent={initialDb() <= floorDb() ? "" : undefined}
