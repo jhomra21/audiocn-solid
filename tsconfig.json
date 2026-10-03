@@ -19,7 +19,7 @@
     "strict": true,
     "paths": {
       "@compat/jsx-types": [
-        "./compat/solid1/jsx-types.ts"
+        "./lib/solid/compat/solid1/jsx-types.ts"
       ],
       "@/*": [
         "./*"
@@ -34,10 +34,14 @@
     "components",
     "hooks",
     "lib",
-    "src",
+    "app",
     "e2e",
     "vite.config.ts",
     "playwright.config.ts",
-    "type-tests"
+    "test"
+  ],
+  "exclude": [
+    "app/solid2",
+    "lib/solid/compat/solid2"
   ]
 }

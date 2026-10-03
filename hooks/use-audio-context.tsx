@@ -1,7 +1,7 @@
 import { createContext, createSignal, useContext } from "solid-js";
 
-import { provideContext } from "@/lib/solid-context";
-import { createCompatEffect } from "@/lib/solid-effect";
+import { provideContext } from "@/lib/solid/context";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export type AudioContextStatus = AudioContextState | "unsupported";
 

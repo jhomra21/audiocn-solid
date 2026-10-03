@@ -1,6 +1,6 @@
 import { createMemo, createSignal, untrack } from "solid-js";
 
-import { createCompatEffect } from "@/lib/solid-effect";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export type MicrophoneStatus =
   | "idle"

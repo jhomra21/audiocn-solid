@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: fileURLToPath(new URL("./solid2", import.meta.url)),
+  root: fileURLToPath(new URL("./app/solid2", import.meta.url)),
   plugins: [solid(), tailwindcss()],
   resolve: {
     alias: {

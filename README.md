@@ -20,6 +20,25 @@ The current port includes:
 The same component source runs under Solid 1 and Solid 2. CI typechecks both
 versions and runs the same browser acceptance suite against both runtimes.
 
+## Repository layout
+
+The port mirrors upstream audiocn where that structure maps cleanly to Solid:
+
+- `components/ui/` — public component implementations;
+- `components/examples/` — upstream-parity examples used by the gallery;
+- `components/docs/` — docs-preview presentation only;
+- `hooks/` — Solid/Web Audio lifecycle integrations;
+- `lib/audio/` — framework-neutral audio math, timing, frame, and meter logic;
+- `lib/solid/` — Solid-specific prop, ref, lifecycle, and Solid 1/2 compatibility helpers;
+- `app/` — local preview and acceptance harness, not library code;
+- `e2e/` — shared browser acceptance for both Solid runtimes;
+- `test/` — non-browser contracts such as public type-surface checks;
+- `tools/` — repository tooling that is not shipped with the library.
+
+The repository stays a single package until a subsystem has an independent
+runtime or distribution boundary. This keeps the source close to audiocn
+without introducing monorepo structure before it is useful.
+
 ## Development
 
 Install and start the Solid 1 preview:
@@ -70,7 +89,7 @@ code stays framework-neutral. React lifecycle and state are translated at the
 framework boundary.
 
 Solid 1 and Solid 2 have different effect and context-provider contracts. The
-small helpers in `lib/solid-effect.ts` and `lib/solid-context.ts` contain
+small helpers in `lib/solid/effect.ts` and `lib/solid/context.ts` contain
 those differences so the component implementations stay shared.
 
 See `AGENTS.md` for the engineering rules and reference codebases.

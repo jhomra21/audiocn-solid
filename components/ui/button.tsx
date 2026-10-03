@@ -2,10 +2,10 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 import type { ButtonDOMProps } from "@compat/jsx-types";
-import { omitProps } from "@/lib/props";
-import { setRefValue } from "@/lib/ref";
-import { createCompatEffect } from "@/lib/solid-effect";
-import type { RefTarget } from "@/lib/ref";
+import { omitProps } from "@/lib/solid/props";
+import { setRefValue } from "@/lib/solid/ref";
+import { createCompatEffect } from "@/lib/solid/effect";
+import type { RefTarget } from "@/lib/solid/ref";
 import { cn } from "@/lib/utils";
 
 export const buttonVariants = cva(

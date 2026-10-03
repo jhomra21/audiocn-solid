@@ -2,7 +2,7 @@ import { clamp, dbToGain, dbToLevel, gainToDb } from "@/lib/audio/decibels";
 import { subscribeFrame } from "@/lib/audio/frame-loop";
 import { appendHistory } from "@/lib/audio/history";
 import type { FrameSource, MeterFrame, VisualFrame } from "@/lib/audio/types";
-import { createCompatEffect } from "@/lib/solid-effect";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export type DemoSignalKind = "speech" | "music" | "tone" | "noise" | "silence";
 

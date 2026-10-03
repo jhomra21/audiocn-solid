@@ -4,6 +4,9 @@
     "components",
     "hooks",
     "lib",
-    "type-tests"
+    "test"
+  ],
+  "exclude": [
+    "lib/solid/compat/solid2"
   ]
 }

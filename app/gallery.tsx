@@ -1,31 +1,31 @@
 import { For } from "solid-js";
 
 import { ComponentPreview } from "@/components/docs/component-preview";
-import { ClipIndicatorDemo } from "@/examples/clip-indicator-demo";
-import { ClipIndicatorLatching } from "@/examples/clip-indicator-latching";
-import { DbReadoutDemo } from "@/examples/db-readout-demo";
-import { DbReadoutZones } from "@/examples/db-readout-zones";
-import { DbScaleDemo } from "@/examples/db-scale-demo";
-import { DbScaleVertical } from "@/examples/db-scale-vertical";
-import { LevelMeterBallistics } from "@/examples/level-meter-ballistics";
-import { LevelMeterCssLevel } from "@/examples/level-meter-css-level";
-import { LevelMeterCustomColors } from "@/examples/level-meter-custom-colors";
-import { LevelMeterDemo } from "@/examples/level-meter-demo";
-import { LevelMeterDual } from "@/examples/level-meter-dual";
-import { LevelMeterMicrophone } from "@/examples/level-meter-microphone";
-import { LevelMeterSimple } from "@/examples/level-meter-simple";
-import { LevelMeterValues } from "@/examples/level-meter-values";
-import { LevelMeterVariants } from "@/examples/level-meter-variants";
-import { LevelMeterVertical } from "@/examples/level-meter-vertical";
+import { ClipIndicatorDemo } from "@/components/examples/clip-indicator-demo";
+import { ClipIndicatorLatching } from "@/components/examples/clip-indicator-latching";
+import { DbReadoutDemo } from "@/components/examples/db-readout-demo";
+import { DbReadoutZones } from "@/components/examples/db-readout-zones";
+import { DbScaleDemo } from "@/components/examples/db-scale-demo";
+import { DbScaleVertical } from "@/components/examples/db-scale-vertical";
+import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
+import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
+import { LevelMeterCustomColors } from "@/components/examples/level-meter-custom-colors";
+import { LevelMeterDemo } from "@/components/examples/level-meter-demo";
+import { LevelMeterDual } from "@/components/examples/level-meter-dual";
+import { LevelMeterMicrophone } from "@/components/examples/level-meter-microphone";
+import { LevelMeterSimple } from "@/components/examples/level-meter-simple";
+import { LevelMeterValues } from "@/components/examples/level-meter-values";
+import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
+import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
 
-const sources = import.meta.glob<string>("../examples/*.tsx", {
+const sources = import.meta.glob<string>("../components/examples/*.tsx", {
   eager: true,
   import: "default",
   query: "?raw",
 });
 
 const codeFor = (name: string) =>
-  sources[`../examples/${name}.tsx`] ?? `// ${name}.tsx`;
+  sources[`../components/examples/${name}.tsx`] ?? `// ${name}.tsx`;
 
 const groups = [
   {
