@@ -163,8 +163,10 @@ export const runParitySuite = ({
     await expect(liveReadout).toHaveText("−∞ dB");
     await readoutSwitch.getByRole("button", { name: "Emit" }).click();
     await expect(liveReadout).toHaveText("−12.0 dB");
+    const sourceNode = await liveReadout.elementHandle();
     await readoutSwitch.getByRole("button", { name: "Value" }).click();
     await expect(liveReadout).toHaveText("−6.0 dB");
+    expect(await sourceNode?.evaluate((node) => node.isConnected)).toBe(false);
     await readoutSwitch.getByRole("button", { name: "Source" }).click();
     await expect(liveReadout).toHaveText("−∞ dB");
 
