@@ -5,7 +5,7 @@ export const ClipIndicatorDemo = () => {
   const signal = useDemoSignal({ kind: "music", seed: 11 });
 
   return (
-    <div className="flex items-center gap-6">
+    <div class="flex items-center gap-6">
       <ClipIndicator source={signal.meter} />
       <ClipIndicator showCount source={signal.meter} />
       <ClipIndicator source={signal.meter}>Clip</ClipIndicator>
