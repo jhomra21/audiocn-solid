@@ -9,12 +9,14 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "check": "bun run typecheck && bun run build",
-    "test:e2e": "playwright test"
+    "test:e2e": "bun run test:e2e:solid1",
+    "test:e2e:solid1": "playwright test",
+    "test:e2e:solid2": "playwright test --config playwright.solid2.config.ts"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
-    "solid-js": "^1.9.15",
-    "class-variance-authority": "^0.7.1"
+    "solid-js": "^1.9.15"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
