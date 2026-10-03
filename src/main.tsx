@@ -9,4 +9,4 @@ if (!root) {
   throw new Error("Missing #root");
 }
 
-render(() => <App />, root);
+render(() => <App runtime="solid-1" />, root);
