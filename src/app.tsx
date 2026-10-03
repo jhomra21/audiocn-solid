@@ -1,83 +1,106 @@
-import { onCleanup, onMount } from "solid-js";
+import { For } from "solid-js";
 
-import { DbReadout } from "@/components/ui/db-readout";
-import {
-  LevelMeter,
-  LevelMeterBar,
-  LevelMeterChannel,
-  LevelMeterChannels,
-  LevelMeterClip,
-  LevelMeterHold,
-  LevelMeterScale,
-  LevelMeterTrack,
-  LevelMeterValue,
-} from "@/components/ui/level-meter";
-import { createFrameEmitter } from "@/lib/audio/frame-source";
-import type { MeterFrame } from "@/lib/audio/types";
+import { ComponentPreview } from "@/components/docs/component-preview";
+import { ClipIndicatorDemo } from "@/examples/clip-indicator-demo";
+import { ClipIndicatorLatching } from "@/examples/clip-indicator-latching";
+import { DbReadoutDemo } from "@/examples/db-readout-demo";
+import { DbReadoutZones } from "@/examples/db-readout-zones";
+import { DbScaleDemo } from "@/examples/db-scale-demo";
+import { DbScaleVertical } from "@/examples/db-scale-vertical";
+import { LevelMeterBallistics } from "@/examples/level-meter-ballistics";
+import { LevelMeterCssLevel } from "@/examples/level-meter-css-level";
+import { LevelMeterCustomColors } from "@/examples/level-meter-custom-colors";
+import { LevelMeterDemo } from "@/examples/level-meter-demo";
+import { LevelMeterDual } from "@/examples/level-meter-dual";
+import { LevelMeterMicrophone } from "@/examples/level-meter-microphone";
+import { LevelMeterSimple } from "@/examples/level-meter-simple";
+import { LevelMeterValues } from "@/examples/level-meter-values";
+import { LevelMeterVariants } from "@/examples/level-meter-variants";
+import { LevelMeterVertical } from "@/examples/level-meter-vertical";
 
-const source = createFrameEmitter<MeterFrame>();
+const sources = import.meta.glob("../examples/*.tsx", {
+  eager: true,
+  import: "default",
+  query: "?raw",
+}) as Record<string, string>;
 
-export const App = () => {
-  onMount(() => {
-    const startedAt = performance.now();
-    const timer = setInterval(() => {
-      const elapsed = (performance.now() - startedAt) / 1000;
-      const peakDb = -30 + Math.sin(elapsed * 2.2) * 18;
-      source.emit({ channels: [{ peakDb, rmsDb: peakDb - 4 }] });
-    }, 50);
-    const clipTimer = setTimeout(() => {
-      source.emit({ channels: [{ peakDb: 0, rmsDb: -4 }] });
-    }, 250);
+const codeFor = (name: string) =>
+  sources[`../examples/${name}.tsx`] ?? `// ${name}.tsx`;
 
-    onCleanup(() => {
-      clearInterval(timer);
-      clearTimeout(clipTimer);
-    });
-  });
+const groups = [
+  {
+    title: "LevelMeter",
+    examples: [
+      ["level-meter-demo", () => <LevelMeterDemo />],
+      ["level-meter-simple", () => <LevelMeterSimple />],
+      ["level-meter-values", () => <LevelMeterValues />],
+      ["level-meter-vertical", () => <LevelMeterVertical />],
+      ["level-meter-variants", () => <LevelMeterVariants />],
+      ["level-meter-dual", () => <LevelMeterDual />],
+      ["level-meter-ballistics", () => <LevelMeterBallistics />],
+      ["level-meter-custom-colors", () => <LevelMeterCustomColors />],
+      ["level-meter-css-level", () => <LevelMeterCssLevel />],
+      ["level-meter-microphone", () => <LevelMeterMicrophone />],
+    ] as const,
+  },
+  {
+    title: "DbReadout",
+    examples: [
+      ["db-readout-demo", () => <DbReadoutDemo />],
+      ["db-readout-zones", () => <DbReadoutZones />],
+    ] as const,
+  },
+  {
+    title: "DbScale",
+    examples: [
+      ["db-scale-demo", () => <DbScaleDemo />],
+      ["db-scale-vertical", () => <DbScaleVertical />],
+    ] as const,
+  },
+  {
+    title: "ClipIndicator",
+    examples: [
+      ["clip-indicator-demo", () => <ClipIndicatorDemo />],
+      ["clip-indicator-latching", () => <ClipIndicatorLatching />],
+    ] as const,
+  },
+];
 
-  return (
-    <main class="mx-auto flex min-h-screen max-w-3xl items-center justify-center p-8">
-      <section class="grid w-full gap-8 rounded-2xl border bg-card p-8 text-card-foreground shadow-sm">
-        <header class="grid gap-1">
-          <h1 class="text-xl font-semibold">audiocn Solid</h1>
-          <p class="text-sm text-muted-foreground">
-            Source-backed Solid ports running against one live meter source.
-          </p>
-        </header>
+export interface AppProps {
+  runtime?: "solid-1" | "solid-2";
+}
 
-        <div class="grid gap-4" data-testid="readouts">
-          <div class="flex items-center justify-between gap-6">
-            <span class="text-sm text-muted-foreground">Declarative</span>
-            <DbReadout value={-12.3} />
-          </div>
-          <div class="flex items-center justify-between gap-6">
-            <span class="text-sm text-muted-foreground">Live source</span>
-            <DbReadout source={source} intervalMs={100} />
-          </div>
-        </div>
+export const App = (props: AppProps) => (
+  <main
+    className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8"
+    data-runtime={props.runtime ?? "solid-1"}
+  >
+    <header className="mb-12 grid gap-2">
+      <h1 className="font-heading text-3xl font-semibold">audiocn Solid</h1>
+      <p className="text-muted-foreground max-w-2xl text-sm">
+        Solid ports rendered through the same examples used by the upstream
+        audiocn component docs.
+      </p>
+    </header>
 
-        <div class="grid gap-3">
-          <span class="text-sm text-muted-foreground">Level meter</span>
-          <LevelMeter
-            aria-label="Live level meter"
-            source={source}
-            variant="segmented"
-          >
-            <LevelMeterChannels>
-              <LevelMeterChannel>
-                <LevelMeterTrack>
-                  <LevelMeterBar measure="rms" />
-                  <LevelMeterBar />
-                  <LevelMeterHold />
-                </LevelMeterTrack>
-              </LevelMeterChannel>
-            </LevelMeterChannels>
-            <LevelMeterValue intervalMs={100} />
-            <LevelMeterClip aria-label="Meter clip status" showCount type="reset" />
-            <LevelMeterScale labels={false} />
-          </LevelMeter>
-        </div>
-      </section>
-    </main>
-  );
-};
+    <For each={groups}>
+      {(group) => (
+        <section className="mb-14" data-example-group={group.title}>
+          <h2 className="font-heading text-2xl font-semibold">{group.title}</h2>
+          <For each={group.examples}>
+            {([name, render]) => (
+              <article data-example={name}>
+                <h3 className="text-muted-foreground mt-6 font-mono text-xs">
+                  {name}
+                </h3>
+                <ComponentPreview code={codeFor(name)}>
+                  {render()}
+                </ComponentPreview>
+              </article>
+            )}
+          </For>
+        </section>
+      )}
+    </For>
+  </main>
+);
