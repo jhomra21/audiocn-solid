@@ -10,6 +10,7 @@ const baseProps = {
   height: "1em",
   viewBox: "0 0 256 256",
   width: "1em",
+  xmlns: "http://www.w3.org/2000/svg",
 };
 
 export const MicrophoneIcon = (props: IconProps) => (
