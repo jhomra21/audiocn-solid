@@ -2,15 +2,11 @@
  * Copies enumerable string props as live getters without carrying framework
  * symbols across a DOM boundary.
  */
-export const forwardProps = (
-  target: object,
-  source: object,
+export const forwardProps = <Target extends {}, Source extends {}>(
+  target: Target,
+  source: Source,
   omitted: ReadonlySet<PropertyKey> = new Set()
 ): void => {
-  // SAFETY: Object.keys only returns enumerable string keys, so this view
-  // cannot expose Solid's internal symbol markers.
-  const readable = source as Record<string, unknown>;
-
   for (const key of Object.keys(source)) {
     if (omitted.has(key)) {
       continue;
@@ -19,7 +15,10 @@ export const forwardProps = (
     Object.defineProperty(target, key, {
       configurable: true,
       enumerable: true,
-      get: () => readable[key],
+      get: () => {
+        // SAFETY: Object.keys only returns own string keys that exist on Source.
+        return source[key as keyof Source];
+      },
     });
   }
 };
@@ -32,11 +31,13 @@ export const forwardProps = (
  * component-only fields as attributes. Copying only string keys as getters
  * keeps values live without carrying framework internals across the boundary.
  */
-export const omitProps = <T extends object, K extends keyof T>(
+export const omitProps = <T extends {}, K extends keyof T>(
   props: T,
   keys: readonly K[]
 ): Omit<T, K> => {
   const omitted = new Set<PropertyKey>(keys);
+
+  // SAFETY: forwardProps writes only T keys not present in the omitted set.
   const rest = {} as Omit<T, K>;
 
   forwardProps(rest, props, omitted);
