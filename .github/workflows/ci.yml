@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - feat/**
+  pull_request:
+
+jobs:
+  solid-1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run lint
+      - run: bun run check
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solid-1-e2e
+          path: |
+            test-results/artifacts
+            playwright-report
+          if-no-files-found: ignore
+
+  solid-2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun add --no-save solid-js@next @solidjs/web@next @solidjs/vite-plugin@next
+      - run: bunx tsc -p tsconfig.solid2.json --noEmit
+      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright test --config playwright.solid2.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solid-2-e2e
+          path: |
+            test-results/solid2-artifacts
+            playwright-report
+          if-no-files-found: ignore
