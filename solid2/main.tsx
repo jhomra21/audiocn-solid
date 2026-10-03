@@ -72,7 +72,7 @@ const dispose = render(
               </LevelMeterChannel>
             </LevelMeterChannels>
             <LevelMeterValue intervalMs={100} />
-            <LevelMeterClip showCount />
+            <LevelMeterClip aria-label="Meter clip status" showCount type="reset" />
             <LevelMeterScale labels={false} />
           </LevelMeter>
         </div>
@@ -82,10 +82,15 @@ const dispose = render(
   root
 );
 
+const clipTimer = setTimeout(() => {
+  source.emit({ channels: [{ peakDb: 0, rmsDb: -4 }] });
+}, 250);
+
 window.addEventListener(
   "beforeunload",
   () => {
     clearInterval(timer);
+    clearTimeout(clipTimer);
     dispose();
   },
   { once: true }
