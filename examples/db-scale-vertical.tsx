@@ -1,7 +1,7 @@
 import { DbScale, DbScaleTick } from "@/components/ui/db-scale";
 
 export const DbScaleVertical = () => (
-  <div className="flex h-56 gap-10">
+  <div class="flex h-56 gap-10">
     <DbScale orientation="vertical" />
     <DbScale maxDb={12} minDb={-60} orientation="vertical" side="start">
       <DbScaleTick value={12} />
