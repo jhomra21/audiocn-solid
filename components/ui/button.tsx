@@ -53,6 +53,7 @@ interface ButtonProps extends VariantProps<typeof buttonVariants> {
 }
 
 const OWN_PROPS = [
+  "class",
   "className",
   "children",
   "ref",
@@ -67,7 +68,7 @@ export const Button = (props: ButtonProps) => {
     <button
       class={cn(
         buttonVariants({
-          className: props.className,
+          className: cn(props.class, props.className),
           size: props.size ?? "default",
           variant: props.variant ?? "default",
         })
