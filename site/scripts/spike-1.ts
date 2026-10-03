@@ -20,8 +20,14 @@ interface SpikeResult {
   error?: string;
 }
 
+interface SourceMapLike {
+  sources?: string[];
+}
+
 const siteRoot = resolve(import.meta.dirname, "..");
+
 const clientDir = join(siteRoot, "dist", "client");
+
 const artifactPath = join(siteRoot, "artifacts", "spike-1.json");
 
 const run = (stage: string, command: string, args: string[]) => {
@@ -32,7 +38,9 @@ const run = (stage: string, command: string, args: string[]) => {
   });
 
   if (result.status !== 0) {
-    throw new Error(`${stage} failed with exit code ${result.status ?? "unknown"}.`);
+    throw new Error(
+      `${stage} failed with exit code ${result.status ?? "unknown"}.`
+    );
   }
 };
 
@@ -58,6 +66,7 @@ const findRouteHtml = async (route: string): Promise<string> => {
     route === "/"
       ? "index.html"
       : `${route.replace(/^\//, "")}/index.html`;
+
   const files = await walk(clientDir);
   const match = files.find((file) => file.endsWith(suffix));
 
@@ -78,9 +87,7 @@ const packageRoots = async (packageName: string): Promise<string[]> => {
       continue;
     }
 
-    const sourceMap = JSON.parse(await readFile(file, "utf8")) as {
-      sources?: string[];
-    };
+    const sourceMap: SourceMapLike = JSON.parse(await readFile(file, "utf8"));
 
     for (const source of sourceMap.sources ?? []) {
       const absolute = resolve(dirname(file), source);
@@ -120,6 +127,7 @@ const assertHtml = async (
 
 const writeResult = async (result: SpikeResult) => {
   await mkdir(dirname(artifactPath), { recursive: true });
+
   await writeFile(artifactPath, `${JSON.stringify(result, null, 2)}\n`);
 };
 
@@ -129,9 +137,11 @@ try {
   run(stage, "bunx", ["tsc", "--noEmit"]);
 
   stage = "build";
+
   run(stage, "bunx", ["vite", "build"]);
 
   stage = "prerender";
+
   const html = {
     home: await assertHtml(
       "/",
@@ -146,6 +156,7 @@ try {
   };
 
   stage = "single-runtime";
+
   const runtimeRoots = {
     "@solidjs/web": await packageRoots("@solidjs/web"),
     "solid-js": await packageRoots("solid-js"),
@@ -160,6 +171,7 @@ try {
   }
 
   stage = "hydration";
+
   run(stage, "bunx", ["playwright", "test"]);
 
   await writeResult({
@@ -177,5 +189,6 @@ try {
     pass: false,
     stage,
   });
+
   throw error;
 }
