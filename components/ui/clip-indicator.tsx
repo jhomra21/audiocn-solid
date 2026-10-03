@@ -154,22 +154,30 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     </>
   );
 
-  const renderProps = () => ({
-    "aria-label":
-      props["aria-label"] ??
-      (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator"),
+  const renderedContent = content();
+  const renderProps = {
+    get "aria-label"() {
+      return (
+        props["aria-label"] ??
+        (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator")
+      );
+    },
     class: cn(
       "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
       props.class,
       props.className
     ),
-    "data-clipping": clipping() ? "" : undefined,
+    get "data-clipping"() {
+      return clipping() ? "" : undefined;
+    },
     "data-slot": "clip-indicator",
+    get children() {
+      return renderedContent;
+    },
     onClick,
     type: props.type ?? "button",
     ...rest,
-    children: content(),
-  });
+  };
 
   const state: ClipIndicatorState = {
     get clipping() {
@@ -179,19 +187,21 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
   };
 
   if (props.render) {
-    return props.render(renderProps(), state);
+    return props.render(renderProps, state);
   }
-
-  const buttonProps = renderProps();
-  const children = buttonProps.children;
-  delete buttonProps.children;
 
   return (
     <button
-      {...buttonProps}
+      aria-label={renderProps["aria-label"]}
+      class={renderProps.class}
+      data-clipping={renderProps["data-clipping"]}
+      data-slot="clip-indicator"
+      onClick={onClick}
       ref={(node) => setRefValue(props.ref, node)}
+      type={props.type ?? "button"}
+      {...rest}
     >
-      {children}
+      {renderedContent}
     </button>
   );
 };
