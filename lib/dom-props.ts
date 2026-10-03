@@ -29,7 +29,7 @@ export type ButtonDOMProps = GlobalDOMProps & {
   disabled?: boolean;
   form?: string;
   name?: string;
-  value?: string | number;
+  value?: string;
 };
 
 export type SvgDOMProps = DataAttributes &
