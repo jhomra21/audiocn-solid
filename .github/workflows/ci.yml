@@ -66,6 +66,7 @@ jobs:
           name: solid-2-site-spike-1
           path: |
             site/artifacts/spike-1.json
+            site/dist/client
             site/test-results
             site/playwright-report
           if-no-files-found: ignore
