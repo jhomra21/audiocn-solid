@@ -69,6 +69,7 @@ jobs:
             site/artifacts/spike-1.json
             site/artifacts/spike-2.json
             site/dist/client
+            site/dist/server
             site/test-results
             site/playwright-report
           if-no-files-found: ignore
