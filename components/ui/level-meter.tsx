@@ -423,14 +423,23 @@ export const LevelMeterChannel = (props: LevelMeterChannelProps) => {
   const rest = omitProps(props, CHANNEL_OWN);
   const index = () => props.index ?? 0;
 
+  let element: HTMLDivElement | null = null;
+
   const setRef = (node: HTMLDivElement) => {
+    element = node;
     context.registerChannel(index(), node);
     setRefValue(props.ref, node);
   };
 
   createCompatEffect(
     () => index(),
-    (currentIndex) => () => context.registerChannel(currentIndex, null)
+    (currentIndex) => {
+      if (element) {
+        context.registerChannel(currentIndex, element);
+      }
+
+      return () => context.registerChannel(currentIndex, null);
+    }
   );
 
   return (
