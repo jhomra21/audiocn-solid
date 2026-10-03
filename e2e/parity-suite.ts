@@ -109,6 +109,13 @@ export const runParitySuite = ({
     expect(tokenSnapshot.ocean).toBe("oklch(0.5 0.215 262.881)");
     expect(tokenSnapshot.dark).toBe("oklch(0.147 0.004 49.25)");
 
+    const microphoneIcon = page
+      .locator('[data-example="level-meter-microphone"] svg')
+      .first();
+    await expect(microphoneIcon).toHaveAttribute(
+      "xmlns",
+      "http://www.w3.org/2000/svg"
+    );
 
     expect(failures).toEqual([]);
 
@@ -194,13 +201,6 @@ export const runParitySuite = ({
       page.locator("[source], [floordb], [mindb], [maxdb], [taper], [render]")
     ).toHaveCount(0);
 
-    const microphoneIcon = page
-      .locator('[data-example="level-meter-microphone"] svg')
-      .first();
-    await expect(microphoneIcon).toHaveAttribute(
-      "xmlns",
-      "http://www.w3.org/2000/svg"
-    );
     expect(failures).toEqual([]);
   });
 };
