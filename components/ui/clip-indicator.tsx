@@ -22,6 +22,8 @@ interface ButtonProps {
   children?: any;
   ref?: RefTarget<HTMLButtonElement>;
   onClick?: (event: MouseEvent) => void;
+  type?: "button" | "submit" | "reset";
+  "aria-label"?: string;
   [key: string]: unknown;
 }
 
@@ -48,6 +50,8 @@ const OWN_PROPS = [
   "children",
   "ref",
   "onClick",
+  "type",
+  "aria-label",
 ] as const;
 
 const loudestPeak = (frame: MeterFrame) => {
@@ -95,7 +99,8 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     <button
       {...rest}
       aria-label={
-        clipping() ? "Clipping. Reset clip indicator" : "Clip indicator"
+        props["aria-label"] ??
+        (clipping() ? "Clipping. Reset clip indicator" : "Clip indicator")
       }
       class={cn(
         "group/clip-indicator text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 data-clipping:text-meter-clip-foreground relative inline-flex h-5 shrink-0 items-center justify-center gap-1 rounded-full px-1 text-xs font-medium transition-colors outline-none after:absolute after:-inset-1 focus-visible:ring-3 pointer-coarse:after:-inset-2.5",
@@ -109,7 +114,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
         props.onClick?.(event);
       }}
       ref={(node) => setRefValue(props.ref, node)}
-      type="button"
+      type={props.type ?? "button"}
     >
       {props.children ?? (
         <span
