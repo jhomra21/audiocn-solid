@@ -26,6 +26,7 @@ export const useFrameSource = <T>(
     () => {
       const current = read(source);
       const { enabled = true } = read(options);
+
       return { current, enabled };
     },
     ({ current, enabled }) => {

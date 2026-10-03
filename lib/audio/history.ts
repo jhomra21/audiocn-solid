@@ -8,6 +8,7 @@ export const appendHistory = (
 ): void => {
   const interval = Number.isFinite(intervalMs) ? Math.max(0, intervalMs) : 0;
   const elapsed = nowMs - (frame.historyUpdatedAt ?? 0);
+
   if (elapsed < interval || frame.history.length === 0) {
     return;
   }
@@ -15,6 +16,7 @@ export const appendHistory = (
   frame.historyIntervalMs = interval;
   frame.historyUpdatedAt = nowMs;
   const size = frame.history.length;
+
   if (frame.historyLength < size) {
     frame.history[(frame.historyStart + frame.historyLength) % size] = level;
     frame.historyLength += 1;

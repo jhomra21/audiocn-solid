@@ -13,8 +13,11 @@ import type { Orientation, Taper } from "@/lib/audio/types";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_TICKS = [12, 6, 0, -6, -12, -18, -24, -36, -48, -60, -72, -90];
+
 const EDGE = 0.02;
+
 const LABEL_GAP = 3;
+
 const MAJOR_STEP = 12;
 
 export const thinDbScaleLabels = (scale: HTMLElement) => {
@@ -25,6 +28,7 @@ export const thinDbScaleLabels = (scale: HTMLElement) => {
     "[data-slot=db-scale-tick]"
   )) {
     const label = tick.querySelector<HTMLElement>("[data-slot=db-scale-label]");
+
     if (label) {
       delete label.dataset.hidden;
       entries.push({ label, rank: 3, value: Number(tick.dataset.value) });
@@ -48,17 +52,22 @@ export const thinDbScaleLabels = (scale: HTMLElement) => {
   entries.sort((a, b) => a.rank - b.rank || b.value - a.value);
 
   const kept: [number, number][] = [];
+
   for (const { label } of entries) {
     const rect = label.getBoundingClientRect();
+
     if (rect.width === 0 && rect.height === 0) {
       continue;
     }
+
     const start = horizontal ? rect.left : rect.top;
     const end = horizontal ? rect.right : rect.bottom;
+
     const collides = kept.some(
       ([keptStart, keptEnd]) =>
         start < keptEnd + LABEL_GAP && end > keptStart - LABEL_GAP
     );
+
     if (collides) {
       label.dataset.hidden = "";
     } else {
@@ -82,9 +91,11 @@ const DbScaleContext = createContext<DbScaleContextValue | null>(null);
 
 const useDbScale = () => {
   const context = useContext(DbScaleContext);
+
   if (!context) {
     throw new Error("DbScaleTick must be used inside DbScale.");
   }
+
   return context;
 };
 
@@ -93,11 +104,14 @@ const alignClass = (orientation: Orientation, position: number) => {
     if (position < EDGE) {
       return "translate-y-0";
     }
+
     return position > 1 - EDGE ? "translate-y-full" : "translate-y-1/2";
   }
+
   if (position < EDGE) {
     return "translate-x-0";
   }
+
   return position > 1 - EDGE ? "-translate-x-full" : "-translate-x-1/2";
 };
 
@@ -105,6 +119,7 @@ const markClass = (horizontal: boolean, major: boolean) => {
   if (horizontal) {
     return major ? "h-1.5 w-px" : "h-1 w-px";
   }
+
   return major ? "h-px w-1.5" : "h-px w-1";
 };
 
@@ -223,19 +238,24 @@ export const DbScale = (props: DbScaleProps) => {
   const rest = omitProps(props, SCALE_OWN_PROPS);
   const minDb = () => props.minDb ?? config.minDb ?? DEFAULT_MIN_DB;
   const maxDb = () => props.maxDb ?? config.maxDb ?? DEFAULT_MAX_DB;
+
   const orientation = () =>
     props.orientation ?? config.orientation ?? "horizontal";
+
   const side = () => props.side ?? "end";
   const labels = () => props.labels ?? true;
   const format = () => props.format ?? defaultFormat;
+
   const taper = createMemo(() =>
     resolveTaper(props.taper ?? "linear", minDb(), maxDb())
   );
+
   const values = createMemo(
     () =>
       props.ticks ??
       DEFAULT_TICKS.filter((tick) => tick >= minDb() && tick <= maxDb())
   );
+
   const [scale, setScale] = createSignal<HTMLDivElement | null>(null);
 
   const context: DbScaleContextValue = {
@@ -259,12 +279,14 @@ export const DbScale = (props: DbScaleProps) => {
 
       const resize =
         typeof ResizeObserver === "undefined" ? null : new ResizeObserver(thin);
+
       resize?.observe(element);
 
       const ticksChanged =
         typeof MutationObserver === "undefined"
           ? null
           : new MutationObserver(thin);
+
       ticksChanged?.observe(element, {
         attributeFilter: ["style"],
         characterData: true,

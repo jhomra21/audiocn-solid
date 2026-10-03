@@ -31,6 +31,7 @@ export interface AudioConfigProviderProps {
  */
 export const AudioConfigProvider = (props: AudioConfigProviderProps) => {
   const parent = useContext(AudioConfigContext);
+
   const merged: AudioConfig = {
     get ballistics() {
       return props.value.ballistics ?? parent.ballistics;

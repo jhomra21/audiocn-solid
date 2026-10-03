@@ -28,6 +28,7 @@ export const resolveBallistics = (
   if (typeof input === "string") {
     return BALLISTICS[input];
   }
+
   return { ...BALLISTICS.peak, ...input };
 };
 
@@ -47,6 +48,7 @@ const smoothingFactor = (elapsedMs: number, timeConstantMs: number): number => {
   if (timeConstantMs <= 0) {
     return 1;
   }
+
   return 1 - Math.exp(-elapsedMs / timeConstantMs);
 };
 
@@ -75,8 +77,10 @@ export const createBallistics = (input?: BallisticsInput): Ballistics => {
       amplitude = target;
     } else {
       const elapsedMs = Math.max(0, nowMs - lastMs);
+
       const timeConstant =
         target > amplitude ? options.attackMs : options.releaseMs;
+
       amplitude +=
         (target - amplitude) * smoothingFactor(elapsedMs, timeConstant);
     }
@@ -94,6 +98,7 @@ export const createBallistics = (input?: BallisticsInput): Ballistics => {
     }
 
     lastMs = nowMs;
+
     return { db: gainToDb(amplitude), holdDb: gainToDb(holdAmplitude) };
   };
 

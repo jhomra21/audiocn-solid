@@ -9,10 +9,13 @@ import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_INTERVAL_MS = 250;
+
 const DEFAULT_FLOOR_DB = -60;
+
 const WIDEST_MAGNITUDE_DB = 88.8;
 
 type Ref<T> = T | ((element: T) => void) | Ref<T>[] | undefined;
+
 type StyleValue = string | Record<string, string | number | undefined>;
 
 interface SpanProps {
@@ -102,9 +105,11 @@ export const readChannel = (
 ) => {
   const read = (index: number) => {
     const level = frame.channels[index];
+
     if (!level) {
       return SILENCE_DB;
     }
+
     return measure === "rms" ? (level.rmsDb ?? level.peakDb) : level.peakDb;
   };
 
@@ -113,9 +118,11 @@ export const readChannel = (
   }
 
   let loudest = SILENCE_DB;
+
   for (let index = 0; index < frame.channels.length; index += 1) {
     loudest = Math.max(loudest, read(index));
   }
+
   return loudest;
 };
 
@@ -151,6 +158,7 @@ export const DbReadout = (props: DbReadoutProps) => {
   const widest = createMemo(() => {
     const floor = floorDb();
     const precision = decimals();
+
     const justAboveFloor = Number.isFinite(floor)
       ? floor + 10 ** -precision
       : -WIDEST_MAGNITUDE_DB;
@@ -175,11 +183,13 @@ export const DbReadout = (props: DbReadoutProps) => {
 
     if (changed) {
       shown = text;
+
       if (element.firstChild) {
         element.firstChild.nodeValue = text;
       } else {
         element.textContent = text;
       }
+
       element.dataset.zone = zoneForDb(db, zones());
       element.toggleAttribute("data-silent", db <= floorDb());
     }
@@ -218,6 +228,7 @@ export const DbReadout = (props: DbReadoutProps) => {
       peakAt = 0;
       fresh = false;
       write(initialDb());
+
       const ticker = createTicker(() => {
         const changed = write(peak);
 
@@ -227,6 +238,7 @@ export const DbReadout = (props: DbReadoutProps) => {
 
         const hadFreshFrame = fresh;
         fresh = false;
+
         return changed || hadFreshFrame;
       }, cadence);
 

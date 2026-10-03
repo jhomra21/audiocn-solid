@@ -30,6 +30,7 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
     if (clippingCurrent === next) {
       return;
     }
+
     clippingCurrent = next;
     setClipping(next);
     untrack(() => options.onClippingChange)?.(next);
@@ -45,6 +46,7 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
   const scheduleRelease = () => {
     clearTimer();
     const holdMs = untrack(() => options.holdMs) ?? CLIP_HOLD_MS;
+
     if (Number.isFinite(holdMs)) {
       timer = setTimeout(() => {
         timer = null;
@@ -56,15 +58,18 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
   const report = (db: number) => {
     const isAbove =
       db >= (untrack(() => options.thresholdDb) ?? CLIP_THRESHOLD_DB);
+
     const wasAbove = above;
     above = isAbove;
 
     if (!isAbove) {
       return;
     }
+
     if (!wasAbove) {
       setCount((previous) => previous + 1);
     }
+
     update(true);
     scheduleRelease();
   };
@@ -82,6 +87,7 @@ export const useClipHold = (options: UseClipHoldOptions = {}): ClipHold => {
       if (clippingCurrent && timer === null) {
         scheduleRelease();
       }
+
       return clearTimer;
     }
   );

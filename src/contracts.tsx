@@ -122,6 +122,7 @@ export const ContractApp = () => {
             const children = renderProps.children;
             const forwarded = { ...renderProps };
             delete forwarded.children;
+
             return (
               <div
                 {...(forwarded as any)}

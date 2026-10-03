@@ -1,7 +1,9 @@
 import * as Solid from "solid-js";
 
 type Cleanup = void | (() => void);
+
 type Solid1CreateEffect = (fn: () => void) => void;
+
 type Solid2CreateEffect = <T>(
   compute: () => T,
   apply: (value: T) => Cleanup
@@ -25,12 +27,14 @@ export const createCompatEffect = <T>(
       compute,
       (value) => Solid.untrack(() => apply(value))
     );
+
     return;
   }
 
   (Solid.createEffect as unknown as Solid1CreateEffect)(() => {
     const value = compute();
     const cleanup = Solid.untrack(() => apply(value));
+
     if (cleanup) {
       Solid.onCleanup(cleanup);
     }

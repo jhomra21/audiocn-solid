@@ -18,6 +18,7 @@ const captureConsoleFailures = (page: Page) => {
   page.on("pageerror", (error: Error) => {
     failures.push(`pageerror: ${error.message}`);
   });
+
   return failures;
 };
 
@@ -79,6 +80,7 @@ export const runParitySuite = ({
     const variants = page.locator('[data-example="level-meter-variants"]');
     const variantMeters = variants.locator('[data-slot="level-meter"]');
     await expect(variantMeters).toHaveCount(3);
+
     for (let index = 0; index < 3; index += 1) {
       await expect(
         variantMeters.nth(index).locator('[data-slot="level-meter-channel"]')
@@ -113,14 +115,17 @@ export const runParitySuite = ({
       const dark = getComputedStyle(root).getPropertyValue("--background").trim();
       root.classList.remove("dark");
       delete root.dataset.theme;
+
       return { dark, ocean };
     });
+
     expect(tokenSnapshot.ocean).toBe("oklch(0.5 0.215 262.881)");
     expect(tokenSnapshot.dark).toBe("oklch(0.147 0.004 49.25)");
 
     const microphoneIcon = page
       .locator('[data-example="level-meter-microphone"] svg')
       .first();
+
     await expect(microphoneIcon).toHaveAttribute(
       "xmlns",
       "http://www.w3.org/2000/svg"
@@ -153,6 +158,7 @@ export const runParitySuite = ({
     const valueClass = page.locator(
       '[data-contract="value-class"] [data-slot="db-readout"]'
     );
+
     await expect(valueClass).toHaveClass(/(?:^|\s)text-sm(?:\s|$)/);
     await expect(valueClass).not.toHaveClass(/(?:^|\s)text-xs(?:\s|$)/);
     await expect(valueClass).not.toHaveClass(

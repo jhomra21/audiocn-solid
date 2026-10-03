@@ -1,11 +1,14 @@
 type FrameListener = (nowMs: number) => void;
+
 type FramePhase = "update" | "paint";
 
 const listeners = {
   paint: new Set<FrameListener>(),
   update: new Set<FrameListener>(),
 };
+
 let handle: number | null = null;
+
 let ticking = false;
 
 const hasListeners = () => listeners.update.size + listeners.paint.size > 0;
@@ -19,6 +22,7 @@ const reportError = (error: unknown) => {
 const tick = (nowMs: number) => {
   handle = null;
   ticking = true;
+
   for (const phase of [listeners.update, listeners.paint]) {
     for (const listener of phase) {
       try {
@@ -28,7 +32,9 @@ const tick = (nowMs: number) => {
       }
     }
   }
+
   ticking = false;
+
   if (hasListeners() && handle === null) {
     handle = requestAnimationFrame(tick);
   }
@@ -44,6 +50,7 @@ export const subscribeFrame = (
   phase: FramePhase = "paint"
 ): (() => void) => {
   listeners[phase].add(listener);
+
   if (
     handle === null &&
     !ticking &&
@@ -51,8 +58,10 @@ export const subscribeFrame = (
   ) {
     handle = requestAnimationFrame(tick);
   }
+
   return () => {
     listeners[phase].delete(listener);
+
     if (!hasListeners() && handle !== null) {
       cancelAnimationFrame(handle);
       handle = null;
@@ -118,11 +127,14 @@ export const MAX_FRAME_GAP_MS = 100;
 export const createPainterClock = (): ((nowMs: number) => number) => {
   let lastMs: number | null = null;
   let clockMs = 0;
+
   return (nowMs) => {
     if (lastMs !== null) {
       clockMs += Math.min(Math.max(0, nowMs - lastMs), MAX_FRAME_GAP_MS);
     }
+
     lastMs = nowMs;
+
     return clockMs;
   };
 };

@@ -9,6 +9,7 @@ export const DEFAULT_ZONES: MeterZone[] = [
 
 /** A level at or above this counts as clipping for a clip light. */
 export const CLIP_THRESHOLD_DB = -1;
+
 /** How long a clip light stays on after the last clip. */
 export const CLIP_HOLD_MS = 1500;
 
@@ -18,10 +19,12 @@ export const zoneForDb = (
   zones: MeterZone[] = DEFAULT_ZONES
 ): MeterZoneName => {
   let current: MeterZoneName = "ok";
+
   for (const zone of zones) {
     if (db >= zone.fromDb) {
       current = zone.zone;
     }
   }
+
   return current;
 };

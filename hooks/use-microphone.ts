@@ -38,6 +38,7 @@ const stopStream = (stream: MediaStream | null) => {
   if (!stream) {
     return;
   }
+
   for (const track of stream.getTracks()) {
     track.stop();
   }
@@ -47,15 +48,18 @@ const statusForError = (caught: unknown): MicrophoneStatus => {
   if (!(caught instanceof DOMException)) {
     return "error";
   }
+
   if (caught.name === "NotAllowedError" || caught.name === "SecurityError") {
     return "denied";
   }
+
   if (
     caught.name === "NotFoundError" ||
     caught.name === "OverconstrainedError"
   ) {
     return "unavailable";
   }
+
   return "error";
 };
 
@@ -77,12 +81,15 @@ const buildConstraints = (
     echoCancellation: options.echoCancellation,
     noiseSuppression: options.noiseSuppression,
   };
+
   if (options.deviceId) {
     constraints.deviceId = { exact: options.deviceId };
   }
+
   if (options.channelCount) {
     constraints.channelCount = options.channelCount;
   }
+
   return constraints;
 };
 
@@ -94,6 +101,7 @@ export const useMicrophone = (
   const [result, setResult] = createSignal<MicrophoneResult | null>(null);
 
   const wanted = createMemo(() => manual() ?? (options.enabled ?? false));
+
   const constraints = createMemo(() =>
     buildConstraints({
       autoGainControl: options.autoGainControl ?? false,
@@ -103,6 +111,7 @@ export const useMicrophone = (
       noiseSuppression: options.noiseSuppression ?? false,
     })
   );
+
   const key = createMemo(() => JSON.stringify(constraints()));
 
   createCompatEffect(
@@ -110,6 +119,7 @@ export const useMicrophone = (
     (current) => {
       if (!current.wanted || !canOpenMicrophone()) {
         setResult(null);
+
         return;
       }
 
@@ -125,10 +135,12 @@ export const useMicrophone = (
         .then((stream) => {
           if (cancelled) {
             stopStream(stream);
+
             return;
           }
 
           acquired = stream;
+
           const handleEnded = () => {
             setResult({
               failure: null,
@@ -155,6 +167,7 @@ export const useMicrophone = (
           if (cancelled) {
             return;
           }
+
           setResult({
             failure:
               caught instanceof Error ? caught : new Error(String(caught)),
@@ -175,12 +188,15 @@ export const useMicrophone = (
   return {
     get error() {
       const current = result();
+
       if (!wanted()) {
         return null;
       }
+
       if (!canOpenMicrophone()) {
         return new Error("This browser cannot open a microphone.");
       }
+
       return current?.key === key() ? current.failure : null;
     },
     async start() {
@@ -191,10 +207,13 @@ export const useMicrophone = (
       if (!wanted()) {
         return "idle";
       }
+
       if (!canOpenMicrophone()) {
         return "unavailable";
       }
+
       const current = result();
+
       return current?.key === key() ? current.status : "acquiring";
     },
     stop() {
@@ -202,6 +221,7 @@ export const useMicrophone = (
     },
     get stream() {
       const current = result();
+
       return current?.key === key() ? current.stream : null;
     },
   };

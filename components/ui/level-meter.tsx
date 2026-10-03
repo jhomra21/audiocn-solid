@@ -54,9 +54,13 @@ import { createCompatEffect } from "@/lib/solid-effect";
 import { cn } from "@/lib/utils";
 
 const ARIA_INTERVAL_MS = 250;
+
 const REDUCED_MOTION_INTERVAL_MS = 250;
+
 const DEFAULT_SEGMENTS = 24;
+
 const POSITION_EPSILON = 0.0005;
+
 const SETTLE_EPSILON = 0.001;
 
 export type LevelMeterVariant = "solid" | "segmented" | "gradient";
@@ -83,22 +87,27 @@ const LevelMeterContext = createContext<LevelMeterContextValue | null>(null);
 
 const useLevelMeter = (part: string) => {
   const context = useContext(LevelMeterContext);
+
   if (!context) {
     throw new Error(`${part} must be used inside LevelMeter.`);
   }
+
   return context;
 };
 
 const byFromDb = (zones: MeterZone[]): MeterZone[] => {
   const sorted: MeterZone[] = [];
+
   for (const zone of zones) {
     const index = sorted.findIndex((other) => other.fromDb > zone.fromDb);
+
     if (index === -1) {
       sorted.push(zone);
     } else {
       sorted.splice(index, 0, zone);
     }
   }
+
   return sorted;
 };
 
@@ -110,6 +119,7 @@ const buildZoneFill = (
 ) => {
   const direction = orientation === "horizontal" ? "to right" : "to top";
   const sorted = byFromDb(zones);
+
   const starts = sorted.map((zone) =>
     Number((taper.toPosition(zone.fromDb) * 100).toFixed(3))
   );
@@ -118,21 +128,26 @@ const buildZoneFill = (
     const stops = sorted.map(
       (zone, index) => `var(--meter-${zone.zone}) ${starts[index] ?? 0}%`
     );
+
     const last = sorted.at(-1);
+
     return `linear-gradient(${direction}, ${stops.join(", ")}, var(--meter-${last?.zone ?? "ok"}) 100%)`;
   }
 
   const stops = sorted.map((zone, index) => {
     const start = starts[index] ?? 0;
     const end = starts[index + 1] ?? 100;
+
     return `var(--meter-${zone.zone}) ${start}% ${end}%`;
   });
+
   return `linear-gradient(${direction}, ${stops.join(", ")})`;
 };
 
 const buildSegmentMask = (orientation: Orientation, segments: number) => {
   const direction = orientation === "horizontal" ? "to right" : "to top";
   const size = `calc(100% / ${segments})`;
+
   return `repeating-linear-gradient(${direction}, black 0 calc(${size} - 2px), transparent calc(${size} - 2px) ${size})`;
 };
 
@@ -144,14 +159,17 @@ const serializeLevels = (
   if (channels) {
     return channels.map((level) => `${level.peakDb}:${level.rmsDb}`).join("|");
   }
+
   if (peakDb === undefined && rmsDb === undefined) {
     return "";
   }
+
   return `${peakDb ?? SILENCE_DB}:${rmsDb}`;
 };
 
 const parseNumber = (text: string | undefined): number | undefined => {
   const value = Number(text);
+
   return Number.isNaN(value) ? undefined : value;
 };
 
@@ -159,9 +177,11 @@ const parseLevels = (key: string): MeterFrame | null => {
   if (key === "") {
     return null;
   }
+
   return {
     channels: key.split("|").map((entry) => {
       const [peak, rms] = entry.split(":");
+
       return {
         peakDb: parseNumber(peak) ?? SILENCE_DB,
         rmsDb: parseNumber(rms),
@@ -208,6 +228,7 @@ interface MeterPainter {
 }
 
 const silentLevel: ChannelLevel = { peakDb: SILENCE_DB };
+
 const noop = () => {};
 
 const writePosition = (
@@ -218,8 +239,10 @@ const writePosition = (
 ) => {
   if (Math.abs(previous - next) > POSITION_EPSILON) {
     element.style.setProperty(property, next.toFixed(4));
+
     return next;
   }
+
   return previous;
 };
 
@@ -232,6 +255,7 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
   const ballisticsOptions: BallisticsInput = options.reducedMotion
     ? "instant"
     : options.ballistics;
+
   const states = new Map<number, ChannelState>();
   const clock = createPainterClock();
   let { scale } = options;
@@ -244,9 +268,11 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
 
   const stateFor = (index: number, element: HTMLElement) => {
     const existing = states.get(index);
+
     if (existing && existing.element === element) {
       return existing;
     }
+
     const created: ChannelState = {
       active: null,
       element,
@@ -260,7 +286,9 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
       rmsLevel: -1,
       zone: "",
     };
+
     states.set(index, created);
+
     return created;
   };
 
@@ -289,11 +317,14 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
     state.hold = writePosition(element, "--meter-hold", state.hold, hold);
 
     const zone = zoneForDb(peak.db, scale.zones);
+
     if (zone !== state.zone) {
       state.zone = zone;
       element.dataset.zone = zone;
     }
+
     const active = state.level > 0;
+
     if (active !== state.active) {
       state.active = active;
       element.toggleAttribute("data-active", active);
@@ -303,6 +334,7 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
       Math.abs(level - taper.toPosition(input.peakDb)) <= SETTLE_EPSILON &&
       Math.abs(rmsLevel - taper.toPosition(inputRmsDb)) <= SETTLE_EPSILON &&
       Math.abs(hold - level) <= SETTLE_EPSILON;
+
     return { db: peak.db, settled };
   };
 
@@ -313,6 +345,7 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
     settled: boolean
   ) => {
     const clipping = nowMs < clipUntil;
+
     if (clipping !== clippingShown) {
       clippingShown = clipping;
       root.toggleAttribute("data-clipping", clipping);
@@ -320,9 +353,11 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
 
     const text = formatDb(loudest, { floorDb: scale.minDb });
     const zone = zoneForDb(loudest, scale.zones);
+
     if (text === ariaShown && zone === rootZoneShown) {
       return;
     }
+
     if (!settled && nowMs - lastAriaMs < ARIA_INTERVAL_MS) {
       return;
     }
@@ -342,12 +377,14 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
     }
 
     const nowMs = clock(frameMs);
+
     if (
       options.reducedMotion &&
       nowMs - lastPaintMs < REDUCED_MOTION_INTERVAL_MS
     ) {
       return true;
     }
+
     lastPaintMs = nowMs;
 
     const frame = options.latest.current;
@@ -357,21 +394,25 @@ const createMeterPainter = (options: PainterOptions): MeterPainter => {
 
     for (const [index, element] of options.channels) {
       const input = frame?.channels[index] ?? silentLevel;
+
       if (input.peakDb >= CLIP_THRESHOLD_DB) {
         clipUntil = nowMs + CLIP_HOLD_MS;
         inputClipping = true;
       }
+
       const painted = paintChannel(index, element, input, nowMs);
       loudest = Math.max(loudest, painted.db);
       settled &&= painted.settled;
     }
 
     const root = options.root.current;
+
     if (root) {
       paintRoot(root, loudest, nowMs, settled);
     }
 
     const releasingClip = nowMs < clipUntil && !inputClipping;
+
     return !settled || releasingClip;
   };
 
@@ -614,8 +655,10 @@ export interface LevelMeterValueProps extends DbReadoutProps {
 export const LevelMeterValue = (props: LevelMeterValueProps) => {
   const context = useLevelMeter("LevelMeterValue");
   const rest = omitProps(props, ["class", "className"] as const);
+
   const value = createMemo(() => {
     const declared = context.declared();
+
     return declared
       ? readChannel(
           declared,
@@ -642,6 +685,7 @@ export interface LevelMeterClipProps extends ClipIndicatorProps {
 
 export const LevelMeterClip = (props: LevelMeterClipProps) => {
   const context = useLevelMeter("LevelMeterClip");
+
   return <ClipIndicator source={context.frames} {...props} />;
 };
 
@@ -714,6 +758,7 @@ const styleWithMeterVars = (
   if (typeof style === "string") {
     return `--meter-fill:${fill};--meter-mask:${mask};${style}`;
   }
+
   return {
     "--meter-fill": fill,
     "--meter-mask": mask,
@@ -729,8 +774,10 @@ export const LevelMeter = (props: LevelMeterProps) => {
   const dimmed = () => config.dimmed ?? false;
   const maxDb = () => props.maxDb ?? config.maxDb ?? DEFAULT_MAX_DB;
   const minDb = () => props.minDb ?? config.minDb ?? DEFAULT_MIN_DB;
+
   const orientation = () =>
     props.orientation ?? config.orientation ?? "horizontal";
+
   const size = () => props.size ?? config.size ?? "default";
   const zones = () => props.zones ?? config.zones ?? DEFAULT_ZONES;
   const variant = () => props.variant ?? "solid";
@@ -744,11 +791,13 @@ export const LevelMeter = (props: LevelMeterProps) => {
   const channelsRef = new Map<number, HTMLElement>();
   let wake = noop;
   const [rootElement, setRootElement] = createSignal<HTMLElement | null>(null);
+
   const visibleRef = useVisibility(rootElement, (visible) => {
     if (visible) {
       wake();
     }
   });
+
   const [observedCount, setObservedCount] = createSignal<number | null>(null);
 
   const accept = (frame: MeterFrame) => {
@@ -760,6 +809,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
   const acceptAndCount = (frame: MeterFrame) => {
     accept(frame);
     const count = frame.channels.length;
+
     if (count > 0) {
       setObservedCount((previous) => (previous === count ? previous : count));
     }
@@ -775,6 +825,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
     if (props.channels) {
       return props.channels.length;
     }
+
     return declarativeKey() === "" ? null : 1;
   });
 
@@ -805,6 +856,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
     } else {
       channelsRef.delete(index);
     }
+
     wake();
   };
 
@@ -840,6 +892,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
         scale: untrack(scale),
         visible: visibleRef,
       });
+
       const task = createFrameTask(nextPainter.paint);
       painter = nextPainter;
       wake = task.wake;
@@ -848,9 +901,11 @@ export const LevelMeter = (props: LevelMeterProps) => {
         if (painter === nextPainter) {
           painter = null;
         }
+
         if (wake === task.wake) {
           wake = noop;
         }
+
         task.stop();
       };
     }
@@ -870,6 +925,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
     () => props.actionsRef,
     (ref) => {
       setRefValue(ref, actions);
+
       return () => setRefValue(ref, null);
     }
   );
@@ -877,6 +933,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
   const zoneFill = createMemo(() =>
     buildZoneFill(zones(), taperFn(), orientation(), variant())
   );
+
   const segmentMask = createMemo(() =>
     variant() === "segmented"
       ? buildSegmentMask(orientation(), segments())

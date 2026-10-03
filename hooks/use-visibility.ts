@@ -31,6 +31,7 @@ export const useVisibility = (
     });
 
     observer.observe(element);
+
     return () => observer.disconnect();
   });
 

@@ -65,12 +65,15 @@ export const getMediaElementSource = (
   element: HTMLMediaElement
 ): MediaElementAudioSourceNode => {
   const existing = mediaElementSources.get(element);
+
   if (existing) {
     return existing;
   }
+
   const node = context.createMediaElementSource(element);
   node.connect(context.destination);
   mediaElementSources.set(element, node);
+
   return node;
 };
 
@@ -82,9 +85,11 @@ export const createInputNode = (
   if (input instanceof MediaStream) {
     return { node: context.createMediaStreamSource(input), owned: true };
   }
+
   if (input instanceof HTMLMediaElement) {
     return { node: getMediaElementSource(context, input), owned: false };
   }
+
   return { node: input, owned: false };
 };
 
@@ -123,6 +128,7 @@ export const createAnalyserTap = (
     const analyser = context.createAnalyser();
     analyser.fftSize = fftSize;
     analyser.smoothingTimeConstant = smoothing;
+
     return analyser;
   };
 
@@ -130,9 +136,11 @@ export const createAnalyserTap = (
   node.connect(mix);
   const analysers: AnalyserNode[] = [];
   let splitter: ChannelSplitterNode | null = null;
+
   if (channels === "stereo") {
     splitter = context.createChannelSplitter(2);
     node.connect(splitter);
+
     for (let channel = 0; channel < 2; channel += 1) {
       const analyser = createAnalyser();
       splitter.connect(analyser, channel);
@@ -145,12 +153,15 @@ export const createAnalyserTap = (
   const timeDomain = new Float32Array(fftSize);
   const mixTimeDomain = new Float32Array(fftSize);
   const spectrum = new Float32Array(mix.frequencyBinCount);
+
   const edges = logBandEdges(
     bands,
     minHz,
     Math.min(maxHz, context.sampleRate / 2)
   );
+
   const meterFrame: MeterFrame = { channels: [] };
+
   const visualFrame: VisualFrame = {
     bands: new Float32Array(bands),
     history: new Float32Array(historySize),
@@ -159,6 +170,7 @@ export const createAnalyserTap = (
     peakDb: Number.NEGATIVE_INFINITY,
     timeDomain: mixTimeDomain,
   };
+
   const meterSubscribers = new Set<(frame: MeterFrame) => void>();
   const visualSubscribers = new Set<(frame: VisualFrame) => void>();
   let lastFrameMs = 0;
@@ -169,10 +181,12 @@ export const createAnalyserTap = (
     if (nowMs - lastFrameMs < intervalMs) {
       return;
     }
+
     lastFrameMs = nowMs;
 
     if (meterSubscribers.size > 0) {
       meterFrame.channels.length = analysers.length;
+
       for (const [index, analyser] of analysers.entries()) {
         analyser.getFloatTimeDomainData(timeDomain);
         meterFrame.channels[index] = {
@@ -180,6 +194,7 @@ export const createAnalyserTap = (
           rmsDb: rmsDb(timeDomain),
         };
       }
+
       for (const subscriber of meterSubscribers) {
         subscriber(meterFrame);
       }
@@ -188,6 +203,7 @@ export const createAnalyserTap = (
     if (visualSubscribers.size === 0) {
       return;
     }
+
     mix.getFloatTimeDomainData(mixTimeDomain);
     mix.getFloatFrequencyData(spectrum);
     bandsFromSpectrum(spectrum, context.sampleRate, edges, visualFrame.bands);
@@ -198,6 +214,7 @@ export const createAnalyserTap = (
       nowMs,
       historyIntervalMs
     );
+
     for (const subscriber of visualSubscribers) {
       subscriber(visualFrame);
     }
@@ -206,6 +223,7 @@ export const createAnalyserTap = (
   const updateLoop = () => {
     const active =
       !disposed && meterSubscribers.size + visualSubscribers.size > 0;
+
     if (active && !stopLoop) {
       stopLoop = subscribeFrame(tick, "update");
     } else if (!active && stopLoop) {
@@ -220,6 +238,7 @@ export const createAnalyserTap = (
     subscribe: (listener) => {
       subscribers.add(listener);
       updateLoop();
+
       return () => {
         subscribers.delete(listener);
         updateLoop();
@@ -231,6 +250,7 @@ export const createAnalyserTap = (
     disposed = true;
     updateLoop();
     disconnectFrom(node, mix);
+
     if (splitter) {
       disconnectFrom(node, splitter);
       splitter.disconnect();
@@ -262,6 +282,7 @@ export const useAudioAnalyser = (
   options: AudioAnalyserOptions = {}
 ): AudioAnalyser => {
   const audio = useAudioContext();
+
   const relays = {
     meter: createFrameRelay<MeterFrame>(),
     visual: createFrameRelay<VisualFrame>(),
@@ -286,6 +307,7 @@ export const useAudioAnalyser = (
       if (!(current.context && current.input && current.enabled)) {
         relays.meter.setSource(null);
         relays.visual.setSource(null);
+
         return;
       }
 
@@ -293,6 +315,7 @@ export const useAudioAnalyser = (
         current.context,
         current.input
       );
+
       const tap = createAnalyserTap(current.context, node, {
         bands: current.bands,
         channels: current.channels,
@@ -312,6 +335,7 @@ export const useAudioAnalyser = (
         relays.meter.setSource(null);
         relays.visual.setSource(null);
         tap.dispose();
+
         if (owned) {
           node.disconnect();
         }
@@ -323,9 +347,11 @@ export const useAudioAnalyser = (
     meter: relays.meter,
     get status() {
       const current = read(input);
+
       if (current === null || (options.enabled ?? true) === false) {
         return "idle";
       }
+
       return audio.status === "running" ? "running" : "suspended";
     },
     visual: relays.visual,

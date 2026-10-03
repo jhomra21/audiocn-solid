@@ -18,6 +18,7 @@ export const createFrameEmitter = <T>(): FrameEmitter<T> => {
   return {
     emit: (frame) => {
       latest = frame;
+
       for (const subscriber of subscribers) {
         subscriber(frame);
       }
@@ -27,6 +28,7 @@ export const createFrameEmitter = <T>(): FrameEmitter<T> => {
     },
     subscribe: (listener) => {
       subscribers.add(listener);
+
       return () => {
         subscribers.delete(listener);
       };
@@ -70,6 +72,7 @@ export const createFrameRelay = <T>(): FrameRelay<T> => {
       if (next === source) {
         return;
       }
+
       release();
       source = next;
       attach();
@@ -77,8 +80,10 @@ export const createFrameRelay = <T>(): FrameRelay<T> => {
     subscribe: (listener) => {
       subscribers.add(listener);
       attach();
+
       return () => {
         subscribers.delete(listener);
+
         if (subscribers.size === 0) {
           release();
         }

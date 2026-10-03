@@ -14,9 +14,11 @@ export const getSharedAudioContext = (): AudioContext | null => {
   if (typeof window === "undefined" || typeof AudioContext === "undefined") {
     return null;
   }
+
   if (!sharedContext || sharedContext.state === "closed") {
     sharedContext = new AudioContext({ latencyHint: "interactive" });
   }
+
   return sharedContext;
 };
 
@@ -46,6 +48,7 @@ export interface UseAudioContextResult {
 export const useAudioContext = (): UseAudioContextResult => {
   const provided = useContext(ProvidedContext);
   const context = provided ?? getSharedAudioContext();
+
   const [status, setStatus] = createSignal<AudioContextStatus>(
     context?.state ?? "unsupported"
   );
@@ -55,14 +58,17 @@ export const useAudioContext = (): UseAudioContextResult => {
     (current) => {
       if (!current) {
         setStatus("unsupported");
+
         return;
       }
 
       const readStatus = () => setStatus(current.state);
+
       const resumeOnGesture = async () => {
         if (current.state !== "suspended") {
           return;
         }
+
         try {
           await current.resume();
         } catch {
@@ -72,12 +78,14 @@ export const useAudioContext = (): UseAudioContextResult => {
 
       readStatus();
       current.addEventListener("statechange", readStatus);
+
       for (const event of GESTURE_EVENTS) {
         document.addEventListener(event, resumeOnGesture, { passive: true });
       }
 
       return () => {
         current.removeEventListener("statechange", readStatus);
+
         for (const event of GESTURE_EVENTS) {
           document.removeEventListener(event, resumeOnGesture);
         }

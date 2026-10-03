@@ -2,6 +2,7 @@ import { clamp } from "@/lib/audio/decibels";
 
 /** `AnalyserNode.minDecibels` default. */
 export const SPECTRUM_MIN_DB = -100;
+
 /** `AnalyserNode.maxDecibels` default. */
 export const SPECTRUM_MAX_DB = -30;
 
@@ -15,9 +16,11 @@ export const logBandEdges = (
 ): Float32Array => {
   const edges = new Float32Array(count + 1);
   const ratio = maxHz / minHz;
+
   for (let index = 0; index <= count; index += 1) {
     edges[index] = minHz * ratio ** (index / count);
   }
+
   return edges;
 };
 
@@ -46,19 +49,24 @@ export const bandsFromSpectrum = (
 
   for (let band = 0; band < bandCount; band += 1) {
     const low = Math.floor((edges[band] ?? 0) / hzPerBin);
+
     const high = Math.max(
       low + 1,
       Math.ceil((edges[band + 1] ?? 0) / hzPerBin)
     );
+
     const first = clamp(low, 0, binCount - 1);
     const last = clamp(high, first + 1, binCount);
     let power = 0;
+
     for (let bin = first; bin < last; bin += 1) {
       power += 10 ** ((spectrumDb[bin] ?? minDb) / POWER_DB_FACTOR);
     }
+
     const meanDb = POWER_DB_FACTOR * Math.log10(power / (last - first));
     out[band] = clamp((meanDb - minDb) / (maxDb - minDb), 0, 1);
   }
+
   return out;
 };
 
@@ -77,6 +85,7 @@ export const resampleLevels = (
 
   if (size === 0 || length <= 0 || count === 0) {
     out.fill(0);
+
     return out;
   }
 
@@ -84,13 +93,17 @@ export const resampleLevels = (
     const from = Math.floor((index * length) / count);
     const to = Math.max(from + 1, Math.floor(((index + 1) * length) / count));
     let loudest = 0;
+
     for (let offset = from; offset < to; offset += 1) {
       const value = source[(start + offset) % size] ?? 0;
+
       if (value > loudest) {
         loudest = value;
       }
     }
+
     out[index] = loudest;
   }
+
   return out;
 };

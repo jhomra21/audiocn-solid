@@ -10,15 +10,20 @@ export const setRefValue = <T>(ref: RefTarget<T>, value: T | null): void => {
   if (!ref) {
     return;
   }
+
   if (typeof ref === "function") {
     ref(value);
+
     return;
   }
+
   if (Array.isArray(ref)) {
     for (const item of ref) {
       setRefValue(item, value);
     }
+
     return;
   }
+
   ref.current = value;
 };

@@ -73,14 +73,17 @@ const OWN_PROPS = [
 
 const loudestPeak = (frame: MeterFrame) => {
   let loudest = SILENCE_DB;
+
   for (const level of frame.channels) {
     loudest = Math.max(loudest, level.peakDb);
   }
+
   return loudest;
 };
 
 export const ClipIndicator = (props: ClipIndicatorProps) => {
   const rest = omitProps(props, OWN_PROPS);
+
   const hold = useClipHold({
     get holdMs() {
       return props.holdMs ?? CLIP_HOLD_MS;
@@ -92,6 +95,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
       return props.thresholdDb ?? CLIP_THRESHOLD_DB;
     },
   });
+
   const clipping = createMemo(() => props.clipping ?? hold.clipping);
 
   useFrameSource(
@@ -108,6 +112,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     () => props.actionsRef,
     (ref) => {
       setRefValue(ref, actions);
+
       return () => setRefValue(ref, null);
     }
   );
@@ -130,6 +135,7 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
     });
 
     untrack(() => props.onClick)?.(baseEvent);
+
     if (!prevented) {
       hold.reset();
     }
@@ -197,8 +203,10 @@ export const ClipIndicator = (props: ClipIndicatorProps) => {
   };
 
   const customRender = untrack(() => props.render);
+
   if (customRender) {
     const rendered = createMemo(() => customRender(renderProps, state));
+
     return rendered as unknown as any;
   }
 
