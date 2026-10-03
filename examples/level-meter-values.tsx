@@ -10,11 +10,11 @@ const levels = [
 ];
 
 export const LevelMeterValues = () => (
-  <div className="grid w-full max-w-sm gap-3">
+  <div class="grid w-full max-w-sm gap-3">
     <For each={levels}>
       {(level) => (
-        <div className="grid grid-cols-[4.5rem_1fr] items-center gap-3">
-          <span className="text-muted-foreground text-sm">{level.label}</span>
+        <div class="grid grid-cols-[4.5rem_1fr] items-center gap-3">
+          <span class="text-muted-foreground text-sm">{level.label}</span>
           <LevelMeter aria-label={`${level.label} level`} peakDb={level.peakDb} />
         </div>
       )}
