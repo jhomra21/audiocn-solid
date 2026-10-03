@@ -114,6 +114,17 @@ const assertHtml = async (
     throw new Error(`Prerendered ${route} is missing LevelMeter markup.`);
   }
 
+  const ssrErrorIndex = html.indexOf("data-docs-ssr-error=");
+
+  if (ssrErrorIndex !== -1) {
+    throw new Error(
+      `Prerendered ${route} contains a docs SSR error: ${html.slice(
+        ssrErrorIndex,
+        ssrErrorIndex + 800
+      )}`
+    );
+  }
+
   const headStart = html.indexOf("<head");
 
   const headEnd = html.indexOf("</head>");
