@@ -14,15 +14,15 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
   const align = () => props.align ?? "center";
 
   return (
-    <div className="not-prose my-6" data-slot="component-preview-tabs">
-      <div className="group/tabs flex gap-2 flex-col" data-orientation="horizontal" data-slot="tabs">
+    <div class="not-prose my-6" data-slot="component-preview-tabs">
+      <div class="group/tabs flex gap-2 flex-col" data-orientation="horizontal" data-slot="tabs">
         <div
-          className="group/tabs-list text-muted-foreground inline-flex h-8 w-fit items-center justify-center gap-1 rounded-none bg-transparent p-[3px]"
+          class="group/tabs-list text-muted-foreground inline-flex h-8 w-fit items-center justify-center gap-1 rounded-none bg-transparent p-[3px]"
           data-slot="tabs-list"
           data-variant="line"
         >
           <button
-            className="text-foreground/60 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-transparent! px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-[3px] focus-visible:outline-1 after:bg-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:opacity-0 after:transition-opacity data-active:text-foreground data-active:after:opacity-100"
+            class="text-foreground/60 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-transparent! px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-[3px] focus-visible:outline-1 after:bg-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:opacity-0 after:transition-opacity data-active:text-foreground data-active:after:opacity-100"
             data-active={tab() === "preview" ? "" : undefined}
             data-slot="tabs-trigger"
             onClick={() => setTab("preview")}
@@ -31,7 +31,7 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
             Preview
           </button>
           <button
-            className="text-foreground/60 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-transparent! px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-[3px] focus-visible:outline-1 after:bg-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:opacity-0 after:transition-opacity data-active:text-foreground data-active:after:opacity-100"
+            class="text-foreground/60 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-transparent! px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-[3px] focus-visible:outline-1 after:bg-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:opacity-0 after:transition-opacity data-active:text-foreground data-active:after:opacity-100"
             data-active={tab() === "code" ? "" : undefined}
             data-slot="tabs-trigger"
             onClick={() => setTab("code")}
@@ -44,16 +44,16 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
         <Show
           when={tab() === "preview"}
           fallback={
-            <div className="flex-1 text-sm outline-none" data-slot="tabs-content">
-              <pre className="bg-code text-code-foreground max-h-[32rem] overflow-auto rounded-xl border p-4 text-xs">
+            <div class="flex-1 text-sm outline-none" data-slot="tabs-content">
+              <pre class="bg-code text-code-foreground max-h-[32rem] overflow-auto rounded-xl border p-4 text-xs">
                 <code>{props.code}</code>
               </pre>
             </div>
           }
         >
-          <div className="flex-1 text-sm outline-none" data-slot="tabs-content">
+          <div class="flex-1 text-sm outline-none" data-slot="tabs-content">
             <div
-              className={cn(
+              class={cn(
                 "bg-background flex min-h-72 w-full justify-center rounded-xl border p-4 sm:p-10",
                 align() === "center" && "items-center",
                 align() === "start" && "items-start",
