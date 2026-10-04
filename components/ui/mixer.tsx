@@ -1,7 +1,7 @@
 import {
   createContext,
+  createSignal,
   createUniqueId,
-  onCleanup,
   useContext,
 } from "solid-js";
 
@@ -371,13 +371,16 @@ export const MixerChannels = (
     CHANNELS_OWN
   );
 
-  let element:
-    | HTMLDivElement
-    | undefined;
+  const [
+    element,
+    setElement,
+  ] = createSignal<
+    HTMLDivElement | null
+  >(null);
 
   createCompatEffect(
     () => [
-      element,
+      element(),
       context.orientation,
       props.onKeyDownCapture,
     ] as const,
@@ -466,10 +469,6 @@ export const MixerChannels = (
     }
   );
 
-  onCleanup(() => {
-    element = undefined;
-  });
-
   const scrollable = () =>
     props.scrollable ??
     true;
@@ -494,7 +493,7 @@ export const MixerChannels = (
       )}
       data-slot="mixer-channels"
       ref={(node) => {
-        element = node;
+        setElement(node);
       }}
       {...rest}
     />
