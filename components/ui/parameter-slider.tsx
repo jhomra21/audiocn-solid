@@ -275,7 +275,9 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
     props.onValueChange?.(next, details);
 
     if (props.value !== undefined) {
-      latestValue = value();
+      queueMicrotask(() => {
+        latestValue = value();
+      });
     }
   };
 

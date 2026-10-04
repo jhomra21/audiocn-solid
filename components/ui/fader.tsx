@@ -771,7 +771,9 @@ export const Fader = (props: FaderProps) => {
     props.onValueChange?.(db, details);
 
     if (props.value !== undefined) {
-      latestValue = value();
+      queueMicrotask(() => {
+        latestValue = value();
+      });
     }
   };
 
