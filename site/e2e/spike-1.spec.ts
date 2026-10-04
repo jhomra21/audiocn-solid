@@ -43,7 +43,9 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       "content",
       current.description
     );
-    await expect(page.locator('[data-slot="level-meter"]')).toBeVisible();
+    await expect(
+      page.locator('[data-slot="level-meter"]').first()
+    ).toBeVisible();
 
     const channel = page.locator('[data-slot="level-meter-channel"]').first();
 
