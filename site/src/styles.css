@@ -1,3 +1,92 @@
 @import "../../app/styles.css";
 
+@plugin "@fumadocs/tailwind/typography";
+
 @source ".";
+
+/*
+ * The fumadocs `prose` plugin reads these tokens. They follow the site theme,
+ * as upstream's fumadocs-ui/css/shadcn.css maps them.
+ */
+:root {
+  --color-fd-foreground: var(--foreground);
+  --color-fd-muted: var(--muted);
+  --color-fd-muted-foreground: var(--muted-foreground);
+  --color-fd-card: var(--card);
+  --color-fd-border: var(--border);
+  --color-fd-primary: var(--primary);
+}
+
+/* Shiki emits both themes as variables (defaultColor: false); pick one here. */
+.shiki {
+  code span {
+    color: var(--shiki-light);
+    font-style: var(--shiki-light-font-style);
+  }
+
+  .line {
+    padding-left: calc(var(--spacing) * 4);
+    padding-right: var(--padding-right, calc(var(--spacing) * 4));
+  }
+
+  .line:empty {
+    height: 1lh;
+  }
+}
+
+.dark .shiki code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+}
+
+@utility fd-scroll-container {
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: var(--color-fd-border);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
+}
+
+@utility fd-steps {
+  counter-reset: step;
+  position: relative;
+  @apply ms-2 border-s ps-6 sm:ms-4 sm:ps-7;
+}
+
+@utility fd-step {
+  &::before {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    content: counter(step);
+    counter-increment: step;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    display: flex;
+    position: absolute;
+    @apply -start-4 size-8 rounded-full;
+  }
+}
+
+@utility prose-no-margin {
+  & > :first-child {
+    margin-top: 0;
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
+  }
+}

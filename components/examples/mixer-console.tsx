@@ -1,3 +1,5 @@
+import { For, Show } from "solid-js";
+
 import {
   ChannelStrip,
   ChannelStripControls,
@@ -35,68 +37,62 @@ const CHANNELS = Array.from({ length: CHANNEL_COUNT }, (_, index) => ({
 
 const INITIAL_CHANNELS = CHANNELS.map(({ id }) => ({ id }));
 
-const ConsoleStrip = ({
-  id,
-  title,
-  kind,
-  seed,
-  mixer,
-}: {
+const ConsoleStrip = (props: {
   id: string;
   title: string;
   kind: DemoSignalKind;
   seed: number;
   mixer: MixerController;
 }) => {
-  const signal = useDemoSignal({ kind, seed });
-  const channel = mixer.channel(id);
-
-  if (!channel) {
-    return null;
-  }
+  const signal = useDemoSignal({ kind: props.kind, seed: props.seed });
+  const channel = () => props.mixer.channel(props.id);
 
   return (
-    <ChannelStrip
-      dimmed={mixer.isDimmed(id)}
-      muted={channel.muted}
-      solo={channel.solo}
-    >
-      <ChannelStripHeader>
-        <ChannelStripTitle>{title}</ChannelStripTitle>
-      </ChannelStripHeader>
-      <ChannelStripMeter>
-        <LevelMeter
-          aria-label={`${title} level`}
-          size="sm"
-          source={signal.meter}
-        />
-      </ChannelStripMeter>
-      <ChannelStripFader>
-        <Fader
-          aria-label={`${title} volume`}
-          onValueChange={(gainDb) => mixer.setGain(id, gainDb)}
-          size="sm"
-          value={channel.gainDb}
-        />
-      </ChannelStripFader>
-      <ChannelStripValue>{formatDb(channel.gainDb)}</ChannelStripValue>
-      <ChannelStripControls>
-        <MuteToggle
-          onPressedChange={(muted) => mixer.setMuted(id, muted)}
-          pressed={channel.muted}
-          size="sm"
+    <Show when={channel()}>
+      {(current) => (
+        <ChannelStrip
+          dimmed={props.mixer.isDimmed(props.id)}
+          muted={current().muted}
+          solo={current().solo}
         >
-          M
-        </MuteToggle>
-        <SoloToggle
-          onPressedChange={(solo) => mixer.setSolo(id, solo)}
-          pressed={channel.solo}
-          size="sm"
-        >
-          S
-        </SoloToggle>
-      </ChannelStripControls>
-    </ChannelStrip>
+          <ChannelStripHeader>
+            <ChannelStripTitle>{props.title}</ChannelStripTitle>
+          </ChannelStripHeader>
+          <ChannelStripMeter>
+            <LevelMeter
+              aria-label={`${props.title} level`}
+              size="sm"
+              source={signal.meter}
+            />
+          </ChannelStripMeter>
+          <ChannelStripFader>
+            <Fader
+              aria-label={`${props.title} volume`}
+              onValueChange={(gainDb) => props.mixer.setGain(props.id, gainDb)}
+              size="sm"
+              value={current().gainDb}
+            />
+          </ChannelStripFader>
+          <ChannelStripValue>{formatDb(current().gainDb)}</ChannelStripValue>
+          <ChannelStripControls>
+            <MuteToggle
+              onPressedChange={(muted) => props.mixer.setMuted(props.id, muted)}
+              pressed={current().muted}
+              size="sm"
+            >
+              M
+            </MuteToggle>
+            <SoloToggle
+              onPressedChange={(solo) => props.mixer.setSolo(props.id, solo)}
+              pressed={current().solo}
+              size="sm"
+            >
+              S
+            </SoloToggle>
+          </ChannelStripControls>
+        </ChannelStrip>
+      )}
+    </Show>
   );
 };
 
@@ -109,15 +105,17 @@ const MixerConsole = () => {
         <MixerTitle>Console</MixerTitle>
       </MixerHeader>
       <MixerChannels>
-        {CHANNELS.map((channel) => (
-          <ConsoleStrip
-            id={channel.id}
-            kind={channel.kind}
-            mixer={mixer}
-            seed={channel.seed}
-            title={channel.title}
-          />
-        ))}
+        <For each={CHANNELS}>
+          {(channel) => (
+            <ConsoleStrip
+              id={channel.id}
+              kind={channel.kind}
+              mixer={mixer}
+              seed={channel.seed}
+              title={channel.title}
+            />
+          )}
+        </For>
       </MixerChannels>
     </Mixer>
   );

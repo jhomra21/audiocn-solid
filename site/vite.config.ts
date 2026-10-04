@@ -13,6 +13,8 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkToc from "remark-toc";
 import { defineConfig } from "vite";
 
+import { codeHighlightOptions } from "./lib/docs/code-highlight.ts";
+import { remarkComponentSource } from "./lib/docs/remark-component-source.ts";
 import { remarkInstallCommand } from "./lib/docs/remark-install-command.ts";
 
 export default defineConfig({
@@ -26,21 +28,14 @@ export default defineConfig({
         stylePropertyNameCase: "css",
         rehypePlugins: [
           rehypeSlug,
-          [
-            rehypeShiki,
-            {
-              themes: {
-                dark: "github-dark-high-contrast",
-                light: "github-light",
-              },
-            },
-          ],
+          [rehypeShiki, codeHighlightOptions],
         ],
         remarkPlugins: [
           remarkFrontmatter,
           remarkMdxFrontmatter,
           remarkGfm,
           remarkInstallCommand,
+          remarkComponentSource,
           [remarkToc, { heading: "Contents", maxDepth: 3 }],
         ],
       }),

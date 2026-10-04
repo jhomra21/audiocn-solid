@@ -1,6 +1,4 @@
-import { createSignal, onSettled } from "solid-js";
-
-import { SearchDialog } from "@/site/components/docs/search-dialog";
+import { SiteSearch, openSearch } from "@/site/components/docs/search-dialog";
 import { siteConfig } from "@/site/lib/site";
 import { useAppearance } from "@/site/components/docs/theme-controls";
 
@@ -12,29 +10,6 @@ const navItems = [
 
 export const SiteHeader = () => {
   const [appearance, setAppearance] = useAppearance();
-  const [searchOpen, setSearchOpen] = createSignal(false);
-
-  onSettled(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === "k"
-      ) {
-        event.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-
-    const onSearchRequest = () => setSearchOpen(true);
-
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("audiocn-open-search", onSearchRequest);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("audiocn-open-search", onSearchRequest);
-    };
-  });
 
   return (
     <>
@@ -76,7 +51,7 @@ export const SiteHeader = () => {
             <button
               aria-label="Search docs"
               class="text-muted-foreground hover:text-foreground hover:bg-muted hidden h-8 items-center gap-2 rounded-md border px-2.5 text-sm transition-colors sm:flex"
-              onClick={() => setSearchOpen(true)}
+              onClick={openSearch}
               type="button"
             >
               Search docs
@@ -123,10 +98,7 @@ export const SiteHeader = () => {
         </div>
       </header>
 
-      <SearchDialog
-        onClose={() => setSearchOpen(false)}
-        open={searchOpen()}
-      />
+      <SiteSearch />
     </>
   );
 };
