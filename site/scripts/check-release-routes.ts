@@ -24,7 +24,10 @@ const marked: string[] = [];
 for (const file of files) {
   const html = await readFile(file, "utf8");
 
-  if (html.includes("data-docs-route-not-yet-ported")) {
+  if (
+    html.includes("data-docs-route-not-yet-ported") ||
+    html.includes("data-route-not-yet-ported")
+  ) {
     marked.push(
       `/${file
         .slice(clientDirectory.length + 1)

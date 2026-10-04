@@ -10,7 +10,10 @@ export default function ContributorsPage() {
         content="People who have contributed to audiocn."
         name="description"
       />
-      <main class="mx-auto grid min-h-svh w-full max-w-3xl content-center gap-4 px-6">
+      <main
+        class="mx-auto grid min-h-svh w-full max-w-3xl content-center gap-4 px-6"
+        data-route-not-yet-ported="/contributors"
+      >
         <h1 class="font-heading text-4xl font-semibold">Contributors</h1>
         <NotYetPorted item="Contributors" />
         <a

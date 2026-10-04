@@ -37,7 +37,11 @@ test("prerendered routes have content and a recorded status", async ({
 
     const route = routePath === "index" ? "/" : `/${routePath}`;
     const body = html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? "";
-    const routeMarker = html.includes("data-docs-route-not-yet-ported");
+
+    const routeMarker =
+      html.includes("data-docs-route-not-yet-ported") ||
+      html.includes("data-route-not-yet-ported");
+
     const exampleMarker = html.includes("data-not-yet-ported");
     expect(body.trim(), `${route} has an empty prerendered body`).not.toBe("");
     routes.push({
@@ -50,12 +54,19 @@ test("prerendered routes have content and a recorded status", async ({
       await expect(page.locator("body")).not.toBeEmpty();
 
       if (routeMarker) {
-        await expect(
-          page.locator("[data-docs-route-not-yet-ported]")
-        ).toBeVisible();
-        await expect(
-          page.getByRole("link", { name: "Read the upstream documentation" })
-        ).toBeVisible();
+        const marker = page.locator(
+          "[data-docs-route-not-yet-ported], [data-route-not-yet-ported]"
+        );
+
+        await expect(marker).toBeVisible();
+
+        if (route.startsWith("/docs/")) {
+          await expect(
+            page.getByRole("link", {
+              name: "Read the upstream documentation",
+            })
+          ).toBeVisible();
+        }
       }
 
       if (exampleMarker) {
