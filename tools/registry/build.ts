@@ -51,6 +51,11 @@ const solid2Dependencies = (dependencies: string[] | undefined): string[] => {
       continue;
     }
 
+    if (dependency.startsWith("@kobalte/core@")) {
+      resolved.push("@kobalte/core@2.0.0-alpha.2");
+      continue;
+    }
+
     resolved.push(dependency);
   }
 

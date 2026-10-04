@@ -434,6 +434,28 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "fader",
+      "type": "registry:ui",
+      "title": "Fader",
+      "description": "A composable decibel fader with tapering, detents, keyboard stepping, reset, editable values, and optional wheel control.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "@kobalte/core@0.13.14",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/db-scale"
+      ],
+      "files": [
+        {
+          "path": "components/ui/fader.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
