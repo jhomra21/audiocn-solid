@@ -75,6 +75,9 @@ jobs:
             artifacts/fader-e2e.json
             artifacts/fader-solid1.png
             artifacts/fader-solid2.png
+            artifacts/parameter-slider-e2e.json
+            artifacts/parameter-slider-solid1.png
+            artifacts/parameter-slider-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client

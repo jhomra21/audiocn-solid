@@ -16,10 +16,11 @@
     "site:spike:1": "cd site && bun run spike:1",
     "registry:build": "bun run tools/registry/build.ts",
     "registry:test-install": "bun run tools/registry/test-install.ts",
-    "registry:spike:3": "bun run registry:build && bun run registry:test-install && bun run registry:test-fader",
+    "registry:spike:3": "bun run registry:build && bun run registry:test-install && bun run registry:test-fader && bun run registry:test-parameter-slider",
     "kobalte:spike:4": "bun run tools/spikes/kobalte/run.ts",
     "site:spike:5": "cd site && bun run spike:5",
-    "registry:test-fader": "bun run tools/registry/test-fader.ts"
+    "registry:test-fader": "bun run tools/registry/test-fader.ts",
+    "registry:test-parameter-slider": "bun run tools/registry/test-parameter-slider.ts"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
