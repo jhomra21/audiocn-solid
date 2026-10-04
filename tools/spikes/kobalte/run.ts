@@ -234,6 +234,7 @@ const runE2E = async (
   port: number
 ): Promise<void> => {
   const baseUrl = `http://127.0.0.1:${port}`;
+
   const preview = spawn(
     "bun",
     [
@@ -341,6 +342,7 @@ const report: Spike4Report = {
 try {
   for (const runtime of runtimes) {
     const fixture = await createFixture(runtime.name);
+
     const result: RuntimeResult = {
       runtime: runtime.name,
       fixture,
