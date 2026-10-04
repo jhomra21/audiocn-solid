@@ -102,7 +102,8 @@ const panControlVariants = cva(
 );
 
 interface SliderCompatProps {
-  changeFromPointer: (value: number) => void;
+  changeFromPointer: (value: number) => number;
+  commitPointer: (value: number) => void;
   currentValue: () => number;
 }
 
@@ -117,10 +118,16 @@ const SliderCompat = (
   const originalSlideMove =
     context.onSlideMove;
 
+  const originalSlideEnd =
+    context.onSlideEnd;
+
   const originalStepHandler =
     context.onStepKeyDown;
 
   let dragPosition =
+    props.currentValue();
+
+  let pointerValue =
     props.currentValue();
 
   context.onStepKeyDown =
@@ -147,9 +154,10 @@ const SliderCompat = (
       1
     );
 
-    props.changeFromPointer(
-      dragPosition
-    );
+    pointerValue =
+      props.changeFromPointer(
+        dragPosition
+      );
   };
 
   context.onSlideMove = ({
@@ -194,8 +202,17 @@ const SliderCompat = (
       1
     );
 
-    props.changeFromPointer(
-      dragPosition
+    pointerValue =
+      props.changeFromPointer(
+        dragPosition
+      );
+  };
+
+  context.onSlideEnd = () => {
+    originalSlideEnd?.();
+
+    props.commitPointer(
+      pointerValue
     );
   };
 
@@ -205,6 +222,9 @@ const SliderCompat = (
 
     context.onSlideMove =
       originalSlideMove;
+
+    context.onSlideEnd =
+      originalSlideEnd;
 
     context.onStepKeyDown =
       originalStepHandler;
@@ -524,9 +544,6 @@ export const PanControl = (
           snapDrag(current)
         );
       }}
-      onChangeEnd={() => {
-        commit(latestValue);
-      }}
       orientation="horizontal"
       step={step()}
       value={sliderValue()}
@@ -534,12 +551,16 @@ export const PanControl = (
     >
       <SliderCompat
         changeFromPointer={(next) => {
-          change(
+          const changed =
             snapDrag(
               quantize(next)
-            )
-          );
+            );
+
+          change(changed);
+
+          return changed;
         }}
+        commitPointer={commit}
         currentValue={value}
       />
 
