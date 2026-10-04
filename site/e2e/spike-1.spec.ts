@@ -67,12 +67,16 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       await expect(heroCanvas).toBeVisible();
       await expect
         .poll(async () =>
-          heroCanvas.evaluate((canvas) => (canvas as HTMLCanvasElement).width)
+          heroCanvas.evaluate((canvas) =>
+            canvas instanceof HTMLCanvasElement ? canvas.width : 0
+          )
         )
         .toBeGreaterThan(0);
       await expect
         .poll(async () =>
-          heroCanvas.evaluate((canvas) => (canvas as HTMLCanvasElement).height)
+          heroCanvas.evaluate((canvas) =>
+            canvas instanceof HTMLCanvasElement ? canvas.height : 0
+          )
         )
         .toBeGreaterThan(0);
 
