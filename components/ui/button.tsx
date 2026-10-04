@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
-import type { ButtonDOMProps } from "@compat/jsx-types";
+import type { ButtonDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import { createCompatEffect } from "@/lib/solid/effect";
