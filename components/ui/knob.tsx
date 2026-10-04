@@ -45,9 +45,9 @@ const HALF_TURN = 180;
 
 const WIDTH_SAMPLES = 24;
 
-const NUMBER = /[-+]?(?:\\d+\\.?\\d*|\\.\\d+)/u;
+const NUMBER = /[-+]?(?:\d+\.?\d*|\.\d+)/u;
 
-const THOUSANDS = /\\d\\s*k/iu;
+const THOUSANDS = /\d\s*k/iu;
 
 const THOUSAND = 1000;
 
