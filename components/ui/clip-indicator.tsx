@@ -1,7 +1,7 @@
 import { createMemo, untrack } from "solid-js";
 
 import { useClipHold } from "@/hooks/use-clip-hold";
-import type { ButtonDOMProps, JSXElement } from "@compat/jsx-types";
+import type { ButtonDOMProps, JSXElement } from "@/lib/solid/jsx-types";
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { SILENCE_DB } from "@/lib/audio/decibels";
 import { forwardProps, omitProps } from "@/lib/solid/props";
