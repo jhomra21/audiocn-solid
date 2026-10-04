@@ -97,8 +97,8 @@ const packageJsonFor = (runtime: RuntimeName): string => {
           },
           dependencies: {
             "@kobalte/core": "2.0.0-alpha.2",
-            "@solidjs/web": "2.0.0-rc.13",
-            "solid-js": "2.0.0-rc.13",
+            "@solidjs/web": "2.0.0-rc.3",
+            "solid-js": "2.0.0-rc.3",
           },
           devDependencies: {
             "@solidjs/vite-plugin": "3.0.0-next.47",
@@ -309,7 +309,7 @@ const report: Spike4Report = {
   versions: {
     solid1: "@kobalte/core@0.13.14 + solid-js@1.9.15",
     solid2:
-      "@kobalte/core@2.0.0-alpha.2 + solid-js/@solidjs/web@2.0.0-rc.13",
+      "@kobalte/core@2.0.0-alpha.2 + solid-js/@solidjs/web@2.0.0-rc.3",
   },
   apiDifferences: [
     {
