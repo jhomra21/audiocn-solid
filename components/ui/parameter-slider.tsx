@@ -552,7 +552,11 @@ export const ParameterSliderInput = (
 
         event.preventDefault();
 
-        const target = event.currentTarget as HTMLSpanElement;
+        const target = event.currentTarget;
+
+        if (!(target instanceof HTMLSpanElement)) {
+          return;
+        }
 
         target.setPointerCapture(event.pointerId);
         scrubStartX = event.clientX;
@@ -560,9 +564,12 @@ export const ParameterSliderInput = (
         setDraft(null);
       }}
       onPointerMove={(event: PointerEvent) => {
-        const target = event.currentTarget as HTMLSpanElement;
+        const target = event.currentTarget;
 
-        if (!target.hasPointerCapture(event.pointerId)) {
+        if (
+          !(target instanceof HTMLSpanElement) ||
+          !target.hasPointerCapture(event.pointerId)
+        ) {
           return;
         }
 
@@ -581,9 +588,12 @@ export const ParameterSliderInput = (
         });
       }}
       onPointerUp={(event: PointerEvent) => {
-        const target = event.currentTarget as HTMLSpanElement;
+        const target = event.currentTarget;
 
-        if (!target.hasPointerCapture(event.pointerId)) {
+        if (
+          !(target instanceof HTMLSpanElement) ||
+          !target.hasPointerCapture(event.pointerId)
+        ) {
           return;
         }
 
