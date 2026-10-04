@@ -306,9 +306,9 @@ try {
         await knob.dispatchEvent("wheel", {
           deltaY: -100,
         });
-        await expect(value).toHaveText("13.3");
+        await expect(value).toHaveText("13");
         await expect(reason).toHaveText("wheel");
-        await expect(committed).toHaveText("13.3");
+        await expect(committed).toHaveText("13");
 
         await knob.dblclick();
         await expect(value).toHaveText("0");
