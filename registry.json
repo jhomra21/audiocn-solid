@@ -456,6 +456,27 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "parameter-slider",
+      "type": "registry:ui",
+      "title": "Parameter Slider",
+      "description": "A labelled parameter slider with a numeric input, units, marks, reset, linear or log scaling, and unit scrubbing.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "@kobalte/core@0.13.14",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/parameter-slider.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
-}
+}\n
