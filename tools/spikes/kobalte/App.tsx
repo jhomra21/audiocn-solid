@@ -7,27 +7,35 @@ import * as Tabs from "@kobalte/core/tabs";
 import * as Tooltip from "@kobalte/core/tooltip";
 import { createSignal } from "solid-js";
 
+import { createCompatEffect } from "./effect";
+
 const options = ["One", "Two", "Three"];
+
+function SliderEditableCompat() {
+  const context = Slider.useSliderContext();
+
+  createCompatEffect(
+    () => [context.thumbs().length, context.state.isDisabled()] as const,
+    ([thumbCount, isDisabled]) => {
+      for (let index = 0; index < thumbCount; index += 1) {
+        context.state.setThumbEditable(index, !isDisabled);
+      }
+    }
+  );
+
+  return null;
+}
 
 function SliderStateProbe() {
   const context = Slider.useSliderContext();
 
   return (
-    <div>
-      <output
-        data-testid="slider-state"
-        data-thumb-count={String(context.thumbs().length)}
-        data-editable={String(context.state.isThumbEditable(0))}
-        data-state-value={String(context.state.getThumbValue(0))}
-      />
-      <button
-        type="button"
-        data-testid="slider-repair"
-        onClick={() => context.state.setThumbEditable(0, true)}
-      >
-        Repair slider state
-      </button>
-    </div>
+    <output
+      data-testid="slider-state"
+      data-thumb-count={String(context.thumbs().length)}
+      data-editable={String(context.state.isThumbEditable(0))}
+      data-state-value={String(context.state.getThumbValue(0))}
+    />
   );
 }
 
@@ -58,6 +66,7 @@ export default function App() {
               <Slider.Input />
             </Slider.Thumb>
           </Slider.Track>
+          <SliderEditableCompat />
           <SliderStateProbe />
         </Slider.Root>
         <output
