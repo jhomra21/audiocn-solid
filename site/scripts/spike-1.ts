@@ -170,7 +170,7 @@ try {
     home: await assertHtml(
       "/",
       "audiocn Solid",
-      "Solid audio components with matching Solid 1 and Solid 2 registry builds."
+      "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own."
     ),
     levelMeter: await assertHtml(
       "/docs/components/level-meter",

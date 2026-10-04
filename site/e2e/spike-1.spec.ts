@@ -20,7 +20,7 @@ const captureConsoleFailures = (page: Page) => {
 const cases = [
   {
     description:
-      "Solid audio components with matching Solid 1 and Solid 2 registry builds.",
+      "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own.",
     path: "/",
     title: "audiocn Solid",
   },
@@ -54,6 +54,20 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
         channel.evaluate((node) => node.style.getPropertyValue("--meter-level"))
       )
       .not.toBe("");
+
+    if (current.path === "/") {
+      await expect(
+        page.getByRole("heading", { name: "Audio UI, mixed and mastered." })
+      ).toBeVisible();
+      await expect(page.locator('[data-slot="showcase-card"]')).toHaveCount(14);
+      await expect(page.locator("[data-not-yet-ported]")).toHaveCount(13);
+
+      await page.getByRole("button", { name: "Ocean" }).click();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
+
+      await page.getByTestId("appearance-toggle").click();
+      await expect(page.locator("html")).toHaveClass(/dark/);
+    }
   }
 
   expect(failures).toEqual([]);
