@@ -1,0 +1,61 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+.spike-shell {
+  display: grid;
+  gap: 24px;
+  margin: 40px auto;
+  max-width: 720px;
+  padding: 0 24px;
+}
+
+section {
+  display: grid;
+  gap: 10px;
+}
+
+button,
+[role="slider"],
+[role="tab"],
+.context-target {
+  cursor: pointer;
+}
+
+.slider-track {
+  background: #ddd;
+  height: 12px;
+  position: relative;
+  width: 320px;
+}
+
+.slider-fill {
+  background: #555;
+  height: 100%;
+}
+
+.slider-thumb {
+  background: white;
+  border: 2px solid black;
+  border-radius: 50%;
+  height: 24px;
+  top: 50%;
+  width: 24px;
+}
+
+.overlay {
+  background: white;
+  border: 1px solid #777;
+  padding: 12px;
+  z-index: 20;
+}
+
+.context-target {
+  border: 1px dashed #777;
+  padding: 20px;
+}
