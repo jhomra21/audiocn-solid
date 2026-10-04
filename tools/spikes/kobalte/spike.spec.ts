@@ -15,7 +15,9 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
 
   await page.goto("/");
 
-  const slider = page.getByRole("slider");
+  const slider = page.getByTestId("slider-thumb");
+
+  await expect(slider).toHaveAttribute("role", "slider");
   await expect(slider).toHaveAttribute("aria-valuenow", "25");
   await slider.focus();
   await slider.press("ArrowRight");
