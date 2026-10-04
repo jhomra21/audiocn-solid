@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { once } from "node:events";
 import {
   createReadStream,
@@ -15,6 +14,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { run } from "./runner";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const registryRoot = join(root, "site/public/r");
@@ -22,26 +23,6 @@ const registryRoot = join(root, "site/public/r");
 const artifactPath = join(root, "artifacts/registry-install.json");
 
 const port = 4999;
-
-const run = async (
-  command: string,
-  args: string[],
-  cwd: string
-): Promise<void> => {
-  const child = spawn(command, args, {
-    cwd,
-    env: process.env,
-    stdio: "inherit",
-  });
-
-  const [code] = await once(child, "close");
-
-  if (code !== 0) {
-    throw new Error(
-      `${command} ${args.join(" ")} failed with exit code ${String(code)}.`
-    );
-  }
-};
 
 const writeJson = async (path: string, value: string): Promise<void> => {
   await mkdir(dirname(path), { recursive: true });

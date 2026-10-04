@@ -10,6 +10,8 @@ import { fileURLToPath } from "node:url";
 
 import { chromium, expect } from "@playwright/test";
 
+import { run, waitForServer } from "./runner";
+
 interface InstallRuntime {
   fixture: string;
   runtime: "solid1" | "solid2";
@@ -98,53 +100,6 @@ export default function App() {
   );
 }
 `;
-
-const run = async (
-  command: string,
-  args: string[],
-  cwd: string
-): Promise<void> => {
-  const child = spawn(command, args, {
-    cwd,
-    env: process.env,
-    stdio: "inherit",
-  });
-
-  const [code] = await once(child, "close");
-
-  if (code !== 0) {
-    throw new Error(
-      `${command} ${args.join(" ")} failed with exit code ${String(code)}.`
-    );
-  }
-};
-
-const waitForServer = async (
-  url: string
-): Promise<void> => {
-  for (
-    let attempt = 0;
-    attempt < 80;
-    attempt += 1
-  ) {
-    try {
-      const response =
-        await fetch(url);
-
-      if (response.ok) {
-        return;
-      }
-    } catch {
-      // Preview has not bound the port yet.
-    }
-
-    await Bun.sleep(100);
-  }
-
-  throw new Error(
-    `Timed out waiting for ${url}.`
-  );
-};
 
 const installReport: InstallReport =
   JSON.parse(
