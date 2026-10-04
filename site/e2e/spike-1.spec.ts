@@ -67,12 +67,14 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       await expect(heroCanvas).toBeVisible();
       await expect
         .poll(async () =>
-          heroCanvas.evaluate((canvas) => ({
-            height: (canvas as HTMLCanvasElement).height,
-            width: (canvas as HTMLCanvasElement).width,
-          }))
+          heroCanvas.evaluate((canvas) => (canvas as HTMLCanvasElement).width)
         )
-        .toEqual(expect.objectContaining({ height: expect.any(Number), width: expect.any(Number) }));
+        .toBeGreaterThan(0);
+      await expect
+        .poll(async () =>
+          heroCanvas.evaluate((canvas) => (canvas as HTMLCanvasElement).height)
+        )
+        .toBeGreaterThan(0);
 
       await page.getByRole("button", { name: "Ocean" }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
