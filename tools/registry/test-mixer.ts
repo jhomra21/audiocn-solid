@@ -87,7 +87,7 @@ const Strip = (props: { name: string }) => (
   <ChannelStrip>
     <ChannelStripTitle>{props.name}</ChannelStripTitle>
     <ChannelStripFader>
-      <Fader aria-label={`${props.name} volume`}>
+      <Fader aria-label={props.name + " volume"}>
         <FaderTrack>
           <FaderThumb />
         </FaderTrack>
