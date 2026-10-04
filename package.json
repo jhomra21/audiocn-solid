@@ -16,7 +16,8 @@
     "site:spike:1": "cd site && bun run spike:1",
     "registry:build": "bun run tools/registry/build.ts",
     "registry:test-install": "bun run tools/registry/test-install.ts",
-    "registry:spike:3": "bun run registry:build && bun run registry:test-install"
+    "registry:spike:3": "bun run registry:build && bun run registry:test-install",
+    "kobalte:spike:4": "bun run tools/spikes/kobalte/run.ts"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
