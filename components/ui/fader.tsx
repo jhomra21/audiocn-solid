@@ -5,6 +5,7 @@ import {
   createMemo,
   createSignal,
   onCleanup,
+  Show,
   useContext,
 } from "solid-js";
 import type { VariantProps } from "class-variance-authority";
@@ -485,8 +486,55 @@ export const FaderValue = (props: FaderValueProps) => {
     context.commit(next);
   };
 
-  if (editing()) {
-    return (
+  const text = () => context.format()(context.value());
+
+  const readout = () => (
+    <Show
+      fallback={
+        <span
+          class={cn(
+            "text-muted-foreground inline-block w-(--fader-value-width) shrink-0 text-end font-mono text-xs whitespace-nowrap tabular-nums",
+            props.class,
+            props.className
+          )}
+          data-slot="fader-value"
+          style={valueStyle()}
+          {...rest}
+        >
+          {text()}
+        </span>
+      }
+      when={props.editable ?? false}
+    >
+      <button
+        class={cn(
+          "text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 h-6 w-[calc(var(--fader-value-width)+0.75rem)] shrink-0 rounded-md px-1.5 text-end font-mono text-xs tabular-nums outline-none focus-visible:ring-3",
+          props.class,
+          props.className
+        )}
+        data-slot="fader-value"
+        disabled={context.disabled()}
+        onClick={() => {
+          setDraft(
+            context.value() === SILENCE_DB
+              ? "-inf"
+              : String(context.value())
+          );
+          setEditing(true);
+        }}
+        style={valueStyle()}
+        type="button"
+      >
+        {text()}
+      </button>
+    </Show>
+  );
+
+  return (
+    <Show
+      fallback={readout()}
+      when={editing()}
+    >
       <input
         aria-label="Value in dB"
         class={cn(
@@ -513,50 +561,7 @@ export const FaderValue = (props: FaderValueProps) => {
         style={valueStyle()}
         value={draft()}
       />
-    );
-  }
-
-  const text = () => context.format()(context.value());
-
-  if (props.editable ?? false) {
-    return (
-      <button
-        class={cn(
-          "text-muted-foreground hover:bg-muted focus-visible:ring-ring/30 h-6 w-[calc(var(--fader-value-width)+0.75rem)] shrink-0 rounded-md px-1.5 text-end font-mono text-xs tabular-nums outline-none focus-visible:ring-3",
-          props.class,
-          props.className
-        )}
-        data-slot="fader-value"
-        disabled={context.disabled()}
-        onClick={() => {
-          setDraft(
-            context.value() === SILENCE_DB
-              ? "-inf"
-              : String(context.value())
-          );
-          setEditing(true);
-        }}
-        style={valueStyle()}
-        type="button"
-      >
-        {text()}
-      </button>
-    );
-  }
-
-  return (
-    <span
-      class={cn(
-        "text-muted-foreground inline-block w-(--fader-value-width) shrink-0 text-end font-mono text-xs whitespace-nowrap tabular-nums",
-        props.class,
-        props.className
-      )}
-      data-slot="fader-value"
-      style={valueStyle()}
-      {...rest}
-    >
-      {text()}
-    </span>
+    </Show>
   );
 };
 
