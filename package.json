@@ -9,6 +9,8 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
+    "compare": "bun run tools/compare/run.ts",
+    "parity": "cd site && bunx playwright test e2e/parity/parity.spec.ts",
     "check": "bun run typecheck && bun run build",
     "test:e2e": "bun run test:e2e:solid1",
     "test:e2e:solid1": "playwright test",
