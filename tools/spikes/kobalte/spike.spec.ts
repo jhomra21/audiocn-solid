@@ -22,11 +22,15 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   await slider.focus();
   await slider.press("ArrowRight");
   const telemetry = page.getByTestId("slider-telemetry");
+  const stateTelemetry = page.getByTestId("slider-state");
   console.log("slider telemetry", {
     ariaValue: await slider.getAttribute("aria-valuenow"),
     key: await telemetry.getAttribute("data-key"),
     changeValue: await telemetry.getAttribute("data-value"),
     refReady: await telemetry.getAttribute("data-ref-ready"),
+    thumbCount: await stateTelemetry.getAttribute("data-thumb-count"),
+    editable: await stateTelemetry.getAttribute("data-editable"),
+    stateValue: await stateTelemetry.getAttribute("data-state-value"),
   });
   await expect.soft(slider).toHaveAttribute("aria-valuenow", "30");
 
@@ -44,7 +48,24 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   console.log("slider pointer telemetry", {
     ariaValue: await slider.getAttribute("aria-valuenow"),
     changeValue: await telemetry.getAttribute("data-value"),
+    thumbCount: await stateTelemetry.getAttribute("data-thumb-count"),
+    editable: await stateTelemetry.getAttribute("data-editable"),
+    stateValue: await stateTelemetry.getAttribute("data-state-value"),
   });
+
+  const beforeRepair = Number(await slider.getAttribute("aria-valuenow"));
+  await page.getByTestId("slider-repair").click();
+  await slider.focus();
+  await slider.press("ArrowRight");
+  const afterRepair = Number(await slider.getAttribute("aria-valuenow"));
+  console.log("slider repair telemetry", {
+    beforeRepair,
+    afterRepair,
+    thumbCount: await stateTelemetry.getAttribute("data-thumb-count"),
+    editable: await stateTelemetry.getAttribute("data-editable"),
+    stateValue: await stateTelemetry.getAttribute("data-state-value"),
+  });
+  expect.soft(afterRepair).toBeGreaterThan(beforeRepair);
 
   const selectTrigger = page.getByTestId("select-trigger");
   await selectTrigger.click();
@@ -71,7 +92,8 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   await tabs.nth(0).focus();
   await tabs.nth(0).press("ArrowRight");
   await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByRole("tabpanel")).toContainText("Body two");
+  await expect.soft.poll(async () => page.getByRole("tabpanel").count()).toBe(1);
+  await expect(page.getByRole("tabpanel", { name: "Two" })).toContainText("Body two");
 
   const tooltipTrigger = page.getByTestId("tooltip-trigger");
   await tooltipTrigger.focus();
