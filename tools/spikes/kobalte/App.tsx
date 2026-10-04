@@ -5,22 +5,44 @@ import * as Slider from "@kobalte/core/slider";
 import * as Switch from "@kobalte/core/switch";
 import * as Tabs from "@kobalte/core/tabs";
 import * as Tooltip from "@kobalte/core/tooltip";
+import { createSignal } from "solid-js";
 
 const options = ["One", "Two", "Three"];
 
 export default function App() {
+  const [sliderKey, setSliderKey] = createSignal("");
+  const [sliderValue, setSliderValue] = createSignal(25);
+  const [sliderRefReady, setSliderRefReady] = createSignal(false);
+
   return (
     <main class="spike-shell">
       <section>
         <h2>Slider</h2>
-        <Slider.Root defaultValue={[25]} minValue={0} maxValue={100} step={5}>
+        <Slider.Root
+          defaultValue={[25]}
+          minValue={0}
+          maxValue={100}
+          step={5}
+          onChange={(value) => setSliderValue(value[0] ?? Number.NaN)}
+        >
           <Slider.Track class="slider-track" data-testid="slider-track">
             <Slider.Fill class="slider-fill" />
-            <Slider.Thumb class="slider-thumb" data-testid="slider-thumb">
+            <Slider.Thumb
+              class="slider-thumb"
+              data-testid="slider-thumb"
+              ref={(element) => setSliderRefReady(element instanceof HTMLElement)}
+              onKeyDown={(event) => setSliderKey(event.key)}
+            >
               <Slider.Input />
             </Slider.Thumb>
           </Slider.Track>
         </Slider.Root>
+        <output
+          data-testid="slider-telemetry"
+          data-key={sliderKey()}
+          data-value={String(sliderValue())}
+          data-ref-ready={String(sliderRefReady())}
+        />
       </section>
 
       <section>
