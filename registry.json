@@ -599,6 +599,25 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "mixer",
+      "type": "registry:ui",
+      "title": "Mixer",
+      "description": "A horizontal or console-style mixer layout with shared audio configuration, empty state, master area, and keyboard focus navigation between channel controls.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/mixer.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

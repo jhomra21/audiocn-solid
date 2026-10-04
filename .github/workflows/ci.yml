@@ -93,6 +93,9 @@ jobs:
             artifacts/channel-strip-e2e.json
             artifacts/channel-strip-solid1.png
             artifacts/channel-strip-solid2.png
+            artifacts/mixer-e2e.json
+            artifacts/mixer-solid1.png
+            artifacts/mixer-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client
