@@ -255,11 +255,15 @@ try {
         const slider = page.getByRole("slider", {
           name: "Sync offset",
         });
+
         const input = page.getByRole("spinbutton", {
           name: "Sync offset",
         });
+
         const value = page.getByTestId("parameter-value");
+
         const reason = page.getByTestId("parameter-reason");
+
         const committed = page.getByTestId(
           "parameter-committed"
         );
@@ -302,6 +306,7 @@ try {
         const unit = page
           .locator('[data-slot="parameter-slider-unit"]')
           .first();
+
         const box = await unit.boundingBox();
 
         if (!box) {
