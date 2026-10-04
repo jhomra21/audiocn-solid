@@ -3,7 +3,7 @@
   "compilerOptions": {
     "jsxImportSource": "@solidjs/web",
     "paths": {
-      "@compat/jsx-types": [
+      "@/lib/solid/jsx-types": [
         "./lib/solid/compat/solid2/jsx-types.ts"
       ],
       "@/*": [
@@ -11,7 +11,5 @@
       ]
     }
   },
-  "exclude": [
-    "lib/solid/compat/solid1"
-  ]
+  "exclude": []
 }
