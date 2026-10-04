@@ -397,6 +397,7 @@ export const WebThreads = (props: WebThreadsProps) => {
       premultipliedAlpha: true,
       webgl: 2,
     });
+
     const { gl } = renderer;
     const { canvas } = gl;
 
