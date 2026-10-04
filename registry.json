@@ -539,6 +539,26 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "volume-control",
+      "type": "registry:ui",
+      "title": "Volume Control",
+      "description": "A composable volume control with mute restore, perceptual or linear curves, horizontal and vertical sliders, and accessible level text.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "@kobalte/core@0.13.14"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/volume-control.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
