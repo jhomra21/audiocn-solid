@@ -18,9 +18,6 @@
     "jsxImportSource": "solid-js",
     "strict": true,
     "paths": {
-      "@compat/jsx-types": [
-        "./lib/solid/compat/solid1/jsx-types.ts"
-      ],
       "@/*": [
         "./*"
       ]
