@@ -48,5 +48,7 @@
     "../hooks",
     "../lib"
   ],
-  "exclude": []
+  "exclude": [
+    "../lib/solid/jsx-types.ts"
+  ]
 }
