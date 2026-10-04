@@ -4,9 +4,15 @@ export type ButtonDOMProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export type DivDOMProps = JSX.HTMLAttributes<HTMLDivElement>;
 
+export type GroupDOMProps = JSX.IntrinsicElements["g"];
+
 export type InputDOMProps = JSX.InputHTMLAttributes<HTMLInputElement>;
 
+export type LineDOMProps = JSX.IntrinsicElements["line"];
+
 export type ParagraphDOMProps = JSX.HTMLAttributes<HTMLParagraphElement>;
+
+export type PathDOMProps = JSX.IntrinsicElements["path"];
 
 export type SpanDOMProps = JSX.HTMLAttributes<HTMLSpanElement>;
 
