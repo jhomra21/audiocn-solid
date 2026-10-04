@@ -356,7 +356,7 @@ export const FaderThumb = (props: FaderThumbProps) => {
         props.className
       )}
       data-slot="fader-thumb"
-      onDoubleClick={(event: MouseEvent) => {
+      onDblClick={(event: MouseEvent) => {
         props.onDoubleClick?.(event);
         context.change(context.resetValue(), {
           event,
