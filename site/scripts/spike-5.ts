@@ -2,8 +2,8 @@ import { spawnSync } from "node:child_process";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 
-interface SearchIndexPayload {
-  version: number;
+interface SearchIndexSummary {
+  version: 1;
   documents: number;
 }
 
@@ -25,6 +25,21 @@ const artifactPath = join(siteRoot, "artifacts", "spike-5.json");
 
 const indexPath = join(siteRoot, "public", "search-index.json");
 
+const isSearchIndexSummary = (
+  value: unknown
+): value is SearchIndexSummary => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return (
+    "version" in value &&
+    value.version === 1 &&
+    "documents" in value &&
+    typeof value.documents === "number" &&
+    value.documents > 0
+  );
+};
 const run = (stage: string, command: string, args: string[]) => {
   const result = spawnSync(command, args, {
     cwd: siteRoot,
@@ -49,11 +64,9 @@ let stage = "search-index";
 try {
   run(stage, "bun", ["run", "scripts/build-search-index.ts"]);
 
-  const payload = JSON.parse(
-    await readFile(indexPath, "utf8")
-  ) as SearchIndexPayload;
+  const payload: unknown = JSON.parse(await readFile(indexPath, "utf8"));
 
-  if (payload.version !== 1 || payload.documents < 1) {
+  if (!isSearchIndexSummary(payload)) {
     throw new Error("Generated search index has no documents.");
   }
 

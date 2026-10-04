@@ -16,6 +16,39 @@ interface SearchIndexPayload {
   index: RawData;
 }
 
+const isRawData = (value: unknown): value is RawData => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return (
+    "internalDocumentIDStore" in value &&
+    "index" in value &&
+    "docs" in value &&
+    "sorting" in value &&
+    "pinning" in value &&
+    "language" in value &&
+    typeof value.language === "string"
+  );
+};
+
+const isSearchIndexPayload = (
+  value: unknown
+): value is SearchIndexPayload => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return (
+    "version" in value &&
+    value.version === 1 &&
+    "documents" in value &&
+    typeof value.documents === "number" &&
+    value.documents > 0 &&
+    "index" in value &&
+    isRawData(value.index)
+  );
+};
 const createSearchDatabase = () => create({ schema: searchSchema });
 
 type SearchDatabase = ReturnType<typeof createSearchDatabase>;
@@ -31,9 +64,9 @@ const loadSearchDatabase = async (): Promise<SearchDatabase> => {
     );
   }
 
-  const payload = (await response.json()) as SearchIndexPayload;
+  const payload: unknown = await response.json();
 
-  if (payload.version !== 1 || payload.documents < 1) {
+  if (!isSearchIndexPayload(payload)) {
     throw new Error("Search index payload is invalid.");
   }
 

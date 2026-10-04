@@ -43,14 +43,25 @@ const frontmatterValue = (frontmatter: string, name: string): string => {
     return "";
   }
 
-  return match[1].trim().replace(/^["']|["']$/g, "");
+  const value = match[1].trim();
+  const first = value[0];
+  const last = value.at(-1);
+
+  if (
+    (first === '"' && last === '"') ||
+    (first === "'" && last === "'")
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
 };
 
 const documentUrl = (path: string): string => {
-  const relativePath = relative(docsRoot, path)
-    .split(sep)
-    .join("/")
-    .replace(/\\.mdx$/, "");
+  const platformPath = relative(docsRoot, path).split(sep).join("/");
+  const relativePath = platformPath.endsWith(".mdx")
+    ? platformPath.slice(0, -".mdx".length)
+    : platformPath;
 
   const route =
     relativePath === "index"
@@ -59,19 +70,28 @@ const documentUrl = (path: string): string => {
         ? relativePath.slice(0, -"/index".length)
         : relativePath;
 
-  return `/docs/${route}`.replace(/\\/$/, "") || "/docs";
+  const url = `/docs/${route}`;
+
+  return url.endsWith("/") ? url.slice(0, -1) : url;
 };
 
 const parseDocument = async (path: string): Promise<SearchDocument> => {
-  const source = await readFile(path, "utf8");
-  const match = source.match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---\\r?\\n?/);
+  const source = (await readFile(path, "utf8")).replaceAll("\r\n", "\n");
 
-  if (!match?.[1]) {
+  if (!source.startsWith("---\n")) {
     throw new Error(`Missing frontmatter in ${relative(siteRoot, path)}.`);
   }
 
-  const title = frontmatterValue(match[1], "title");
-  const description = frontmatterValue(match[1], "description");
+  const closingMarker = "\n---\n";
+  const frontmatterEnd = source.indexOf(closingMarker, 4);
+
+  if (frontmatterEnd === -1) {
+    throw new Error(`Missing frontmatter end in ${relative(siteRoot, path)}.`);
+  }
+
+  const frontmatter = source.slice(4, frontmatterEnd);
+  const title = frontmatterValue(frontmatter, "title");
+  const description = frontmatterValue(frontmatter, "description");
 
   if (!title || !description) {
     throw new Error(
@@ -85,7 +105,7 @@ const parseDocument = async (path: string): Promise<SearchDocument> => {
     id: url,
     title,
     description,
-    content: source.slice(match[0].length),
+    content: source.slice(frontmatterEnd + closingMarker.length),
     url,
   };
 };
