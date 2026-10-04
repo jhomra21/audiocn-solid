@@ -618,6 +618,24 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "use-mixer",
+      "type": "registry:hook",
+      "title": "useMixer",
+      "description": "Mixer state controller for channel gain, mute, solo, pan, monitoring, master controls, audibility, dynamic channels, reset, controlled state, and optional localStorage persistence.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-mixer.ts",
+          "type": "registry:hook"
+        }
+      ]
     }
   ]
 }

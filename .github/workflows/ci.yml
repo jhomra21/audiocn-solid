@@ -96,6 +96,9 @@ jobs:
             artifacts/mixer-e2e.json
             artifacts/mixer-solid1.png
             artifacts/mixer-solid2.png
+            artifacts/use-mixer-e2e.json
+            artifacts/use-mixer-solid1.png
+            artifacts/use-mixer-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client
