@@ -43,10 +43,10 @@ const run = async (
   }
 };
 
-const writeJson = async (path: string, value: object): Promise<void> => {
+const writeJson = async (path: string, value: string): Promise<void> => {
   await mkdir(dirname(path), { recursive: true });
 
-  await writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
+  await writeFile(path, value);
 };
 
 const packageJsonFor = (runtime: string) => {
@@ -188,13 +188,19 @@ const createFixture = async (runtime: string): Promise<string> => {
 
   await mkdir(join(workspace, "src"), { recursive: true });
 
-  await writeJson(join(workspace, "package.json"), packageJsonFor(runtime));
+  await writeJson(
+    join(workspace, "package.json"),
+    `${JSON.stringify(packageJsonFor(runtime), null, 2)}\n`
+  );
 
-  await writeJson(join(workspace, "tsconfig.json"), tsconfigFor(runtime));
+  await writeJson(
+    join(workspace, "tsconfig.json"),
+    `${JSON.stringify(tsconfigFor(runtime), null, 2)}\n`
+  );
 
   await writeJson(
     join(workspace, "components.json"),
-    componentsJsonFor(runtime)
+    `${JSON.stringify(componentsJsonFor(runtime), null, 2)}\n`
   );
 
   await writeFile(
@@ -229,7 +235,7 @@ const registryText = await readFile(join(root, "registry.json"), "utf8");
 
 const registry = JSON.parse(registryText);
 
-const itemNames = registry.items.map((item: { name: string }) => item.name);
+const itemNames = registry.items.map((item) => item.name);
 
 const report = {
   pass: false,
@@ -265,7 +271,7 @@ try {
     const runtimeResult = {
       runtime,
       fixture,
-      items: [] as { installed: boolean; name: string; error?: string }[],
+      items: [],
       typecheck: false,
       build: false,
     };
@@ -275,7 +281,7 @@ try {
     await run("bun", ["install"], fixture);
 
     for (const name of itemNames) {
-      const itemResult: { installed: boolean; name: string; error?: string } = {
+      const itemResult = {
         installed: false,
         name,
       };
@@ -321,5 +327,8 @@ try {
 } finally {
   server.close();
 
-  await writeJson(artifactPath, report);
+  await writeJson(
+    artifactPath,
+    `${JSON.stringify(report, null, 2)}\n`
+  );
 }
