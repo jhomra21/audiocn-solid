@@ -12,23 +12,23 @@ npx shadcn@latest add @audiocn-solid/use-visibility
 ## Usage
 
 ```tsx
-import { useEffect, useRef } from "react";
+import { createEffect, onCleanup } from "solid-js";
 
 import { useVisibility } from "@/hooks/use-visibility";
 
 export const Spinner = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const visibleRef = useVisibility(ref);
+  let ref!: HTMLDivElement;
+  const visibleRef = useVisibility(() => ref);
 
-  useEffect(() => {
+  createEffect(() => {
     let frame = requestAnimationFrame(function tick(now) {
       if (visibleRef.current) {
-        ref.current?.style.setProperty("--angle", `${(now / 10) % 360}deg`);
+        ref.style.setProperty("--angle", `${(now / 10) % 360}deg`);
       }
       frame = requestAnimationFrame(tick);
     });
-    return () => cancelAnimationFrame(frame);
-  }, [visibleRef]);
+    onCleanup(() => cancelAnimationFrame(frame));
+  });
 
   return <div class="size-4 rotate-(--angle) bg-primary" ref={ref} />;
 };
@@ -41,10 +41,10 @@ The hook returns a ref, not state: reading `visibleRef.current` inside a loop co
 Pass `onChange` to hear when the element comes into view or leaves it. audiocn painters use it with `createFrameTask` from `lib/audio/frame-loop`: a meter that is off screen, or has settled, requests no frames at all, and coming back into view wakes it.
 
 ```tsx
-const task = useRef<FrameTask | null>(null);
+let task: FrameTask | null = null;
 const visibleRef = useVisibility(ref, (visible) => {
   if (visible) {
-    task.current?.wake();
+    task?.wake();
   }
 });
 ```

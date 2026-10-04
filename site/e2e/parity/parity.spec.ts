@@ -60,7 +60,12 @@ const inspectPage = async (page: Page): Promise<PageMetrics> =>
   page.locator("body").evaluate((body) => {
     const main = body.querySelector("main") ?? body;
 
-    const headings = [...main.querySelectorAll("h1, h2, h3")].map((heading) => {
+    const headings = [...main.querySelectorAll("h1, h2, h3")].flatMap(
+      (heading) => {
+        if (heading.closest("aside")) {
+          return [];
+        }
+
       const text = (heading.textContent ?? "")
         .replace("Copy Anchor Link", "")
         .trim();
@@ -81,7 +86,7 @@ const inspectPage = async (page: Page): Promise<PageMetrics> =>
     }, {});
 
     return {
-      examples: main.querySelectorAll("[data-example], [data-missing]").length,
+      examples: main.querySelectorAll('[data-slot="component-preview"]').length,
       headings,
       slots,
     };
@@ -109,7 +114,8 @@ test("compare upstream and local page structure", async ({ page }) => {
       await page.setViewportSize({
         height: viewport.height,
         width: viewport.width,
-      });
+      }
+    );
       await page.goto(`https://www.audiocn.dev${route}`, {
         waitUntil: "domcontentloaded",
       });

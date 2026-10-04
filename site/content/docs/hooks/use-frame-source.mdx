@@ -12,18 +12,16 @@ npx shadcn@latest add @audiocn-solid/use-frame-source
 ## Usage
 
 ```tsx
-import { useRef } from "react";
-
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { dbToLevel } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame } from "@/lib/audio/types";
 
 export const TinyMeter = ({ source }: { source: FrameSource<MeterFrame> }) => {
-  const barRef = useRef<HTMLDivElement>(null);
+  let barRef!: HTMLDivElement;
 
   useFrameSource(source, (frame) => {
     const level = dbToLevel(frame.channels[0]?.peakDb ?? -Infinity);
-    barRef.current?.style.setProperty("--level", String(level));
+    barRef.style.setProperty("--level", String(level));
   });
 
   return (

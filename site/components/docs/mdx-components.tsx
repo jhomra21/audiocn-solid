@@ -11,6 +11,26 @@ import { LevelMeterSimple } from "@/components/examples/level-meter-simple";
 import { LevelMeterValues } from "@/components/examples/level-meter-values";
 import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
+import FaderSizes from "@/components/examples/fader-sizes";
+import FaderBipolar from "@/components/examples/fader-bipolar";
+import FaderDemo from "@/components/examples/fader-demo";
+import FaderSilence from "@/components/examples/fader-silence";
+import FaderVertical from "@/components/examples/fader-vertical";
+import FaderWithMeter from "@/components/examples/fader-with-meter";
+import KnobDemo from "@/components/examples/knob-demo";
+import KnobDragDirections from "@/components/examples/knob-drag-directions";
+import KnobMetal from "@/components/examples/knob-metal";
+import KnobSizes from "@/components/examples/knob-sizes";
+import KnobVolume from "@/components/examples/knob-volume";
+import MixerConsole from "@/components/examples/mixer-console";
+import MixerEmptyDemo from "@/components/examples/mixer-empty";
+import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
+import PanControlDemo from "@/components/examples/pan-control-demo";
+import PanControlKnob from "@/components/examples/pan-control-knob";
+import ParameterSliderDemo from "@/components/examples/parameter-slider-demo";
+import ChannelToggleDemo from "@/components/examples/channel-toggle-demo";
+import ChannelToggleVariants from "@/components/examples/channel-toggle-variants";
+import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import levelMeterSource from "@/components/ui/level-meter.tsx?raw";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
 
@@ -114,6 +134,26 @@ export const Tab = (props: TabProps) => (
 type ExampleName = keyof typeof examples;
 
 const examples = {
+  "fader-sizes": FaderSizes,
+  "fader-bipolar": FaderBipolar,
+  "fader-demo": FaderDemo,
+  "fader-silence": FaderSilence,
+  "fader-vertical": FaderVertical,
+  "fader-with-meter": FaderWithMeter,
+  "knob-demo": KnobDemo,
+  "knob-drag-directions": KnobDragDirections,
+  "knob-metal": KnobMetal,
+  "knob-sizes": KnobSizes,
+  "knob-volume": KnobVolume,
+  "mixer-console": MixerConsole,
+  "mixer-empty": MixerEmptyDemo,
+  "parameter-slider-frequency": ParameterSliderFrequency,
+  "pan-control-demo": PanControlDemo,
+  "pan-control-knob": PanControlKnob,
+  "parameter-slider-demo": ParameterSliderDemo,
+  "channel-toggle-demo": ChannelToggleDemo,
+  "channel-toggle-variants": ChannelToggleVariants,
+  "volume-control-demo": VolumeControlDemo,
   "level-meter-ballistics": LevelMeterBallistics,
   "level-meter-css-level": LevelMeterCssLevel,
   "level-meter-custom-colors": LevelMeterCustomColors,
@@ -135,7 +175,11 @@ interface ComponentPreviewProps {
 export const ComponentPreview = (props: ComponentPreviewProps) => {
   if (!isExampleName(props.name)) {
     return (
-      <section data-docs-component="component-preview" data-missing={props.name}>
+      <section
+        data-docs-component="component-preview"
+        data-missing={props.name}
+        data-slot="component-preview"
+      >
         <NotYetPorted item={`Example ${props.name}`} />
       </section>
     );
@@ -148,6 +192,7 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
       class="my-4 rounded-xl border p-6"
       data-docs-component="component-preview"
       data-example={props.name}
+      data-slot="component-preview"
     >
       <Errored
         fallback={(error) => {

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "field": "slots",
+    "route": "*",
+    "reason": "Fumadocs injects React layout, tab, anchor, and code-block slot names; the Solid shell and preview wrappers intentionally use their own slots."
+  },
+  {
+    "field": "headings",
+    "route": "/docs/installation",
+    "reason": "The upstream React installation page includes a Radix-specific section; the Solid page documents the supported Solid 1 and Solid 2 runtimes instead."
+  },
+  {
+    "field": "headings",
+    "route": "/docs/concepts/feeding-data",
+    "reason": "The upstream includes a subsection demonstrating React state; the Solid port's examples use Solid lifecycle and reactive ownership instead."
+  },
+  {
+    "field": "headings",
+    "route": "/docs/components/mixer",
+    "reason": "The upstream mixer page opens with a React-specific example section; the Solid port moves that guidance under usage and maintains matching section content."
+  }
+]

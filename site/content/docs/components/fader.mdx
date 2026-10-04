@@ -18,9 +18,9 @@ import { Fader } from "@/components/ui/fader";
 ```
 
 ```tsx
-const [gainDb, setGainDb] = useState(0);
+const [gainDb, setGainDb] = createSignal(0);
 
-<Fader aria-label="Microphone" value={gainDb} onValueChange={setGainDb} />;
+<Fader aria-label="Microphone" value={gainDb()} onValueChange={setGainDb} />;
 ```
 
 The value is always in dB. The taper decides where each dB value sits on the travel. The thumb snaps to 0 dB while dragging, and double-clicking it resets.
