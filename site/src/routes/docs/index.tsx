@@ -1,22 +1,22 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import LevelMeterDoc, {
+import IntroductionDoc, {
   frontmatter,
-} from "@/site/content/docs/components/level-meter.mdx";
+} from "@/site/content/docs/index.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
 
-export default function LevelMeterPage() {
+export default function IntroductionPage() {
   return (
     <>
-      <Title>{frontmatter.title} for Solid - audiocn Solid</Title>
+      <Title>{frontmatter.title} - audiocn Solid</Title>
       <Meta content={frontmatter.description} name="description" />
 
       <DocsShell
-        currentPath="/docs/components/level-meter"
+        currentPath="/docs"
         description={frontmatter.description}
-        title={`${frontmatter.title} for Solid`}
+        title={frontmatter.title}
       >
-        <LevelMeterDoc />
+        <IntroductionDoc />
       </DocsShell>
     </>
   );

@@ -160,6 +160,10 @@ let stage = "typecheck";
 try {
   run(stage, "bunx", ["tsc", "--noEmit"]);
 
+  stage = "search-index";
+
+  run(stage, "bun", ["run", "search:index"]);
+
   stage = "build";
 
   run(stage, "bunx", ["vite", "build"]);

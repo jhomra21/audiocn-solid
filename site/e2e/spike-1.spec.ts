@@ -29,12 +29,27 @@ const cases = [
   {
     description:
       "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own.",
+    hasMeter: true,
     path: "/",
     title: "audiocn Solid",
   },
   {
+    description: "Audio components for Solid, built the shadcn way.",
+    hasMeter: false,
+    path: "/docs",
+    title: "Introduction - audiocn Solid",
+  },
+  {
+    description:
+      "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI.",
+    hasMeter: false,
+    path: "/docs/installation",
+    title: "Installation - audiocn Solid",
+  },
+  {
     description:
       "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
+    hasMeter: true,
     path: "/docs/components/level-meter",
     title: "Level Meter for Solid - audiocn Solid",
   },
@@ -51,17 +66,22 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       "content",
       current.description
     );
-    await expect(
-      page.locator('[data-slot="level-meter"]').first()
-    ).toBeVisible();
 
-    const channel = page.locator('[data-slot="level-meter-channel"]').first();
+    if (current.hasMeter) {
+      await expect(
+        page.locator('[data-slot="level-meter"]').first()
+      ).toBeVisible();
 
-    await expect
-      .poll(async () =>
-        channel.evaluate((node) => node.style.getPropertyValue("--meter-level"))
-      )
-      .not.toBe("");
+      const channel = page.locator('[data-slot="level-meter-channel"]').first();
+
+      await expect
+        .poll(async () =>
+          channel.evaluate((node) =>
+            node.style.getPropertyValue("--meter-level")
+          )
+        )
+        .not.toBe("");
+    }
 
     if (current.path === "/") {
       await expect(
@@ -93,6 +113,44 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
 
       await page.getByTestId("appearance-toggle").click();
       await expect(page.locator("html")).toHaveClass(/dark/);
+    }
+
+    if (current.path === "/docs") {
+      await expect(
+        page.getByRole("link", { name: "Introduction", exact: true })
+      ).toHaveAttribute("aria-current", "page");
+    }
+
+    if (current.path === "/docs/installation") {
+      await expect(
+        page.getByRole("link", { name: "Installation", exact: true })
+      ).toHaveAttribute("aria-current", "page");
+    }
+
+    if (current.path === "/docs/components/level-meter") {
+      const docsNav = page.getByRole("navigation", {
+        name: "Documentation",
+      });
+
+      await expect(docsNav).toBeVisible();
+      await expect(
+        docsNav.getByRole("link", { name: "Level Meter", exact: true })
+      ).toHaveAttribute("aria-current", "page");
+
+      await page.getByRole("button", { name: "Search docs" }).click();
+
+      const dialog = page.getByRole("dialog", {
+        name: "Search documentation",
+      });
+
+      await expect(dialog).toBeVisible();
+      await dialog.getByRole("searchbox").fill("Level Meter");
+      await expect(
+        dialog.getByRole("link", { name: "Level Meter", exact: true })
+      ).toBeVisible();
+
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
     }
   }
 
