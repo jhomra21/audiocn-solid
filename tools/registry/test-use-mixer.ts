@@ -1,56 +1,6 @@
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import {
-  mkdir,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { expect } from "@playwright/test";
 
-import { chromium, expect } from "@playwright/test";
-
-import { run, waitForServer } from "./runner";
-
-interface InstallRuntime {
-  fixture: string;
-  runtime: "solid1" | "solid2";
-}
-
-interface InstallReport {
-  pass: boolean;
-  runtimes: InstallRuntime[];
-}
-
-interface RuntimeEvidence {
-  consoleFailures: string[];
-  persistedGain: string;
-  runtime: InstallRuntime["runtime"];
-  screenshot: string;
-}
-
-interface AcceptanceReport {
-  pass: boolean;
-  runtimes: RuntimeEvidence[];
-  error?: string;
-}
-
-const root = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.."
-);
-
-const installReportPath = join(
-  root,
-  "artifacts",
-  "registry-install.json"
-);
-
-const artifactPath = join(
-  root,
-  "artifacts",
-  "use-mixer-e2e.json"
-);
+import { runAcceptance } from "./runner";
 
 const appSource = `import { createSignal } from "solid-js";
 
@@ -155,412 +105,68 @@ export default function App() {
 }
 `;
 
-const installReport: InstallReport =
-  JSON.parse(
-    await readFile(
-      installReportPath,
-      "utf8"
-    )
-  );
+await runAcceptance({
+  appSource,
+  check: async (page) => {
+    const a = page.getByTestId("a");
+    const b = page.getByTestId("b");
+    const audible = page.getByTestId("audible");
+    const master = page.getByTestId("master");
+    const count = page.getByTestId("count");
+    const persistedGain = page.getByTestId("persisted-gain");
 
-if (!installReport.pass) {
-  throw new Error(
-    "Registry install report did not pass."
-  );
-}
+    const click = (name: string) =>
+      page.getByRole("button", { exact: true, name }).click();
 
-const report: AcceptanceReport = {
-  pass: false,
-  runtimes: [],
-};
+    await expect(a).toHaveText("0|0|false|false|false");
+    await expect(master).toHaveText("-3|false");
 
-await mkdir(
-  dirname(artifactPath),
-  { recursive: true }
-);
+    await click("gain");
+    await expect(a).toHaveText("-12|0|false|false|false");
 
-try {
-  for (
-    const [
-      index,
-      runtime,
-    ] of
-    installReport.runtimes.entries()
-  ) {
-    const port =
-      5091 + index;
+    await click("pan");
+    await expect(a).toHaveText("-12|1|false|false|false");
 
-    const baseUrl =
-      `http://127.0.0.1:${port}`;
+    await click("solo-b");
+    await expect(b).toHaveText("true");
+    await expect(audible).toHaveText("false|true|true|false");
 
-    const screenshot = join(
-      root,
-      "artifacts",
-      `use-mixer-${runtime.runtime}.png`
-    );
+    await click("solo-a-exclusive");
+    await expect(a).toHaveText("-12|1|false|true|false");
+    await expect(b).toHaveText("false");
 
-    await writeFile(
-      join(
-        runtime.fixture,
-        "src",
-        "App.tsx"
-      ),
-      appSource
-    );
+    await click("mute-a");
+    await expect(audible).toHaveText("false|false|false|true");
 
-    await run(
-      "bun",
-      ["run", "typecheck"],
-      runtime.fixture
-    );
+    await click("monitor");
+    await expect(a).toHaveText("-12|1|true|true|true");
 
-    await run(
-      "bun",
-      ["run", "build"],
-      runtime.fixture
-    );
+    await click("master-gain");
+    await click("master-mute");
+    await expect(master).toHaveText("-8|true");
 
-    const preview = spawn(
-      "bunx",
-      [
-        "vite",
-        "preview",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        String(port),
-      ],
-      {
-        cwd: runtime.fixture,
-        env: process.env,
-        stdio: "inherit",
-      }
-    );
+    await click("add-c");
+    await expect(count).toHaveText("3");
 
-    try {
-      await waitForServer(
-        baseUrl
-      );
+    await click("remove-c");
+    await expect(count).toHaveText("2");
 
-      const browser =
-        await chromium.launch();
+    await click("controlled-pan");
+    await expect(page.getByTestId("controlled-pan")).toHaveText("-0.75");
 
-      try {
-        const page =
-          await browser.newPage({
-            viewport: {
-              height: 900,
-              width: 1000,
-            },
-          });
+    await click("persist-gain");
+    await expect(persistedGain).toHaveText("-9");
 
-        const consoleFailures:
-          string[] = [];
+    await page.reload();
+    await expect(persistedGain).toHaveText("-9");
 
-        page.on(
-          "console",
-          (message) => {
-            if (
-              message.type() ===
-                "warning" ||
-              message.type() ===
-                "error"
-            ) {
-              consoleFailures.push(
-                `${message.type()}: ${message.text()}`
-              );
-            }
-          }
-        );
+    await click("reset");
+    await expect(a).toHaveText("0|0|false|false|false");
+    await expect(master).toHaveText("-3|false");
 
-        page.on(
-          "pageerror",
-          (error) => {
-            consoleFailures.push(
-              `pageerror: ${error.message}`
-            );
-          }
-        );
-
-        await page.goto(
-          baseUrl
-        );
-
-        const a =
-          page.getByTestId("a");
-
-        const b =
-          page.getByTestId("b");
-
-        const audible =
-          page.getByTestId(
-            "audible"
-          );
-
-        const master =
-          page.getByTestId(
-            "master"
-          );
-
-        await expect(
-          a
-        ).toHaveText(
-          "0|0|false|false|false"
-        );
-
-        await expect(
-          master
-        ).toHaveText(
-          "-3|false"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "gain",
-          })
-          .click();
-
-        await expect(
-          a
-        ).toHaveText(
-          "-12|0|false|false|false"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "pan",
-          })
-          .click();
-
-        await expect(
-          a
-        ).toHaveText(
-          "-12|1|false|false|false"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "solo-b",
-          })
-          .click();
-
-        await expect(
-          b
-        ).toHaveText("true");
-
-        await expect(
-          audible
-        ).toHaveText(
-          "false|true|true|false"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name:
-              "solo-a-exclusive",
-          })
-          .click();
-
-        await expect(
-          a
-        ).toHaveText(
-          "-12|1|false|true|false"
-        );
-
-        await expect(
-          b
-        ).toHaveText("false");
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "mute-a",
-          })
-          .click();
-
-        await expect(
-          audible
-        ).toHaveText(
-          "false|false|false|true"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "monitor",
-          })
-          .click();
-
-        await expect(
-          a
-        ).toHaveText(
-          "-12|1|true|true|true"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "master-gain",
-          })
-          .click();
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "master-mute",
-          })
-          .click();
-
-        await expect(
-          master
-        ).toHaveText(
-          "-8|true"
-        );
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "add-c",
-          })
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "count"
-          )
-        ).toHaveText("3");
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "remove-c",
-          })
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "count"
-          )
-        ).toHaveText("2");
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name:
-              "controlled-pan",
-          })
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "controlled-pan"
-          )
-        ).toHaveText("-0.75");
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name:
-              "persist-gain",
-          })
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "persisted-gain"
-          )
-        ).toHaveText("-9");
-
-        await page.reload();
-
-        await expect(
-          page.getByTestId(
-            "persisted-gain"
-          )
-        ).toHaveText("-9");
-
-        await page
-          .getByRole("button", {
-            exact: true,
-            name: "reset",
-          })
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "a"
-          )
-        ).toHaveText(
-          "0|0|false|false|false"
-        );
-
-        await expect(
-          page.getByTestId(
-            "master"
-          )
-        ).toHaveText(
-          "-3|false"
-        );
-
-        expect(
-          consoleFailures
-        ).toEqual([]);
-
-        await page.screenshot({
-          fullPage: true,
-          path: screenshot,
-        });
-
-        report.runtimes.push({
-          consoleFailures,
-          persistedGain:
-            await page
-              .getByTestId(
-                "persisted-gain"
-              )
-              .textContent(),
-          runtime:
-            runtime.runtime,
-          screenshot:
-            screenshot.slice(
-              root.length + 1
-            ),
-        });
-      } finally {
-        await browser.close();
-      }
-    } finally {
-      preview.kill(
-        "SIGTERM"
-      );
-
-      if (
-        preview.exitCode ===
-        null
-      ) {
-        await once(
-          preview,
-          "close"
-        );
-      }
-    }
-  }
-
-  report.pass = true;
-} catch (error) {
-  report.error =
-    error instanceof Error
-      ? error.message
-      : String(error);
-
-  throw error;
-} finally {
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
-}
+    return { persistedGain: await persistedGain.textContent() };
+  },
+  name: "use-mixer",
+  port: 5091,
+  viewport: { height: 900, width: 1000 },
+});

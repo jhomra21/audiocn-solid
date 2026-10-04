@@ -1,54 +1,6 @@
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import {
-  mkdir,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { expect } from "@playwright/test";
 
-import { chromium, expect } from "@playwright/test";
-
-import { run, waitForServer } from "./runner";
-
-interface InstallRuntime {
-  fixture: string;
-  runtime: "solid1" | "solid2";
-}
-
-interface InstallReport {
-  pass: boolean;
-  runtimes: InstallRuntime[];
-}
-
-interface RuntimeEvidence {
-  committed: string;
-  consoleFailures: string[];
-  finalValue: string;
-  runtime: InstallRuntime["runtime"];
-  screenshot: string;
-}
-
-interface AcceptanceReport {
-  pass: boolean;
-  runtimes: RuntimeEvidence[];
-  error?: string;
-}
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-
-const installReportPath = join(
-  root,
-  "artifacts",
-  "registry-install.json"
-);
-
-const artifactPath = join(
-  root,
-  "artifacts",
-  "knob-e2e.json"
-);
+import { runAcceptance } from "./runner";
 
 const appSource = `import { createSignal } from "solid-js";
 
@@ -135,231 +87,92 @@ export default function App() {
 }
 `;
 
-const installReport: InstallReport = JSON.parse(
-  await readFile(installReportPath, "utf8")
-);
+await runAcceptance({
+  appSource,
+  check: async (page, runtime) => {
+    const knob = page.getByRole("slider", { name: "Gain" });
+    const value = page.getByTestId("knob-value");
+    const reason = page.getByTestId("knob-reason");
+    const committed = page.getByTestId("knob-committed");
 
-if (!installReport.pass) {
-  throw new Error("Registry install report did not pass.");
-}
+    await expect(knob).toBeVisible();
+    await expect(knob).toHaveAttribute("aria-valuetext", "0.0 dB");
 
-const report: AcceptanceReport = {
-  pass: false,
-  runtimes: [],
-};
+    await knob.focus();
+    await knob.press("ArrowRight");
+    await expect(value).toHaveText("1");
+    await expect(reason).toHaveText("keyboard");
+    await expect(committed).toHaveText("1");
 
-await mkdir(dirname(artifactPath), { recursive: true });
+    await knob.press("Shift+ArrowRight");
+    await expect(value).toHaveText("7");
+    await expect(committed).toHaveText("7");
 
-try {
-  for (const [index, runtime] of installReport.runtimes.entries()) {
-    const port = 5021 + index;
-    const baseUrl = `http://127.0.0.1:${port}`;
+    await knob.press("Alt+ArrowLeft");
+    await expect(value).toHaveText("6.9");
+    await expect(committed).toHaveText("6.9");
 
-    const screenshot = join(
-      root,
-      "artifacts",
-      `knob-${runtime.runtime}.png`
-    );
+    await knob.dblclick();
+    await expect(value).toHaveText("0");
+    await expect(reason).toHaveText("reset");
+    await expect(committed).toHaveText("0");
 
-    await writeFile(
-      join(runtime.fixture, "src", "App.tsx"),
-      appSource
-    );
+    await knob.focus();
+    await knob.press("Enter");
 
-    await run("bun", ["run", "typecheck"], runtime.fixture);
-    await run("bun", ["run", "build"], runtime.fixture);
+    const input = page.getByRole("textbox", { name: "Value" });
 
-    const preview = spawn(
-      "bunx",
-      [
-        "vite",
-        "preview",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        String(port),
-      ],
-      {
-        cwd: runtime.fixture,
-        env: process.env,
-        stdio: "inherit",
-      }
-    );
+    await expect(input).toBeVisible();
+    await input.fill("12.3");
+    await input.press("Enter");
+    await expect(value).toHaveText("12.3");
+    await expect(reason).toHaveText("input");
+    await expect(committed).toHaveText("12.3");
 
-    try {
-      await waitForServer(baseUrl);
+    await knob.focus();
+    await knob.dispatchEvent("wheel", { deltaY: -100 });
+    await expect(value).toHaveText("13");
+    await expect(reason).toHaveText("wheel");
+    await expect(committed).toHaveText("13");
 
-      const browser = await chromium.launch();
+    await knob.dblclick();
+    await expect(value).toHaveText("0");
 
-      try {
-        const page = await browser.newPage({
-          viewport: { height: 720, width: 1000 },
-        });
+    const box = await knob.boundingBox();
 
-        const consoleFailures: string[] = [];
-
-        page.on("console", (message) => {
-          if (
-            message.type() === "warning" ||
-            message.type() === "error"
-          ) {
-            consoleFailures.push(
-              `${message.type()}: ${message.text()}`
-            );
-          }
-        });
-
-        page.on("pageerror", (error) => {
-          consoleFailures.push(
-            `pageerror: ${error.message}`
-          );
-        });
-
-        await page.goto(baseUrl);
-
-        const knob = page.getByRole("slider", {
-          name: "Gain",
-        });
-
-        const value = page.getByTestId("knob-value");
-
-        const reason = page.getByTestId("knob-reason");
-
-        const committed = page.getByTestId("knob-committed");
-
-        await expect(knob).toBeVisible();
-        await expect(knob).toHaveAttribute(
-          "aria-valuetext",
-          "0.0 dB"
-        );
-
-        await knob.focus();
-        await knob.press("ArrowRight");
-        await expect(value).toHaveText("1");
-        await expect(reason).toHaveText("keyboard");
-        await expect(committed).toHaveText("1");
-
-        await knob.press("Shift+ArrowRight");
-        await expect(value).toHaveText("7");
-        await expect(committed).toHaveText("7");
-
-        await knob.press("Alt+ArrowLeft");
-        await expect(value).toHaveText("6.9");
-        await expect(committed).toHaveText("6.9");
-
-        await knob.dblclick();
-        await expect(value).toHaveText("0");
-        await expect(reason).toHaveText("reset");
-        await expect(committed).toHaveText("0");
-
-        await knob.focus();
-        await knob.press("Enter");
-
-        const input = page.getByRole("textbox", {
-          name: "Value",
-        });
-
-        await expect(input).toBeVisible();
-        await input.fill("12.3");
-        await input.press("Enter");
-        await expect(value).toHaveText("12.3");
-        await expect(reason).toHaveText("input");
-        await expect(committed).toHaveText("12.3");
-
-        await knob.focus();
-        await knob.dispatchEvent("wheel", {
-          deltaY: -100,
-        });
-        await expect(value).toHaveText("13");
-        await expect(reason).toHaveText("wheel");
-        await expect(committed).toHaveText("13");
-
-        await knob.dblclick();
-        await expect(value).toHaveText("0");
-
-        const box = await knob.boundingBox();
-
-        if (!box) {
-          throw new Error(
-            `Missing knob bounds for ${runtime.runtime}.`
-          );
-        }
-
-        await page.mouse.move(
-          box.x + box.width / 2,
-          box.y + box.height / 2
-        );
-        await page.mouse.down();
-        await page.mouse.move(
-          box.x + box.width / 2,
-          box.y + box.height / 2 - 40
-        );
-        await page.mouse.up();
-
-        await expect(value).toHaveText("10");
-        await expect(reason).toHaveText("drag");
-        await expect(committed).toHaveText("10");
-
-        const frequency = page.getByRole("slider", {
-          name: "Frequency",
-        });
-
-        await expect(frequency).toHaveAttribute(
-          "aria-valuetext",
-          "1.0 kHz"
-        );
-
-        const frequencyRoot = page
-          .locator('[data-slot="knob"]')
-          .filter({ has: page.getByText("Frequency", { exact: true }) });
-
-        await expect(
-          frequencyRoot.locator('[data-slot="knob-tick"]')
-        ).toHaveCount(11);
-
-        await expect(
-          frequencyRoot.locator('[data-slot="knob-scale-label"]')
-        ).toHaveCount(3);
-
-        await expect(
-          frequencyRoot.locator('[data-slot="knob-cap"]')
-        ).toHaveCount(1);
-
-        expect(consoleFailures).toEqual([]);
-
-        await page.screenshot({
-          fullPage: true,
-          path: screenshot,
-        });
-
-        report.runtimes.push({
-          committed: await committed.textContent(),
-          consoleFailures,
-          finalValue: await value.textContent(),
-          runtime: runtime.runtime,
-          screenshot: screenshot.slice(root.length + 1),
-        });
-      } finally {
-        await browser.close();
-      }
-    } finally {
-      preview.kill("SIGTERM");
-
-      if (preview.exitCode === null) {
-        await once(preview, "close");
-      }
+    if (!box) {
+      throw new Error(`Missing knob bounds for ${runtime}.`);
     }
-  }
 
-  report.pass = true;
-} catch (error) {
-  report.error =
-    error instanceof Error ? error.message : String(error);
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 - 40);
+    await page.mouse.up();
 
-  throw error;
-} finally {
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
-}
+    await expect(value).toHaveText("10");
+    await expect(reason).toHaveText("drag");
+    await expect(committed).toHaveText("10");
+
+    await expect(
+      page.getByRole("slider", { name: "Frequency" })
+    ).toHaveAttribute("aria-valuetext", "1.0 kHz");
+
+    const frequencyRoot = page
+      .locator('[data-slot="knob"]')
+      .filter({ has: page.getByText("Frequency", { exact: true }) });
+
+    await expect(frequencyRoot.locator('[data-slot="knob-tick"]')).toHaveCount(11);
+    await expect(
+      frequencyRoot.locator('[data-slot="knob-scale-label"]')
+    ).toHaveCount(3);
+    await expect(frequencyRoot.locator('[data-slot="knob-cap"]')).toHaveCount(1);
+
+    return {
+      committed: await committed.textContent(),
+      finalValue: await value.textContent(),
+    };
+  },
+  name: "knob",
+  port: 5021,
+  viewport: { height: 720, width: 1000 },
+});

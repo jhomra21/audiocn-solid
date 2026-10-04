@@ -1,55 +1,6 @@
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import {
-  mkdir,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { expect } from "@playwright/test";
 
-import { chromium, expect } from "@playwright/test";
-
-import { run, waitForServer } from "./runner";
-
-interface InstallRuntime {
-  fixture: string;
-  runtime: "solid1" | "solid2";
-}
-
-interface InstallReport {
-  pass: boolean;
-  runtimes: InstallRuntime[];
-}
-
-interface RuntimeEvidence {
-  consoleFailures: string[];
-  runtime: InstallRuntime["runtime"];
-  screenshot: string;
-}
-
-interface AcceptanceReport {
-  pass: boolean;
-  runtimes: RuntimeEvidence[];
-  error?: string;
-}
-
-const root = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.."
-);
-
-const installReportPath = join(
-  root,
-  "artifacts",
-  "registry-install.json"
-);
-
-const artifactPath = join(
-  root,
-  "artifacts",
-  "channel-strip-e2e.json"
-);
+import { runAcceptance } from "./runner";
 
 const appSource = `import { createSignal } from "solid-js";
 
@@ -145,347 +96,51 @@ export default function App() {
 }
 `;
 
-const installReport: InstallReport =
-  JSON.parse(
-    await readFile(
-      installReportPath,
-      "utf8"
-    )
-  );
+await runAcceptance({
+  appSource,
+  check: async (page) => {
+    const mic = page.getByRole("group", { name: "Mic" });
+    const toggleClipping = page.getByRole("button", { name: "Toggle clipping" });
 
-if (!installReport.pass) {
-  throw new Error(
-    "Registry install report did not pass."
-  );
-}
+    await expect(mic).toHaveAttribute("data-orientation", "vertical");
+    await expect(mic).toHaveAttribute("data-muted", "");
+    await expect(mic).toHaveAttribute("data-solo", "");
+    await expect(mic).toHaveAttribute("data-selected", "");
+    await expect(mic).toHaveAttribute("data-disabled", "");
+    await expect(mic).toHaveAttribute("data-size", "lg");
+    await expect(mic).toHaveAttribute("data-variant", "card");
+    await expect(mic).toHaveAttribute("style", /--channel-accent/);
 
-const report: AcceptanceReport = {
-  pass: false,
-  runtimes: [],
-};
-
-await mkdir(
-  dirname(artifactPath),
-  { recursive: true }
-);
-
-try {
-  for (
-    const [
-      index,
-      runtime,
-    ] of
-    installReport.runtimes.entries()
-  ) {
-    const port =
-      5071 + index;
-
-    const baseUrl =
-      `http://127.0.0.1:${port}`;
-
-    const screenshot = join(
-      root,
-      "artifacts",
-      `channel-strip-${runtime.runtime}.png`
+    await expect(page.getByTestId("strip-state")).toHaveText(
+      "vertical|true|true|false"
+    );
+    await expect(page.getByTestId("config-state")).toHaveText(
+      "vertical|true|true|lg"
     );
 
-    await writeFile(
-      join(
-        runtime.fixture,
-        "src",
-        "App.tsx"
-      ),
-      appSource
+    await expect(
+      mic.locator('[data-slot="channel-strip-status"]')
+    ).toHaveAttribute("data-tone", "live");
+    await expect(
+      mic.locator('[data-slot="channel-strip-notice"]')
+    ).toHaveText("Peak warning");
+
+    await expect(mic).not.toHaveAttribute("data-clipping");
+    await toggleClipping.click();
+    await expect(mic).toHaveAttribute("data-clipping", "");
+    await toggleClipping.click();
+    await expect(mic).not.toHaveAttribute("data-clipping");
+
+    await expect(
+      mic.locator('[data-slot="channel-strip-layout"]')
+    ).toContainText("Fader");
+    await expect(page.getByRole("group", { name: "Aux" })).toHaveClass(
+      /@container\/channel-strip/
     );
 
-    await run(
-      "bun",
-      ["run", "typecheck"],
-      runtime.fixture
-    );
-
-    await run(
-      "bun",
-      ["run", "build"],
-      runtime.fixture
-    );
-
-    const preview = spawn(
-      "bunx",
-      [
-        "vite",
-        "preview",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        String(port),
-      ],
-      {
-        cwd: runtime.fixture,
-        env: process.env,
-        stdio: "inherit",
-      }
-    );
-
-    try {
-      await waitForServer(
-        baseUrl
-      );
-
-      const browser =
-        await chromium.launch();
-
-      try {
-        const page =
-          await browser.newPage({
-            viewport: {
-              height: 900,
-              width: 1000,
-            },
-          });
-
-        const consoleFailures:
-          string[] = [];
-
-        page.on(
-          "console",
-          (message) => {
-            if (
-              message.type() ===
-                "warning" ||
-              message.type() ===
-                "error"
-            ) {
-              consoleFailures.push(
-                `${message.type()}: ${message.text()}`
-              );
-            }
-          }
-        );
-
-        page.on(
-          "pageerror",
-          (error) => {
-            consoleFailures.push(
-              `pageerror: ${error.message}`
-            );
-          }
-        );
-
-        await page.goto(
-          baseUrl
-        );
-
-        const mic =
-          page.getByRole(
-            "group",
-            {
-              name: "Mic",
-            }
-          );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-orientation",
-          "vertical"
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-muted",
-          ""
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-solo",
-          ""
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-selected",
-          ""
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-disabled",
-          ""
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-size",
-          "lg"
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-variant",
-          "card"
-        );
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "style",
-          /--channel-accent/
-        );
-
-        await expect(
-          page.getByTestId(
-            "strip-state"
-          )
-        ).toHaveText(
-          "vertical|true|true|false"
-        );
-
-        await expect(
-          page.getByTestId(
-            "config-state"
-          )
-        ).toHaveText(
-          "vertical|true|true|lg"
-        );
-
-        await expect(
-          mic.locator(
-            '[data-slot="channel-strip-status"]'
-          )
-        ).toHaveAttribute(
-          "data-tone",
-          "live"
-        );
-
-        await expect(
-          mic.locator(
-            '[data-slot="channel-strip-notice"]'
-          )
-        ).toHaveText(
-          "Peak warning"
-        );
-
-        await expect(
-          mic
-        ).not.toHaveAttribute(
-          "data-clipping"
-        );
-
-        await page
-          .getByRole(
-            "button",
-            {
-              name:
-                "Toggle clipping",
-            }
-          )
-          .click();
-
-        await expect(
-          mic
-        ).toHaveAttribute(
-          "data-clipping",
-          ""
-        );
-
-        await page
-          .getByRole(
-            "button",
-            {
-              name:
-                "Toggle clipping",
-            }
-          )
-          .click();
-
-        await expect(
-          mic
-        ).not.toHaveAttribute(
-          "data-clipping"
-        );
-
-        const layout =
-          mic.locator(
-            '[data-slot="channel-strip-layout"]'
-          );
-
-        await expect(
-          layout
-        ).toContainText(
-          "Fader"
-        );
-
-        const aux =
-          page.getByRole(
-            "group",
-            {
-              name: "Aux",
-            }
-          );
-
-        await expect(
-          aux
-        ).toHaveClass(
-          /@container\/channel-strip/
-        );
-
-        expect(
-          consoleFailures
-        ).toEqual([]);
-
-        await page.screenshot({
-          fullPage: true,
-          path: screenshot,
-        });
-
-        report.runtimes.push({
-          consoleFailures,
-          runtime:
-            runtime.runtime,
-          screenshot:
-            screenshot.slice(
-              root.length + 1
-            ),
-        });
-      } finally {
-        await browser.close();
-      }
-    } finally {
-      preview.kill(
-        "SIGTERM"
-      );
-
-      if (
-        preview.exitCode ===
-        null
-      ) {
-        await once(
-          preview,
-          "close"
-        );
-      }
-    }
-  }
-
-  report.pass = true;
-} catch (error) {
-  report.error =
-    error instanceof Error
-      ? error.message
-      : String(error);
-
-  throw error;
-} finally {
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
-}
+    return {};
+  },
+  name: "channel-strip",
+  port: 5071,
+  viewport: { height: 900, width: 1000 },
+});

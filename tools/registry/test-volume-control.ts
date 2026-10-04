@@ -1,57 +1,6 @@
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import {
-  mkdir,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { expect } from "@playwright/test";
 
-import { chromium, expect } from "@playwright/test";
-
-import { run, waitForServer } from "./runner";
-
-interface InstallRuntime {
-  fixture: string;
-  runtime: "solid1" | "solid2";
-}
-
-interface InstallReport {
-  pass: boolean;
-  runtimes: InstallRuntime[];
-}
-
-interface RuntimeEvidence {
-  committed: string;
-  consoleFailures: string[];
-  finalVolume: string;
-  runtime: InstallRuntime["runtime"];
-  screenshot: string;
-}
-
-interface AcceptanceReport {
-  pass: boolean;
-  runtimes: RuntimeEvidence[];
-  error?: string;
-}
-
-const root = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.."
-);
-
-const installReportPath = join(
-  root,
-  "artifacts",
-  "registry-install.json"
-);
-
-const artifactPath = join(
-  root,
-  "artifacts",
-  "volume-control-e2e.json"
-);
+import { runAcceptance } from "./runner";
 
 const appSource = `import { createSignal } from "solid-js";
 
@@ -105,432 +54,85 @@ export default function App() {
 }
 `;
 
-const installReport: InstallReport =
-  JSON.parse(
-    await readFile(
-      installReportPath,
-      "utf8"
-    )
-  );
+await runAcceptance({
+  appSource,
+  check: async (page, runtime) => {
+    const groups = page.getByRole("group", { name: "Volume" });
+    const main = groups.nth(0);
+    const zero = groups.nth(1);
+    const vertical = groups.nth(2);
+    const slider = main.getByRole("slider", { name: "Volume" });
+    const mute = main.getByRole("button", { name: "Mute" });
+    const value = main.locator('[data-slot="volume-control-value"]');
+    const volume = page.getByTestId("volume");
+    const muted = page.getByTestId("muted");
+    const committed = page.getByTestId("committed");
 
-if (!installReport.pass) {
-  throw new Error(
-    "Registry install report did not pass."
-  );
-}
+    await expect(slider).toHaveAttribute("aria-valuetext", "25%");
+    await expect(value).toHaveText("50%");
+    await expect(main).toHaveAttribute("data-level", "low");
 
-const report: AcceptanceReport = {
-  pass: false,
-  runtimes: [],
-};
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect(volume).toHaveText("0.3025");
+    await expect(committed).toHaveText("0.3025");
 
-await mkdir(
-  dirname(artifactPath),
-  { recursive: true }
-);
+    await mute.click();
+    await expect(muted).toHaveText("true");
+    await expect(slider).toHaveAttribute("aria-valuetext", "Muted");
+    await expect(value).toHaveText("0%");
+    await expect(main).toHaveAttribute("data-level", "muted");
 
-try {
-  for (
-    const [
-      index,
-      runtime,
-    ] of
-    installReport.runtimes.entries()
-  ) {
-    const port =
-      5051 + index;
+    await main.getByRole("button", { name: "Unmute" }).click();
+    await expect(muted).toHaveText("false");
 
-    const baseUrl =
-      `http://127.0.0.1:${port}`;
+    await slider.press("Home");
+    await expect(volume).toHaveText("0");
 
-    const screenshot = join(
-      root,
-      "artifacts",
-      `volume-control-${runtime.runtime}.png`
-    );
+    await slider.press("End");
+    await expect(volume).toHaveText("1");
 
-    await writeFile(
-      join(
-        runtime.fixture,
-        "src",
-        "App.tsx"
-      ),
-      appSource
-    );
+    await slider.press("Home");
 
-    await run(
-      "bun",
-      ["run", "typecheck"],
-      runtime.fixture
-    );
+    const trackBox = await main
+      .locator('[data-slot="volume-control-slider"]')
+      .boundingBox();
 
-    await run(
-      "bun",
-      ["run", "build"],
-      runtime.fixture
-    );
+    const thumbBox = await slider.boundingBox();
 
-    const preview = spawn(
-      "bunx",
-      [
-        "vite",
-        "preview",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        String(port),
-      ],
-      {
-        cwd: runtime.fixture,
-        env: process.env,
-        stdio: "inherit",
-      }
-    );
-
-    try {
-      await waitForServer(
-        baseUrl
-      );
-
-      const browser =
-        await chromium.launch();
-
-      try {
-        const page =
-          await browser.newPage({
-            viewport: {
-              height: 760,
-              width: 900,
-            },
-          });
-
-        const consoleFailures:
-          string[] = [];
-
-        page.on(
-          "console",
-          (message) => {
-            if (
-              message.type() ===
-                "warning" ||
-              message.type() ===
-                "error"
-            ) {
-              consoleFailures.push(
-                `${message.type()}: ${message.text()}`
-              );
-            }
-          }
-        );
-
-        page.on(
-          "pageerror",
-          (error) => {
-            consoleFailures.push(
-              `pageerror: ${error.message}`
-            );
-          }
-        );
-
-        await page.goto(
-          baseUrl
-        );
-
-        const groups =
-          page.getByRole(
-            "group",
-            {
-              name: "Volume",
-            }
-          );
-
-        const main =
-          groups.nth(0);
-
-        const zero =
-          groups.nth(1);
-
-        const vertical =
-          groups.nth(2);
-
-        const slider =
-          main.getByRole(
-            "slider",
-            {
-              name: "Volume",
-            }
-          );
-
-        const mute =
-          main.getByRole(
-            "button",
-            {
-              name: "Mute",
-            }
-          );
-
-        const value =
-          main.locator(
-            '[data-slot="volume-control-value"]'
-          );
-
-        await expect(
-          slider
-        ).toHaveAttribute(
-          "aria-valuetext",
-          "25%"
-        );
-
-        await expect(
-          value
-        ).toHaveText("50%");
-
-        await expect(
-          main
-        ).toHaveAttribute(
-          "data-level",
-          "low"
-        );
-
-        await slider.focus();
-
-        await slider.press(
-          "ArrowRight"
-        );
-
-        await expect(
-          page.getByTestId(
-            "volume"
-          )
-        ).toHaveText("0.3025");
-
-        await expect(
-          page.getByTestId(
-            "committed"
-          )
-        ).toHaveText("0.3025");
-
-        await mute.click();
-
-        await expect(
-          page.getByTestId(
-            "muted"
-          )
-        ).toHaveText("true");
-
-        await expect(
-          slider
-        ).toHaveAttribute(
-          "aria-valuetext",
-          "Muted"
-        );
-
-        await expect(
-          value
-        ).toHaveText("0%");
-
-        await expect(
-          main
-        ).toHaveAttribute(
-          "data-level",
-          "muted"
-        );
-
-        await main
-          .getByRole(
-            "button",
-            {
-              name: "Unmute",
-            }
-          )
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "muted"
-          )
-        ).toHaveText("false");
-
-        await slider.press(
-          "Home"
-        );
-
-        await expect(
-          page.getByTestId(
-            "volume"
-          )
-        ).toHaveText("0");
-
-        await slider.press(
-          "End"
-        );
-
-        await expect(
-          page.getByTestId(
-            "volume"
-          )
-        ).toHaveText("1");
-
-        await slider.press(
-          "Home"
-        );
-
-        const track =
-          main.locator(
-            '[data-slot="volume-control-slider"]'
-          );
-
-        const trackBox =
-          await track.boundingBox();
-
-        const thumbBox =
-          await slider.boundingBox();
-
-        if (
-          !trackBox ||
-          !thumbBox
-        ) {
-          throw new Error(
-            `Missing volume bounds for ${runtime.runtime}.`
-          );
-        }
-
-        await page.mouse.move(
-          thumbBox.x +
-            thumbBox.width / 2,
-          thumbBox.y +
-            thumbBox.height / 2
-        );
-
-        await page.mouse.down();
-
-        await page.mouse.move(
-          trackBox.x +
-            trackBox.width *
-              0.5,
-          thumbBox.y +
-            thumbBox.height / 2
-        );
-
-        await page.mouse.up();
-
-        await expect(
-          page.getByTestId(
-            "volume"
-          )
-        ).toHaveText("0.25");
-
-        await expect(
-          page.getByTestId(
-            "committed"
-          )
-        ).toHaveText("0.25");
-
-        const zeroMute =
-          zero.getByRole(
-            "button",
-            {
-              name: "Mute",
-            }
-          );
-
-        await zeroMute.click();
-
-        await zero
-          .getByRole(
-            "button",
-            {
-              name: "Unmute",
-            }
-          )
-          .click();
-
-        await expect(
-          page.getByTestId(
-            "restored"
-          )
-        ).toHaveText("1");
-
-        await expect(
-          vertical
-        ).toHaveAttribute(
-          "data-orientation",
-          "vertical"
-        );
-
-        await expect(
-          vertical.getByRole(
-            "slider",
-            {
-              name: "Volume",
-            }
-          )
-        ).toHaveAttribute(
-          "aria-valuetext",
-          "25%"
-        );
-
-        expect(
-          consoleFailures
-        ).toEqual([]);
-
-        await page.screenshot({
-          fullPage: true,
-          path: screenshot,
-        });
-
-        report.runtimes.push({
-          committed:
-            await page
-              .getByTestId(
-                "committed"
-              )
-              .textContent(),
-          consoleFailures,
-          finalVolume:
-            await page
-              .getByTestId(
-                "volume"
-              )
-              .textContent(),
-          runtime:
-            runtime.runtime,
-          screenshot:
-            screenshot.slice(
-              root.length + 1
-            ),
-        });
-      } finally {
-        await browser.close();
-      }
-    } finally {
-      preview.kill(
-        "SIGTERM"
-      );
-
-      if (
-        preview.exitCode ===
-        null
-      ) {
-        await once(
-          preview,
-          "close"
-        );
-      }
+    if (!trackBox || !thumbBox) {
+      throw new Error(`Missing volume bounds for ${runtime}.`);
     }
-  }
 
-  report.pass = true;
-} catch (error) {
-  report.error =
-    error instanceof Error
-      ? error.message
-      : String(error);
+    await page.mouse.move(
+      thumbBox.x + thumbBox.width / 2,
+      thumbBox.y + thumbBox.height / 2
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      trackBox.x + trackBox.width * 0.5,
+      thumbBox.y + thumbBox.height / 2
+    );
+    await page.mouse.up();
 
-  throw error;
-} finally {
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
-}
+    await expect(volume).toHaveText("0.25");
+    await expect(committed).toHaveText("0.25");
+
+    await zero.getByRole("button", { name: "Mute" }).click();
+    await zero.getByRole("button", { name: "Unmute" }).click();
+    await expect(page.getByTestId("restored")).toHaveText("1");
+
+    await expect(vertical).toHaveAttribute("data-orientation", "vertical");
+    await expect(
+      vertical.getByRole("slider", { name: "Volume" })
+    ).toHaveAttribute("aria-valuetext", "25%");
+
+    return {
+      committed: await committed.textContent(),
+      finalVolume: await volume.textContent(),
+    };
+  },
+  name: "volume-control",
+  port: 5051,
+  viewport: { height: 760, width: 900 },
+});

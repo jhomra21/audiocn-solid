@@ -12,11 +12,8 @@ import {
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 
-import { run } from "./runner";
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+import { root, run } from "./runner";
 
 const registryRoot = join(root, "site/public/r");
 

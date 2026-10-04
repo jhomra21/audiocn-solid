@@ -1,56 +1,6 @@
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import {
-  mkdir,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { expect } from "@playwright/test";
 
-import { chromium, expect } from "@playwright/test";
-
-import { run, waitForServer } from "./runner";
-
-interface InstallRuntime {
-  fixture: string;
-  runtime: "solid1" | "solid2";
-}
-
-interface InstallReport {
-  pass: boolean;
-  runtimes: InstallRuntime[];
-}
-
-interface RuntimeEvidence {
-  consoleFailures: string[];
-  focused: string;
-  runtime: InstallRuntime["runtime"];
-  screenshot: string;
-}
-
-interface AcceptanceReport {
-  pass: boolean;
-  runtimes: RuntimeEvidence[];
-  error?: string;
-}
-
-const root = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.."
-);
-
-const installReportPath = join(
-  root,
-  "artifacts",
-  "registry-install.json"
-);
-
-const artifactPath = join(
-  root,
-  "artifacts",
-  "mixer-e2e.json"
-);
+import { runAcceptance } from "./runner";
 
 const appSource = `import {
   ChannelStrip,
@@ -152,306 +102,54 @@ export default function App() {
 }
 `;
 
-const installReport: InstallReport =
-  JSON.parse(
-    await readFile(
-      installReportPath,
-      "utf8"
-    )
-  );
+await runAcceptance({
+  appSource,
+  check: async (page) => {
+    const mixer = page.getByRole("group", { name: "Console" });
 
-if (!installReport.pass) {
-  throw new Error(
-    "Registry install report did not pass."
-  );
-}
-
-const report: AcceptanceReport = {
-  pass: false,
-  runtimes: [],
-};
-
-await mkdir(
-  dirname(artifactPath),
-  { recursive: true }
-);
-
-try {
-  for (
-    const [
-      index,
-      runtime,
-    ] of
-    installReport.runtimes.entries()
-  ) {
-    const port =
-      5081 + index;
-
-    const baseUrl =
-      `http://127.0.0.1:${port}`;
-
-    const screenshot = join(
-      root,
-      "artifacts",
-      `mixer-${runtime.runtime}.png`
+    await expect(mixer).toHaveAttribute("data-orientation", "vertical");
+    await expect(mixer).toHaveAttribute("data-size", "sm");
+    await expect(page.getByTestId("mixer-context")).toHaveText(
+      "vertical|vertical|sm|false|-72|3"
     );
 
-    await writeFile(
-      join(
-        runtime.fixture,
-        "src",
-        "App.tsx"
-      ),
-      appSource
-    );
+    const sliders = mixer.locator('[data-slot="fader-thumb"]');
+    const first = sliders.nth(0);
+    const second = sliders.nth(1);
 
-    await run(
-      "bun",
-      ["run", "typecheck"],
-      runtime.fixture
-    );
+    await expect(sliders).toHaveCount(2);
 
-    await run(
-      "bun",
-      ["run", "build"],
-      runtime.fixture
-    );
+    await first.focus();
+    await first.press("Control+ArrowRight");
+    await expect(second).toBeFocused();
 
-    const preview = spawn(
-      "bunx",
-      [
-        "vite",
-        "preview",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        String(port),
-      ],
-      {
-        cwd: runtime.fixture,
-        env: process.env,
-        stdio: "inherit",
-      }
-    );
+    await second.press("Control+ArrowLeft");
+    await expect(first).toBeFocused();
 
-    try {
-      await waitForServer(
-        baseUrl
-      );
+    await expect(
+      mixer.locator('[data-slot="mixer-separator"]')
+    ).toHaveClass(/h-full/);
+    await expect(
+      mixer.locator('[data-slot="mixer-master"]')
+    ).toContainText("Master");
 
-      const browser =
-        await chromium.launch();
+    const empty = page.getByRole("group", { name: "Empty mixer" });
 
-      try {
-        const page =
-          await browser.newPage({
-            viewport: {
-              height: 900,
-              width: 1100,
-            },
-          });
+    await expect(empty.locator('[data-slot="mixer-channels"]')).toBeHidden();
+    await expect(empty.locator('[data-slot="mixer-empty"]')).toBeVisible();
+    await expect(page.getByTestId("disabled-context")).toHaveText("true");
 
-        const consoleFailures:
-          string[] = [];
+    return {
+      focused: await page.evaluate(() => {
+        const active = document.activeElement;
 
-        page.on(
-          "console",
-          (message) => {
-            if (
-              message.type() ===
-                "warning" ||
-              message.type() ===
-                "error"
-            ) {
-              consoleFailures.push(
-                `${message.type()}: ${message.text()}`
-              );
-            }
-          }
-        );
-
-        page.on(
-          "pageerror",
-          (error) => {
-            consoleFailures.push(
-              `pageerror: ${error.message}`
-            );
-          }
-        );
-
-        await page.goto(
-          baseUrl
-        );
-
-        const mixer =
-          page.getByRole(
-            "group",
-            {
-              name: "Console",
-            }
-          );
-
-        await expect(
-          mixer
-        ).toHaveAttribute(
-          "data-orientation",
-          "vertical"
-        );
-
-        await expect(
-          mixer
-        ).toHaveAttribute(
-          "data-size",
-          "sm"
-        );
-
-        await expect(
-          page.getByTestId(
-            "mixer-context"
-          )
-        ).toHaveText(
-          "vertical|vertical|sm|false|-72|3"
-        );
-
-        const sliders =
-          mixer.locator(
-            '[data-slot="fader-thumb"]'
-          );
-
-        await expect(
-          sliders
-        ).toHaveCount(2);
-
-        const first =
-          sliders.nth(0);
-
-        const second =
-          sliders.nth(1);
-
-        await first.focus();
-
-        await first.press(
-          "Control+ArrowRight"
-        );
-
-        await expect(
-          second
-        ).toBeFocused();
-
-        await second.press(
-          "Control+ArrowLeft"
-        );
-
-        await expect(
-          first
-        ).toBeFocused();
-
-        await expect(
-          mixer.locator(
-            '[data-slot="mixer-separator"]'
-          )
-        ).toHaveClass(
-          /h-full/
-        );
-
-        await expect(
-          mixer.locator(
-            '[data-slot="mixer-master"]'
-          )
-        ).toContainText(
-          "Master"
-        );
-
-        const empty =
-          page.getByRole(
-            "group",
-            {
-              name:
-                "Empty mixer",
-            }
-          );
-
-        await expect(
-          empty.locator(
-            '[data-slot="mixer-channels"]'
-          )
-        ).toBeHidden();
-
-        await expect(
-          empty.locator(
-            '[data-slot="mixer-empty"]'
-          )
-        ).toBeVisible();
-
-        await expect(
-          page.getByTestId(
-            "disabled-context"
-          )
-        ).toHaveText("true");
-
-        expect(
-          consoleFailures
-        ).toEqual([]);
-
-        await page.screenshot({
-          fullPage: true,
-          path: screenshot,
-        });
-
-        report.runtimes.push({
-          consoleFailures,
-          focused:
-            await page.evaluate(
-              () => {
-                const active =
-                  document.activeElement;
-
-                return active instanceof
-                  HTMLElement
-                  ? active.getAttribute(
-                      "aria-label"
-                    ) ?? ""
-                  : "";
-              }
-            ),
-          runtime:
-            runtime.runtime,
-          screenshot:
-            screenshot.slice(
-              root.length + 1
-            ),
-        });
-      } finally {
-        await browser.close();
-      }
-    } finally {
-      preview.kill(
-        "SIGTERM"
-      );
-
-      if (
-        preview.exitCode ===
-        null
-      ) {
-        await once(
-          preview,
-          "close"
-        );
-      }
-    }
-  }
-
-  report.pass = true;
-} catch (error) {
-  report.error =
-    error instanceof Error
-      ? error.message
-      : String(error);
-
-  throw error;
-} finally {
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
-}
+        return active instanceof HTMLElement
+          ? (active.getAttribute("aria-label") ?? "")
+          : "";
+      }),
+    };
+  },
+  name: "mixer",
+  port: 5081,
+  viewport: { height: 900, width: 1100 },
+});
