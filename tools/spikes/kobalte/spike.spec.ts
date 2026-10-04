@@ -28,7 +28,7 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
     changeValue: await telemetry.getAttribute("data-value"),
     refReady: await telemetry.getAttribute("data-ref-ready"),
   });
-  await expect(slider).toHaveAttribute("aria-valuenow", "30");
+  await expect.soft(slider).toHaveAttribute("aria-valuenow", "30");
 
   const track = page.getByTestId("slider-track");
   const box = await track.boundingBox();
@@ -38,9 +38,13 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   }
 
   await page.mouse.click(box.x + box.width * 0.8, box.y + box.height / 2);
-  await expect
+  await expect.soft
     .poll(async () => Number(await slider.getAttribute("aria-valuenow")))
     .toBeGreaterThan(30);
+  console.log("slider pointer telemetry", {
+    ariaValue: await slider.getAttribute("aria-valuenow"),
+    changeValue: await telemetry.getAttribute("data-value"),
+  });
 
   const selectTrigger = page.getByTestId("select-trigger");
   await selectTrigger.click();
