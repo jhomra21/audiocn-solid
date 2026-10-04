@@ -145,9 +145,12 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
 
       await expect(dialog).toBeVisible();
       await dialog.getByRole("searchbox").fill("Level Meter");
-      await expect(
-        dialog.getByRole("link", { name: "Level Meter", exact: true })
-      ).toBeVisible();
+      const searchResult = dialog.locator(
+        'a[href="/docs/components/level-meter"]'
+      );
+
+      await expect(searchResult).toBeVisible();
+      await expect(searchResult).toContainText("Level Meter");
 
       await page.keyboard.press("Escape");
       await expect(dialog).toBeHidden();
