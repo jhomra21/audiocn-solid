@@ -411,8 +411,8 @@ try {
         );
 
         await expect(
-          mic.getByRole(
-            "status"
+          mic.locator(
+            '[data-slot="channel-strip-notice"]'
           )
         ).toHaveText(
           "Peak warning"
