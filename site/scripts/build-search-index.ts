@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import {
   searchSchema,
   type SearchDocument,
-} from "../lib/search-schema.ts";
+} from "../lib/search-schema";
 
 interface SearchIndexPayload {
   version: 1;
