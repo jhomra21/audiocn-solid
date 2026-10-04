@@ -427,12 +427,17 @@ try {
           consoleFailures,
           focused:
             await page.evaluate(
-              () =>
-                (
-                  document.activeElement as HTMLElement | null
-                )?.getAttribute(
-                  "aria-label"
-                ) ?? ""
+              () => {
+                const active =
+                  document.activeElement;
+
+                return active instanceof
+                  HTMLElement
+                  ? active.getAttribute(
+                      "aria-label"
+                    ) ?? ""
+                  : "";
+              }
             ),
           runtime:
             runtime.runtime,
