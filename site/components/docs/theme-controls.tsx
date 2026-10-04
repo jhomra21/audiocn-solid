@@ -28,6 +28,7 @@ const applyColorTheme = (theme: ThemeName) => {
 const readColorTheme = (): ThemeName => {
   try {
     const stored = window.localStorage.getItem(COLOR_STORAGE_KEY);
+
     return isTheme(stored) ? stored : "stone";
   } catch {
     return "stone";
