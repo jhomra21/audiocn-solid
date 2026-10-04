@@ -20,8 +20,10 @@ export default defineConfig({
     {
       enforce: "pre",
       ...mdx({
+        elementAttributeNameCase: "html",
         jsx: true,
         providerImportSource: "@/site/src/mdx-provider",
+        stylePropertyNameCase: "css",
         rehypePlugins: [
           rehypeSlug,
           [
