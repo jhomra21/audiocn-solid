@@ -145,6 +145,7 @@ try {
   for (const [index, runtime] of installReport.runtimes.entries()) {
     const port = 5001 + index;
     const baseUrl = `http://127.0.0.1:${port}`;
+
     const screenshot = join(
       root,
       "artifacts",
@@ -182,6 +183,7 @@ try {
         const page = await browser.newPage({
           viewport: { height: 700, width: 900 },
         });
+
         const consoleFailures: string[] = [];
 
         page.on("console", (message) => {
