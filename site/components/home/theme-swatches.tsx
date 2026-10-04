@@ -13,7 +13,7 @@ export const ThemeSwatches = () => {
       <For each={THEMES}>
         {(option) => (
           <Button
-            aria-pressed={theme() === option.value}
+            aria-pressed={theme() === option.value ? "true" : "false"}
             onClick={() => setTheme(option.value)}
             size="xs"
             variant={theme() === option.value ? "outline" : "ghost"}
