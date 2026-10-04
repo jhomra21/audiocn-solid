@@ -58,6 +58,8 @@ const sharedAppPath = join(root, "tools/spikes/kobalte/App.tsx");
 
 const sharedStylesPath = join(root, "tools/spikes/kobalte/styles.css");
 
+const compatEffectPath = join(root, "lib/solid/effect.ts");
+
 const runtimes: RuntimeConfig[] = [
   { name: "solid1", port: 4191 },
   { name: "solid2", port: 4192 },
@@ -190,9 +192,10 @@ const createFixture = async (runtime: RuntimeName): Promise<string> => {
 
   await mkdir(sourceDir, { recursive: true });
 
-  const [app, styles] = await Promise.all([
+  const [app, styles, compatEffect] = await Promise.all([
     readFile(sharedAppPath, "utf8"),
     readFile(sharedStylesPath, "utf8"),
+    readFile(compatEffectPath, "utf8"),
   ]);
 
   await Promise.all([
@@ -204,6 +207,7 @@ const createFixture = async (runtime: RuntimeName): Promise<string> => {
       '<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n'
     ),
     writeFile(join(sourceDir, "App.tsx"), app),
+    writeFile(join(sourceDir, "effect.ts"), compatEffect),
     writeFile(join(sourceDir, "main.tsx"), mainFor(runtime)),
     writeFile(join(sourceDir, "styles.css"), styles),
   ]);
@@ -334,6 +338,23 @@ const report: Spike4Report = {
       solid2: "Solid 2 Ref arrays plus merge/omit and two-phase effects",
       consequence:
         "The implementation differs internally, but the tested public API does not.",
+    },
+    {
+      surface: "Slider thumb editability",
+      solid1:
+        "0.13.14 marks registered thumbs editable during its mount lifecycle.",
+      solid2:
+        "2.0.0-alpha.2 leaves registered thumbs non-editable on Solid 2 rc.13.",
+      consequence:
+        "Shared source re-applies editability from the registered thumb count and disabled state using lib/solid/effect.ts.",
+    },
+    {
+      surface: "Solid 2 peer range",
+      solid1: "0.13.14 supports the Solid 1 runtime used by the fixture.",
+      solid2:
+        "2.0.0-alpha.2 declares rc.3 peers, while the current Solid runtime is rc.13.",
+      consequence:
+        "Bun reports peer warnings. Keep this as a prerelease compatibility caveat until Kobalte publishes an rc.13-compatible range.",
     },
   ],
   runtimes: [],
