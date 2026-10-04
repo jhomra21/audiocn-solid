@@ -81,6 +81,9 @@ jobs:
             artifacts/knob-e2e.json
             artifacts/knob-solid1.png
             artifacts/knob-solid2.png
+            artifacts/pan-control-e2e.json
+            artifacts/pan-control-solid1.png
+            artifacts/pan-control-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client
