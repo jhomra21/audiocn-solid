@@ -48,6 +48,26 @@ const cases = [
   },
   {
     description:
+      "The units audiocn uses, and the helpers in the audio core that convert between them.",
+    hasMeter: false,
+    path: "/docs/concepts/decibels",
+    title: "Decibels and levels - audiocn Solid",
+  },
+  {
+    description: "Every audiocn component, grouped by what it does.",
+    hasMeter: false,
+    path: "/docs/components",
+    title: "Components - audiocn Solid",
+  },
+  {
+    description:
+      "Complete, working assemblies you install once and then make your own.",
+    hasMeter: false,
+    path: "/docs/blocks",
+    title: "Blocks - audiocn Solid",
+  },
+  {
+    description:
       "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
     hasMeter: true,
     path: "/docs/components/level-meter",
