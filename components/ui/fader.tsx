@@ -346,6 +346,7 @@ export const FaderThumb = (props: FaderThumbProps) => {
     <SliderPrimitive.Thumb
       aria-label={context.ariaLabel()}
       aria-labelledby={context.ariaLabelledBy()}
+      aria-valuetext={context.format()(context.value())}
       class={cn(
         thumbVariants({
           orientation: context.orientation(),
