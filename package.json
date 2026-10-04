@@ -3,12 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "workspaces": [
+    "site"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "compare": "bun run tools/compare/run.ts",
     "parity": "cd site && bunx playwright test e2e/parity/parity.spec.ts",
     "check": "bun run typecheck && bun run build",
@@ -35,27 +40,26 @@
     "@fontsource-variable/dm-sans": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@fontsource-variable/outfit": "^5.3.0",
+    "@kobalte/core-solid1": "npm:@kobalte/core@0.13.14",
+    "@kobalte/core-solid2": "npm:@kobalte/core@2.0.0-alpha.2",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
-    "solid-js": "^1.9.15",
-    "@kobalte/core-solid1": "npm:@kobalte/core@0.13.14",
-    "@kobalte/core-solid2": "npm:@kobalte/core@2.0.0-alpha.2"
+    "solid-js": "^1.9.15"
   },
   "devDependencies": {
     "@oxlint/plugins": "1.86.0",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.19.0",
+    "oxfmt": "0.71.0",
     "oxlint": "1.86.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
+    "ultracite": "7.12.2",
     "vite": "^7.3.6",
     "vite-plugin-solid": "^2.11.14"
   },
   "peerDependencies": {
     "solid-js": ">=1.9.15 <3"
-  },
-  "workspaces": [
-    "site"
-  ]
+  }
 }
