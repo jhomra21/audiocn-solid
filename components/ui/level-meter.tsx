@@ -10,7 +10,7 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
-import type { DivDOMProps } from "@compat/jsx-types";
+import type { DivDOMProps } from "@/lib/solid/jsx-types";
 import type { ClipIndicatorProps } from "@/components/ui/clip-indicator";
 import { DbReadout, readChannel } from "@/components/ui/db-readout";
 import type { DbReadoutProps } from "@/components/ui/db-readout";
