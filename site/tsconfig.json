@@ -27,11 +27,11 @@
       "@solidjs/web/jsx-runtime": [
         "./node_modules/@solidjs/web/types/jsx.d.ts"
       ],
-      "@compat/jsx-types": [
-        "../lib/solid/compat/solid2/jsx-types.ts"
-      ],
       "@/*": [
         "../*"
+      ],
+      "@/lib/solid/jsx-types": [
+        "../lib/solid/compat/solid2/jsx-types.ts"
       ]
     },
     "types": [
@@ -48,7 +48,5 @@
     "../hooks",
     "../lib"
   ],
-  "exclude": [
-    "../lib/solid/compat/solid1"
-  ]
+  "exclude": []
 }
