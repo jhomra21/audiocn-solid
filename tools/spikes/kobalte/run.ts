@@ -186,6 +186,31 @@ render(() => <App />, document.getElementById("root")!);
 `;
 };
 
+const patchSliderEditableGuard = async (fixture: string): Promise<void> => {
+  const coreDist = join(fixture, "node_modules/@kobalte/core/dist");
+  const entries = await Array.fromAsync(new Bun.Glob("**/*.{js,jsx}").scan({ cwd: coreDist }));
+
+  let patched = false;
+
+  for (const entry of entries) {
+    const path = join(coreDist, entry);
+    const source = await readFile(path, "utf8");
+    const next = source.replace(
+      /if \(mergedProps\.isDisabled\(\) \|\| !isThumbEditable\(index\)\) return;/g,
+      "if (mergedProps.isDisabled()) return;"
+    );
+
+    if (next !== source) {
+      await writeFile(path, next);
+      patched = true;
+    }
+  }
+
+  if (!patched) {
+    throw new Error("Could not find Kobalte Slider editable guard to patch.");
+  }
+};
+
 const createFixture = async (runtime: RuntimeName): Promise<string> => {
   const fixture = await mkdtemp(join(tmpdir(), `kobalte-${runtime}-`));
   const sourceDir = join(fixture, "src");
@@ -378,6 +403,10 @@ try {
     try {
       await run("bun", ["install"], fixture);
       result.install = true;
+
+      if (runtime.name === "solid2") {
+        await patchSliderEditableGuard(fixture);
+      }
 
       await run("bun", ["run", "typecheck"], fixture);
       result.typecheck = true;
