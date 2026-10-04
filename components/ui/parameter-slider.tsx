@@ -209,8 +209,10 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   const step = () => props.step ?? 1;
   const largeStep = () => props.largeStep ?? 10;
   const decimals = () => props.decimals ?? decimalsOf(step());
+
   const resetValue = () =>
     props.resetValue ?? props.defaultValue ?? min();
+
   const disabled = () => props.disabled ?? config.disabled ?? false;
   const unit = () => props.unit;
   const marks = () => props.marks;
@@ -565,6 +567,7 @@ export const ParameterSliderInput = (
           (event.clientX - scrubStartX) /
             SCRUB_PIXELS_PER_STEP
         );
+
         const next = context.quantize(
           scrubStartValue + steps * context.step()
         );
@@ -703,6 +706,7 @@ export const ParameterSliderReset = (
 ) => {
   const context = useParameterSlider("ParameterSliderReset");
   const rest = omitProps(props, RESET_OWN);
+
   const modified = () =>
     context.value() !== context.resetValue();
 
@@ -941,6 +945,7 @@ export const ParameterSliderDescription = (
 ) => {
   const context =
     useParameterSlider("ParameterSliderDescription");
+
   const rest = omitProps(props, DESCRIPTION_OWN);
 
   return (
