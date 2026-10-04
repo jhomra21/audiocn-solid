@@ -83,6 +83,16 @@ const ContextProbe = () => {
   );
 };
 
+const DisabledProbe = () => {
+  const config = useAudioConfig();
+
+  return (
+    <output data-testid="disabled-context">
+      {String(config.disabled)}
+    </output>
+  );
+};
+
 const Strip = (props: { name: string }) => (
   <ChannelStrip>
     <ChannelStripTitle>{props.name}</ChannelStripTitle>
@@ -100,7 +110,6 @@ export default function App() {
   return (
     <main style="display: grid; gap: 40px; padding: 48px; min-height: 760px">
       <Mixer
-        disabled
         maxDb={3}
         minDb={-72}
         orientation="vertical"
@@ -130,6 +139,11 @@ export default function App() {
         <MixerTitle>Empty mixer</MixerTitle>
         <MixerChannels />
         <MixerEmpty>Nothing here</MixerEmpty>
+      </Mixer>
+
+      <Mixer disabled>
+        <MixerTitle>Disabled mixer</MixerTitle>
+        <DisabledProbe />
       </Mixer>
     </main>
   );
@@ -341,7 +355,7 @@ try {
             "mixer-context"
           )
         ).toHaveText(
-          "vertical|vertical|sm|true|-72|3"
+          "vertical|vertical|sm|false|-72|3"
         );
 
         const sliders =
@@ -413,6 +427,12 @@ try {
             '[data-slot="mixer-empty"]'
           )
         ).toBeVisible();
+
+        await expect(
+          page.getByTestId(
+            "disabled-context"
+          )
+        ).toHaveText("true");
 
         expect(
           consoleFailures
