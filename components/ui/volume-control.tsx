@@ -3,16 +3,17 @@ import {
   createContext,
   createMemo,
   createSignal,
-  onCleanup,
   useContext,
 } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
+import { roundValue } from "@/lib/number";
 import type { Orientation } from "@/lib/audio/types";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
@@ -28,8 +29,6 @@ const LOW_LEVEL = 0.34;
 const MEDIUM_LEVEL = 0.67;
 
 const PERCEPTUAL_EXPONENT = 2;
-
-const PRECISION = 1e6;
 
 export type VolumeLevel =
   | "muted"
@@ -83,9 +82,6 @@ const useVolumeControl = (
   return context;
 };
 
-const roundValue = (value: number): number =>
-  Math.round(value * PRECISION) / PRECISION;
-
 const levelFor = (
   volume: number,
   muted: boolean
@@ -118,156 +114,66 @@ const VolumeSliderCompat = (
   const context =
     SliderPrimitive.useSliderContext();
 
-  const originalSlideStart =
-    context.onSlideStart;
-
-  const originalSlideMove =
-    context.onSlideMove;
-
-  const originalSlideEnd =
-    context.onSlideEnd;
-
-  const originalStepHandler =
-    context.onStepKeyDown;
-
   let dragPosition =
     props.currentPosition();
 
   let pointerVolume = 0;
 
-  context.onStepKeyDown =
-    () => undefined;
-
-  context.onSlideStart = (
-    index,
-    position
-  ) => {
-    originalSlideStart?.(
-      index,
-      position
-    );
-
-    if (
-      context.state.isDisabled()
-    ) {
-      return;
-    }
-
-    dragPosition = clamp(
-      position,
-      0,
-      1
-    );
-
-    pointerVolume =
-      props.changeFromPointer(
-        dragPosition
-      );
-  };
-
-  context.onSlideMove = ({
-    deltaX,
-    deltaY,
-  }) => {
-    if (
-      context.state.isDisabled()
-    ) {
-      return;
-    }
-
-    const track =
-      context.trackRef();
-
-    if (!track) {
-      originalSlideMove?.({
-        deltaX,
-        deltaY,
-      });
-
-      return;
-    }
-
-    const rect =
-      track.getBoundingClientRect();
-
-    const horizontal =
-      props.orientation() ===
-      "horizontal";
-
-    const size = horizontal
-      ? rect.width
-      : rect.height;
-
-    if (size <= 0) {
-      return;
-    }
-
-    const delta = horizontal
-      ? deltaX
-      : deltaY;
-
-    const direction = horizontal
-      ? context.isSlidingFromLeft()
-        ? 1
-        : -1
-      : context.isSlidingFromBottom()
-        ? -1
-        : 1;
-
-    dragPosition = clamp(
-      dragPosition +
-        direction *
-          (delta / size),
-      0,
-      1
-    );
-
-    pointerVolume =
-      props.changeFromPointer(
-        dragPosition
-      );
-  };
-
-  context.onSlideEnd = () => {
-    originalSlideEnd?.();
-
-    props.commitPointer(
-      pointerVolume
-    );
-  };
-
-  onCleanup(() => {
-    context.onSlideStart =
-      originalSlideStart;
-
-    context.onSlideMove =
-      originalSlideMove;
-
-    context.onSlideEnd =
-      originalSlideEnd;
-
-    context.onStepKeyDown =
-      originalStepHandler;
-  });
-
-  createCompatEffect(
-    () => [
-      context.thumbs().length,
-      context.state.isDisabled(),
-    ] as const,
-    ([thumbCount, isDisabled]) => {
-      for (
-        let index = 0;
-        index < thumbCount;
-        index += 1
-      ) {
-        context.state.setThumbEditable(
-          index,
-          !isDisabled
-        );
+  useKobalteSliderCompat(context, {
+    onSlideEnd: (originalSlideEnd) => {
+      originalSlideEnd?.();
+      props.commitPointer(pointerVolume);
+    },
+    onSlideMove: (originalSlideMove, { deltaX, deltaY }) => {
+      if (context.state.isDisabled()) {
+        return;
       }
-    }
-  );
+
+      const track = context.trackRef();
+
+      if (!track) {
+        originalSlideMove?.({ deltaX, deltaY });
+
+        return;
+      }
+
+      const rect = track.getBoundingClientRect();
+      const horizontal = props.orientation() === "horizontal";
+      const size = horizontal ? rect.width : rect.height;
+
+      if (size <= 0) {
+        return;
+      }
+
+      const delta = horizontal ? deltaX : deltaY;
+
+      const direction = horizontal
+        ? context.isSlidingFromLeft()
+          ? 1
+          : -1
+        : context.isSlidingFromBottom()
+          ? -1
+          : 1;
+
+      dragPosition = clamp(
+        dragPosition + direction * (delta / size),
+        0,
+        1
+      );
+      pointerVolume = props.changeFromPointer(dragPosition);
+    },
+    onSlideStart: (originalSlideStart, index, position) => {
+      originalSlideStart?.(index, position);
+
+      if (context.state.isDisabled()) {
+        return;
+      }
+
+      dragPosition = clamp(position, 0, 1);
+      pointerVolume = props.changeFromPointer(dragPosition);
+    },
+    suppressStep: true,
+  });
 
   return null;
 };

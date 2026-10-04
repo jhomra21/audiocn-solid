@@ -4,7 +4,6 @@ import {
   createContext,
   createMemo,
   createSignal,
-  onCleanup,
   Show,
   useContext,
 } from "solid-js";
@@ -15,11 +14,13 @@ import type { DbScaleProps } from "@/components/ui/db-scale";
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp, formatDb, SILENCE_DB } from "@/lib/audio/decibels";
+import { roundValue } from "@/lib/number";
 import { resolveTaper } from "@/lib/audio/taper";
 import type { TaperInput } from "@/lib/audio/taper";
 import type { Orientation, Taper } from "@/lib/audio/types";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
@@ -39,8 +40,6 @@ const DEFAULT_MAX_DB = 6;
 const POSITION_STEP = 0.0005;
 
 const DETENT_SNAP = 0.012;
-
-const PRECISION = 1e6;
 
 const DEFAULT_DETENTS = [0] as const;
 
@@ -97,9 +96,6 @@ const useFader = (part: string): FaderContextValue => {
 const defaultFormat = (db: number): string =>
   db === SILENCE_DB ? "Silent" : formatDb(db);
 
-const roundValue = (value: number): number =>
-  Math.round(value * PRECISION) / PRECISION;
-
 const parseDb = (text: string): number | null => {
   const normalized = text.replaceAll("−", "-").replace(DB_SUFFIX, "").trim();
 
@@ -131,22 +127,7 @@ const incrementFor = (
 
 const SliderCompat = () => {
   const context = SliderPrimitive.useSliderContext();
-  const originalStepHandler = context.onStepKeyDown;
-
-  context.onStepKeyDown = () => undefined;
-
-  onCleanup(() => {
-    context.onStepKeyDown = originalStepHandler;
-  });
-
-  createCompatEffect(
-    () => [context.thumbs().length, context.state.isDisabled()] as const,
-    ([thumbCount, isDisabled]) => {
-      for (let index = 0; index < thumbCount; index += 1) {
-        context.state.setThumbEditable(index, !isDisabled);
-      }
-    }
-  );
+  useKobalteSliderCompat(context, { suppressStep: true });
 
   return null;
 };

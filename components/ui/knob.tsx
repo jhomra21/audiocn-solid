@@ -13,6 +13,7 @@ import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { getSharedAudioContext } from "@/hooks/use-audio-context";
 import { clamp } from "@/lib/audio/decibels";
+import { roundValue, widestFormattedValue } from "@/lib/number";
 import { linearTaper, logTaper } from "@/lib/audio/taper";
 import type { Taper } from "@/lib/audio/types";
 import { provideContext } from "@/lib/solid/context";
@@ -36,8 +37,6 @@ const CENTER = 50;
 const RADIUS = 40;
 
 const FINE_FACTOR = 0.1;
-
-const PRECISION = 1e6;
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
 
@@ -191,34 +190,6 @@ const useKnobDial = (): KnobDialContextValue => {
   }
 
   return context;
-};
-
-const roundValue = (value: number): number =>
-  Math.round(value * PRECISION) / PRECISION;
-
-const widestValue = (
-  format: (value: number) => string,
-  taper: Taper,
-  snap: (value: number) => number
-): number => {
-  let widest = 0;
-
-  for (
-    let index = 0;
-    index <= WIDTH_SAMPLES;
-    index += 1
-  ) {
-    const sample = snap(
-      taper.toValue(index / WIDTH_SAMPLES)
-    );
-
-    widest = Math.max(
-      widest,
-      format(sample).length
-    );
-  }
-
-  return widest;
 };
 
 /**
@@ -918,11 +889,11 @@ export const Knob = (
     createSignal(false);
 
   const valueWidth = createMemo(() =>
-    widestValue(
-      format(),
-      taper(),
-      (next) =>
-        quantize(next, step())
+    widestFormattedValue(
+      Array.from({ length: WIDTH_SAMPLES + 1 }, (_, index) =>
+        quantize(taper().toValue(index / WIDTH_SAMPLES), step())
+      ),
+      format()
     )
   );
 

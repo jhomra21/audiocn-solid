@@ -92,6 +92,14 @@
         {
           "path": "lib/utils.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/number.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/kobalte-slider.ts",
+          "type": "registry:lib"
         }
       ],
       "cssVars": {
@@ -454,6 +462,10 @@
         {
           "path": "components/ui/fader.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/solid/kobalte-slider.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -475,6 +487,10 @@
         {
           "path": "components/ui/parameter-slider.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/solid/kobalte-slider.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -517,6 +533,10 @@
         {
           "path": "components/ui/pan-control.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/solid/kobalte-slider.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -557,6 +577,10 @@
         {
           "path": "components/ui/volume-control.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/solid/kobalte-slider.ts",
+          "type": "registry:lib"
         }
       ]
     },

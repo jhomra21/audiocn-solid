@@ -5,17 +5,18 @@ import {
   createSignal,
   createUniqueId,
   For,
-  onCleanup,
   Show,
   useContext,
 } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
+import { roundValue, widestFormattedValue } from "@/lib/number";
 import { linearTaper, logTaper } from "@/lib/audio/taper";
 import type { Taper } from "@/lib/audio/types";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
@@ -30,7 +31,6 @@ import { cn } from "@/lib/utils";
 
 const POSITION_STEP = 0.0005;
 
-const PRECISION = 1e6;
 
 const WIDTH_SAMPLES = 24;
 
@@ -98,43 +98,9 @@ const decimalsOf = (step: number): number => {
   return dot === -1 ? 0 : text.length - dot - 1;
 };
 
-const roundValue = (value: number): number =>
-  Math.round(value * PRECISION) / PRECISION;
-
-const widestValue = (
-  format: (value: number) => string,
-  taper: Taper,
-  snap: (value: number) => number
-): number => {
-  let widest = 0;
-
-  for (let index = 0; index <= WIDTH_SAMPLES; index += 1) {
-    const sample = snap(taper.toValue(index / WIDTH_SAMPLES));
-
-    widest = Math.max(widest, format(sample).length);
-  }
-
-  return widest;
-};
-
 const SliderCompat = () => {
   const context = SliderPrimitive.useSliderContext();
-  const originalStepHandler = context.onStepKeyDown;
-
-  context.onStepKeyDown = () => undefined;
-
-  onCleanup(() => {
-    context.onStepKeyDown = originalStepHandler;
-  });
-
-  createCompatEffect(
-    () => [context.thumbs().length, context.state.isDisabled()] as const,
-    ([thumbCount, isDisabled]) => {
-      for (let index = 0; index < thumbCount; index += 1) {
-        context.state.setThumbEditable(index, !isDisabled);
-      }
-    }
-  );
+  useKobalteSliderCompat(context, { suppressStep: true });
 
   return null;
 };
@@ -673,10 +639,13 @@ export const ParameterSliderValue = (
   const rest = omitProps(props, VALUE_OWN);
 
   const valueWidth = createMemo(() =>
-    widestValue(
-      context.format(),
-      context.taper(),
-      context.quantize
+    widestFormattedValue(
+      Array.from({ length: WIDTH_SAMPLES + 1 }, (_, index) =>
+        context.quantize(
+          context.taper().toValue(index / WIDTH_SAMPLES)
+        )
+      ),
+      context.format()
     )
   );
 

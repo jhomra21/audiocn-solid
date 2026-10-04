@@ -3,13 +3,14 @@ import { cva } from "class-variance-authority";
 import {
   createMemo,
   createSignal,
-  onCleanup,
 } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
 import { createCompatEffect } from "@/lib/solid/effect";
+import { roundValue } from "@/lib/number";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import { omitProps } from "@/lib/solid/props";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,6 @@ const PERCENT = 100;
 
 const DETENT_RANGE = 0.08;
 
-const PRECISION = 1e6;
 
 const CENTER_TEXT = /^c(?:enter|entre)?$/iu;
 
@@ -79,8 +79,6 @@ export const describePan = (value: number): string => {
   return `${amount}% ${value < 0 ? "left" : "right"}`;
 };
 
-const roundValue = (value: number): number =>
-  Math.round(value * PRECISION) / PRECISION;
 
 const panControlVariants = cva(
   "group/pan-control relative flex w-full touch-none items-center select-none data-disabled:opacity-50",
@@ -112,142 +110,56 @@ const SliderCompat = (
 ) => {
   const context = SliderPrimitive.useSliderContext();
 
-  const originalSlideStart =
-    context.onSlideStart;
-
-  const originalSlideMove =
-    context.onSlideMove;
-
-  const originalSlideEnd =
-    context.onSlideEnd;
-
-  const originalStepHandler =
-    context.onStepKeyDown;
-
   let dragPosition =
     props.currentValue();
 
   let pointerValue =
     props.currentValue();
 
-  context.onStepKeyDown =
-    () => undefined;
-
-  context.onSlideStart = (
-    index,
-    value
-  ) => {
-    originalSlideStart?.(
-      index,
-      value
-    );
-
-    if (
-      context.state.isDisabled()
-    ) {
-      return;
-    }
-
-    dragPosition = clamp(
-      value,
-      -1,
-      1
-    );
-
-    pointerValue =
-      props.changeFromPointer(
-        dragPosition
-      );
-  };
-
-  context.onSlideMove = ({
-    deltaX,
-  }) => {
-    if (
-      context.state.isDisabled()
-    ) {
-      return;
-    }
-
-    const track =
-      context.trackRef();
-
-    if (!track) {
-      originalSlideMove?.({
-        deltaX,
-        deltaY: 0,
-      });
-
-      return;
-    }
-
-    const { width } =
-      track.getBoundingClientRect();
-
-    if (width <= 0) {
-      return;
-    }
-
-    const direction =
-      context.isSlidingFromLeft()
-        ? 1
-        : -1;
-
-    dragPosition = clamp(
-      dragPosition +
-        direction *
-          (deltaX / width) *
-          2,
-      -1,
-      1
-    );
-
-    pointerValue =
-      props.changeFromPointer(
-        dragPosition
-      );
-  };
-
-  context.onSlideEnd = () => {
-    originalSlideEnd?.();
-
-    props.commitPointer(
-      pointerValue
-    );
-  };
-
-  onCleanup(() => {
-    context.onSlideStart =
-      originalSlideStart;
-
-    context.onSlideMove =
-      originalSlideMove;
-
-    context.onSlideEnd =
-      originalSlideEnd;
-
-    context.onStepKeyDown =
-      originalStepHandler;
-  });
-
-  createCompatEffect(
-    () => [
-      context.thumbs().length,
-      context.state.isDisabled(),
-    ] as const,
-    ([thumbCount, isDisabled]) => {
-      for (
-        let index = 0;
-        index < thumbCount;
-        index += 1
-      ) {
-        context.state.setThumbEditable(
-          index,
-          !isDisabled
-        );
+  useKobalteSliderCompat(context, {
+    onSlideEnd: (originalSlideEnd) => {
+      originalSlideEnd?.();
+      props.commitPointer(pointerValue);
+    },
+    onSlideMove: (originalSlideMove, { deltaX }) => {
+      if (context.state.isDisabled()) {
+        return;
       }
-    }
-  );
+
+      const track = context.trackRef();
+
+      if (!track) {
+        originalSlideMove?.({ deltaX, deltaY: 0 });
+
+        return;
+      }
+
+      const { width } = track.getBoundingClientRect();
+
+      if (width <= 0) {
+        return;
+      }
+
+      const direction = context.isSlidingFromLeft() ? 1 : -1;
+      dragPosition = clamp(
+        dragPosition + direction * (deltaX / width) * 2,
+        -1,
+        1
+      );
+      pointerValue = props.changeFromPointer(dragPosition);
+    },
+    onSlideStart: (originalSlideStart, index, value) => {
+      originalSlideStart?.(index, value);
+
+      if (context.state.isDisabled()) {
+        return;
+      }
+
+      dragPosition = clamp(value, -1, 1);
+      pointerValue = props.changeFromPointer(dragPosition);
+    },
+    suppressStep: true,
+  });
 
   return null;
 };
