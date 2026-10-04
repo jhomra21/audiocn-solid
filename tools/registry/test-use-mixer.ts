@@ -361,6 +361,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "gain",
           })
           .click();
@@ -373,6 +374,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "pan",
           })
           .click();
@@ -385,6 +387,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "solo-b",
           })
           .click();
@@ -401,6 +404,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name:
               "solo-a-exclusive",
           })
@@ -418,6 +422,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "mute-a",
           })
           .click();
@@ -430,6 +435,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "monitor",
           })
           .click();
@@ -442,12 +448,14 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "master-gain",
           })
           .click();
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "master-mute",
           })
           .click();
@@ -460,6 +468,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "add-c",
           })
           .click();
@@ -472,6 +481,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "remove-c",
           })
           .click();
@@ -484,6 +494,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name:
               "controlled-pan",
           })
@@ -497,6 +508,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name:
               "persist-gain",
           })
@@ -518,6 +530,7 @@ try {
 
         await page
           .getByRole("button", {
+            exact: true,
             name: "reset",
           })
           .click();
