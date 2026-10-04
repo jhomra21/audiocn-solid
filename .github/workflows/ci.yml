@@ -78,6 +78,9 @@ jobs:
             artifacts/parameter-slider-e2e.json
             artifacts/parameter-slider-solid1.png
             artifacts/parameter-slider-solid2.png
+            artifacts/knob-e2e.json
+            artifacts/knob-solid1.png
+            artifacts/knob-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client
