@@ -345,8 +345,8 @@ try {
         );
 
         const sliders =
-          mixer.getByRole(
-            "slider"
+          mixer.locator(
+            '[data-slot="fader-thumb"]'
           );
 
         await expect(
