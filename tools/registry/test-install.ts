@@ -251,6 +251,7 @@ const server = createServer((request, response) => {
 
   if (!requested.startsWith(rootPrefix) || !existsSync(requested)) {
     response.writeHead(404).end();
+
     return;
   }
 
@@ -268,6 +269,7 @@ await once(server, "listening");
 try {
   for (const runtime of ["solid1", "solid2"]) {
     const fixture = await createFixture(runtime);
+
     const runtimeResult = {
       runtime,
       fixture,
