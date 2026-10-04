@@ -34,6 +34,7 @@ test("prerendered routes have content and a recorded status", async ({
     const routePath = relative(clientDirectory, file)
       .replace(/\/index\.html$/, "")
       .replace(/\.html$/, "");
+
     const route = routePath === "index" ? "/" : `/${routePath}`;
 
     const body = html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? "";
