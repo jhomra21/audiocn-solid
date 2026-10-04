@@ -1,0 +1,439 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "audiocn-solid",
+  "homepage": "https://github.com/jhomra21/audiocn-solid",
+  "items": [
+    {
+      "name": "core",
+      "type": "registry:lib",
+      "title": "Audio core",
+      "description": "Framework-neutral audio primitives plus the Solid compatibility helpers used by the installable components.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "lib/audio/types.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/decibels.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/ballistics.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/zones.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/taper.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/bands.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/bar-levels.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/wave-line.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/time.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/frame-loop.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/frame-source.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/audio/history.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/accessor.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/context.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/props.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/ref.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/style.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/jsx-types.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-meter-ok": "var(--meter-ok)",
+          "color-meter-warn": "var(--meter-warn)",
+          "color-meter-clip": "var(--meter-clip)",
+          "color-channel-mute": "var(--channel-mute)",
+          "color-channel-solo": "var(--channel-solo)",
+          "color-channel-monitor": "var(--channel-monitor)",
+          "color-meter-ok-foreground": "var(--meter-ok-foreground)",
+          "color-meter-warn-foreground": "var(--meter-warn-foreground)",
+          "color-meter-clip-foreground": "var(--meter-clip-foreground)",
+          "color-channel-mute-foreground": "var(--channel-mute-foreground)",
+          "color-channel-solo-foreground": "var(--channel-solo-foreground)",
+          "color-channel-monitor-foreground": "var(--channel-monitor-foreground)"
+        },
+        "light": {
+          "meter-ok": "oklch(0.696 0.17 162.48)",
+          "meter-warn": "oklch(0.795 0.184 86.047)",
+          "meter-clip": "var(--destructive)",
+          "channel-mute": "var(--destructive)",
+          "channel-solo": "oklch(0.795 0.184 86.047)",
+          "channel-monitor": "oklch(0.623 0.214 259.815)",
+          "meter-ok-foreground": "color-mix(in oklch, var(--meter-ok), black 40%)",
+          "meter-warn-foreground": "color-mix(in oklch, var(--meter-warn), black 40%)",
+          "meter-clip-foreground": "color-mix(in oklch, var(--meter-clip), black 40%)",
+          "channel-mute-foreground": "color-mix(in oklch, var(--channel-mute), black 40%)",
+          "channel-solo-foreground": "color-mix(in oklch, var(--channel-solo), black 40%)",
+          "channel-monitor-foreground": "color-mix(in oklch, var(--channel-monitor), black 40%)"
+        },
+        "dark": {
+          "meter-ok": "oklch(0.765 0.177 163.223)",
+          "meter-warn": "oklch(0.852 0.199 91.936)",
+          "meter-clip": "var(--destructive)",
+          "channel-mute": "var(--destructive)",
+          "channel-solo": "oklch(0.852 0.199 91.936)",
+          "channel-monitor": "oklch(0.707 0.165 254.624)",
+          "meter-ok-foreground": "var(--meter-ok)",
+          "meter-warn-foreground": "var(--meter-warn)",
+          "meter-clip-foreground": "var(--meter-clip)",
+          "channel-mute-foreground": "var(--channel-mute)",
+          "channel-solo-foreground": "var(--channel-solo)",
+          "channel-monitor-foreground": "var(--channel-monitor)"
+        }
+      }
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Solid button primitive using the same base-rhea styling as the site.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "class-variance-authority",
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/solid/jsx-types.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/props.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/ref.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-frame-source",
+      "type": "registry:hook",
+      "title": "useFrameSource",
+      "description": "Subscribe to a frame source with automatic Solid lifecycle cleanup.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-frame-source.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-clip-hold",
+      "type": "registry:hook",
+      "title": "useClipHold",
+      "description": "Clip detection with hold time, count, and reset.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-clip-hold.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-reduced-motion",
+      "type": "registry:hook",
+      "title": "useReducedMotion",
+      "description": "Tracks the operating system reduced-motion preference.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-reduced-motion.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-visibility",
+      "type": "registry:hook",
+      "title": "useVisibility",
+      "description": "Tracks whether an element intersects the viewport.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-visibility.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-demo-signal",
+      "type": "registry:hook",
+      "title": "useDemoSignal",
+      "description": "Synthetic speech, music, tone, or noise frame sources for demos and tests.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-demo-signal.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-audio-context",
+      "type": "registry:hook",
+      "title": "useAudioContext",
+      "description": "A shared AudioContext with a provider for supplying an existing context.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-audio-context.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "lib/solid/context.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "lib/solid/jsx-types.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-audio-analyser",
+      "type": "registry:hook",
+      "title": "useAudioAnalyser",
+      "description": "Meter and visual frame sources backed by Web Audio AnalyserNode.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-context"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-audio-analyser.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-microphone",
+      "type": "registry:hook",
+      "title": "useMicrophone",
+      "description": "Open a microphone MediaStream with browser processing disabled by default.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-microphone.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "lib/solid/effect.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-audio-config",
+      "type": "registry:hook",
+      "title": "useAudioConfig",
+      "description": "Shared meter and control configuration context.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "hooks/use-audio-config.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "db-scale",
+      "type": "registry:ui",
+      "title": "dB Scale",
+      "description": "Tick marks and labels for a decibel range.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/db-scale.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "db-readout",
+      "type": "registry:ui",
+      "title": "dB Readout",
+      "description": "A stable-width numeric level readout.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source"
+      ],
+      "files": [
+        {
+          "path": "components/ui/db-readout.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "clip-indicator",
+      "type": "registry:ui",
+      "title": "Clip Indicator",
+      "description": "A clip light with hold, count, and reset behavior.",
+      "dependencies": [
+        "solid-js@^1.9.15"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-clip-hold",
+        "@audiocn-solid/use-frame-source"
+      ],
+      "files": [
+        {
+          "path": "components/ui/clip-indicator.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "level-meter",
+      "type": "registry:ui",
+      "title": "Level Meter",
+      "description": "Composable peak and RMS level meter with stereo, hold, scale, readout, and clip indication.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/db-scale",
+        "@audiocn-solid/db-readout",
+        "@audiocn-solid/clip-indicator",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        {
+          "path": "components/ui/level-meter.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}
