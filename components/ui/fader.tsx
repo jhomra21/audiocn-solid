@@ -842,32 +842,38 @@ export const Fader = (props: FaderProps) => {
 
         break;
       }
+
       case "ArrowRight":
       case "ArrowUp": {
         next = nudge(1, increment);
 
         break;
       }
+
       case "End": {
         next = max();
 
         break;
       }
+
       case "Home": {
         next = silenceAtMin() ? SILENCE_DB : min();
 
         break;
       }
+
       case "PageDown": {
         next = nudge(-1, largeStep());
 
         break;
       }
+
       case "PageUp": {
         next = nudge(1, largeStep());
 
         break;
       }
+
       default: {
         return;
       }
