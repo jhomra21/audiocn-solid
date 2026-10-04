@@ -11,5 +11,7 @@
       ]
     }
   },
-  "exclude": []
+  "exclude": [
+    "lib/solid/jsx-types.ts"
+  ]
 }
