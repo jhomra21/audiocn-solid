@@ -125,7 +125,7 @@ const payload: SearchIndexPayload = {
 };
 
 await mkdir(dirname(outputPath), { recursive: true });
-await writeFile(outputPath, `${JSON.stringify(payload)}\\n`);
+await writeFile(outputPath, `${JSON.stringify(payload)}\n`);
 
 console.log(
   `Built search index with ${documents.length} document${documents.length === 1 ? "" : "s"}.`

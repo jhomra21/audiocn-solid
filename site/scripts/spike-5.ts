@@ -56,7 +56,7 @@ const run = (stage: string, command: string, args: string[]) => {
 
 const writeResult = async (result: SpikeResult) => {
   await mkdir(dirname(artifactPath), { recursive: true });
-  await writeFile(artifactPath, `${JSON.stringify(result, null, 2)}\\n`);
+  await writeFile(artifactPath, `${JSON.stringify(result, null, 2)}\n`);
 };
 
 let stage = "search-index";
