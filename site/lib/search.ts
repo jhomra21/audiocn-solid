@@ -49,6 +49,7 @@ const isSearchIndexPayload = (
     isRawData(value.index)
   );
 };
+
 const createSearchDatabase = () => create({ schema: searchSchema });
 
 type SearchDatabase = ReturnType<typeof createSearchDatabase>;

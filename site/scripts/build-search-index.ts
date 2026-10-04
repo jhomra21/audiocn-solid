@@ -59,6 +59,7 @@ const frontmatterValue = (frontmatter: string, name: string): string => {
 
 const documentUrl = (path: string): string => {
   const platformPath = relative(docsRoot, path).split(sep).join("/");
+
   const relativePath = platformPath.endsWith(".mdx")
     ? platformPath.slice(0, -".mdx".length)
     : platformPath;
@@ -125,6 +126,7 @@ const payload: SearchIndexPayload = {
 };
 
 await mkdir(dirname(outputPath), { recursive: true });
+
 await writeFile(outputPath, `${JSON.stringify(payload)}\n`);
 
 console.log(

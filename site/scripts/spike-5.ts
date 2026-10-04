@@ -40,6 +40,7 @@ const isSearchIndexSummary = (
     value.documents > 0
   );
 };
+
 const run = (stage: string, command: string, args: string[]) => {
   const result = spawnSync(command, args, {
     cwd: siteRoot,
