@@ -1,15 +1,15 @@
 import { createMemo, untrack } from "solid-js";
 
 import { useClipHold } from "@/hooks/use-clip-hold";
-import type { ButtonDOMProps, JSXElement } from "@/lib/solid/jsx-types";
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { SILENCE_DB } from "@/lib/audio/decibels";
+import type { FrameSource, MeterFrame } from "@/lib/audio/types";
+import { CLIP_HOLD_MS, CLIP_THRESHOLD_DB } from "@/lib/audio/zones";
+import { createCompatEffect } from "@/lib/solid/effect";
+import type { ButtonDOMProps, JSXElement } from "@/lib/solid/jsx-types";
 import { forwardProps, omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import type { RefTarget } from "@/lib/solid/ref";
-import { createCompatEffect } from "@/lib/solid/effect";
-import type { FrameSource, MeterFrame } from "@/lib/audio/types";
-import { CLIP_HOLD_MS, CLIP_THRESHOLD_DB } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
 export interface ClipIndicatorActions {

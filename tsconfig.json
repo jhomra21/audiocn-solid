@@ -3,11 +3,7 @@
     "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
@@ -18,17 +14,12 @@
     "jsxImportSource": "solid-js",
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ],
+      "@/*": ["./*"],
       "@kobalte/core/slider": [
         "./node_modules/@kobalte/core-solid1/dist/slider/index.d.ts"
       ]
     },
-    "types": [
-      "vite/client",
-      "node"
-    ]
+    "types": ["vite/client", "node"]
   },
   "include": [
     "components",
@@ -40,8 +31,5 @@
     "playwright.config.ts",
     "test"
   ],
-  "exclude": [
-    "app/solid2",
-    "lib/solid/compat/solid2"
-  ]
+  "exclude": ["app/solid2", "lib/solid/compat/solid2"]
 }

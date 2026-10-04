@@ -1,7 +1,7 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import KnobDoc, { frontmatter } from "@/site/content/docs/components/knob.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import KnobDoc, { frontmatter } from "@/site/content/docs/components/knob.mdx";
 
 export default function KnobPage() {
   return (

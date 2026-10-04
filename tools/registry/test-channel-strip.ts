@@ -100,7 +100,10 @@ await runAcceptance({
   appSource,
   check: async (page) => {
     const mic = page.getByRole("group", { name: "Mic" });
-    const toggleClipping = page.getByRole("button", { name: "Toggle clipping" });
+
+    const toggleClipping = page.getByRole("button", {
+      name: "Toggle clipping",
+    });
 
     await expect(mic).toHaveAttribute("data-orientation", "vertical");
     await expect(mic).toHaveAttribute("data-muted", "");
@@ -121,9 +124,9 @@ await runAcceptance({
     await expect(
       mic.locator('[data-slot="channel-strip-status"]')
     ).toHaveAttribute("data-tone", "live");
-    await expect(
-      mic.locator('[data-slot="channel-strip-notice"]')
-    ).toHaveText("Peak warning");
+    await expect(mic.locator('[data-slot="channel-strip-notice"]')).toHaveText(
+      "Peak warning"
+    );
 
     await expect(mic).not.toHaveAttribute("data-clipping");
     await toggleClipping.click();

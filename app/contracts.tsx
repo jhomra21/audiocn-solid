@@ -32,13 +32,25 @@ const ReadoutSwitch = () => {
         source={mode() === "source" ? source : null}
         value={mode() === "value" ? -6 : undefined}
       />
-      <button data-testid="emit-readout" onClick={() => source.emit({ channels: [{ peakDb: -12 }] })} type="button">
+      <button
+        data-testid="emit-readout"
+        onClick={() => source.emit({ channels: [{ peakDb: -12 }] })}
+        type="button"
+      >
         Emit
       </button>
-      <button data-testid="use-value" onClick={() => setMode("value")} type="button">
+      <button
+        data-testid="use-value"
+        onClick={() => setMode("value")}
+        type="button"
+      >
         Value
       </button>
-      <button data-testid="use-source" onClick={() => setMode("source")} type="button">
+      <button
+        data-testid="use-source"
+        onClick={() => setMode("source")}
+        type="button"
+      >
         Source
       </button>
     </section>
@@ -55,10 +67,16 @@ const PreventedClip = () => {
           actions = next;
         }}
         holdMs={Number.POSITIVE_INFINITY}
-        onClick={(event: ClipIndicatorClickEvent) => event.preventBaseUIHandler()}
+        onClick={(event: ClipIndicatorClickEvent) =>
+          event.preventBaseUIHandler()
+        }
         showCount
       />
-      <button data-testid="report-clip" onClick={() => actions?.report(0)} type="button">
+      <button
+        data-testid="report-clip"
+        onClick={() => actions?.report(0)}
+        type="button"
+      >
         Report
       </button>
     </section>
@@ -77,7 +95,12 @@ export const ContractApp = () => {
       </section>
 
       <section data-contract="readout-overrides">
-        <DbReadout data-slot="custom-readout" data-zone="mine" role="status" value={-6} />
+        <DbReadout
+          data-slot="custom-readout"
+          data-zone="mine"
+          role="status"
+          value={-6}
+        />
       </section>
 
       <section data-contract="value-class">

@@ -1,5 +1,6 @@
 import * as SliderPrimitive from "@kobalte/core/slider";
 import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import {
   createContext,
   createMemo,
@@ -7,25 +8,24 @@ import {
   Show,
   useContext,
 } from "solid-js";
-import type { VariantProps } from "class-variance-authority";
 
 import { DbScale } from "@/components/ui/db-scale";
 import type { DbScaleProps } from "@/components/ui/db-scale";
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp, formatDb, SILENCE_DB } from "@/lib/audio/decibels";
-import { roundValue } from "@/lib/number";
 import { resolveTaper } from "@/lib/audio/taper";
 import type { TaperInput } from "@/lib/audio/taper";
 import type { Orientation, Taper } from "@/lib/audio/types";
+import { roundValue } from "@/lib/number";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
-import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
   SpanDOMProps,
 } from "@/lib/solid/jsx-types";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import type { RefTarget } from "@/lib/solid/ref";
@@ -400,11 +400,10 @@ export const FaderScale = (props: FaderScaleProps) => {
   );
 };
 
-export interface FaderValueProps
-  extends Omit<
-    SpanDOMProps,
-    "children" | "class" | "className" | "ref" | "style"
-  > {
+export interface FaderValueProps extends Omit<
+  SpanDOMProps,
+  "children" | "class" | "className" | "ref" | "style"
+> {
   class?: string;
   className?: string;
   editable?: boolean;
@@ -497,9 +496,7 @@ export const FaderValue = (props: FaderValueProps) => {
         disabled={context.disabled()}
         onClick={() => {
           setDraft(
-            context.value() === SILENCE_DB
-              ? "-inf"
-              : String(context.value())
+            context.value() === SILENCE_DB ? "-inf" : String(context.value())
           );
           setEditing(true);
         }}
@@ -512,10 +509,7 @@ export const FaderValue = (props: FaderValueProps) => {
   );
 
   return (
-    <Show
-      fallback={readout()}
-      when={editing()}
-    >
+    <Show fallback={readout()} when={editing()}>
       <input
         aria-label="Value in dB"
         class={cn(
@@ -546,23 +540,17 @@ export const FaderValue = (props: FaderValueProps) => {
   );
 };
 
-export interface FaderResetProps
-  extends Omit<
-    ButtonDOMProps,
-    "children" | "class" | "className" | "onClick" | "ref" | "type"
-  > {
+export interface FaderResetProps extends Omit<
+  ButtonDOMProps,
+  "children" | "class" | "className" | "onClick" | "ref" | "type"
+> {
   class?: string;
   className?: string;
   children?: ButtonDOMProps["children"];
   onClick?: (event: MouseEvent) => void;
 }
 
-const RESET_OWN = [
-  "children",
-  "class",
-  "className",
-  "onClick",
-] as const;
+const RESET_OWN = ["children", "class", "className", "onClick"] as const;
 
 export const FaderReset = (props: FaderResetProps) => {
   const context = useFader("FaderReset");
@@ -606,8 +594,7 @@ export const faderVariants = cva(
         vertical: "h-full min-h-32 flex-row justify-center",
       },
       size: {
-        default:
-          "[--fader-thumb-size:1rem] [--fader-track-size:0.25rem]",
+        default: "[--fader-thumb-size:1rem] [--fader-track-size:0.25rem]",
         lg: "[--fader-thumb-size:1.25rem] [--fader-track-size:0.375rem]",
         sm: "[--fader-thumb-size:0.75rem] [--fader-track-size:0.1875rem]",
       },
@@ -637,7 +624,8 @@ type FaderDOMProps = Omit<
 >;
 
 export interface FaderProps
-  extends FaderDOMProps,
+  extends
+    FaderDOMProps,
     Omit<VariantProps<typeof faderVariants>, "orientation"> {
   "aria-label"?: string;
   "aria-labelledby"?: string;
@@ -711,8 +699,7 @@ export const Fader = (props: FaderProps) => {
   const largeStep = () => props.largeStep ?? 6;
   const fineStep = () => props.fineStep ?? 0.1;
 
-  const detents = (): readonly number[] =>
-    props.detents ?? DEFAULT_DETENTS;
+  const detents = (): readonly number[] => props.detents ?? DEFAULT_DETENTS;
 
   const silenceAtMin = () => props.silenceAtMin ?? false;
   const disabled = () => props.disabled ?? config.disabled ?? false;
@@ -762,9 +749,7 @@ export const Fader = (props: FaderProps) => {
     props.onValueCommitted?.(db);
   };
 
-  const taper = createMemo(() =>
-    resolveTaper(taperInput(), min(), max())
-  );
+  const taper = createMemo(() => resolveTaper(taperInput(), min(), max()));
 
   const toPosition = (db: number): number =>
     db === SILENCE_DB ? 0 : taper().toPosition(db);
@@ -774,8 +759,7 @@ export const Fader = (props: FaderProps) => {
       return silenceAtMin() ? SILENCE_DB : min();
     }
 
-    const stepped =
-      min() + Math.round((db - min()) / increment) * increment;
+    const stepped = min() + Math.round((db - min()) / increment) * increment;
 
     return roundValue(clamp(stepped, min(), max()));
   };
@@ -791,10 +775,7 @@ export const Fader = (props: FaderProps) => {
       }
     }
 
-    return quantize(
-      taper().toValue(position),
-      fine ? fineStep() : step()
-    );
+    return quantize(taper().toValue(position), fine ? fineStep() : step());
   };
 
   const nudge = (direction: number, increment: number): number => {
@@ -815,12 +796,7 @@ export const Fader = (props: FaderProps) => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    const increment = incrementFor(
-      event,
-      step(),
-      fineStep(),
-      largeStep()
-    );
+    const increment = incrementFor(event, step(), fineStep(), largeStep());
 
     let next: number | undefined;
 
@@ -879,8 +855,9 @@ export const Fader = (props: FaderProps) => {
   const originPosition = () =>
     toPosition(clamp(props.origin ?? min(), min(), max()));
 
-  const [rootElement, setRootElement] =
-    createSignal<HTMLDivElement | null>(null);
+  const [rootElement, setRootElement] = createSignal<HTMLDivElement | null>(
+    null
+  );
 
   createCompatEffect(
     () => [rootElement(), props.allowWheel ?? false] as const,

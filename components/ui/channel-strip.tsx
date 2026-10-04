@@ -1,26 +1,20 @@
 import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import {
   createContext,
   createSignal,
   createUniqueId,
   useContext,
 } from "solid-js";
-import type { VariantProps } from "class-variance-authority";
 
 import { Badge } from "@/components/ui/badge";
 import type { BadgeProps } from "@/components/ui/badge";
-import {
-  AudioConfigProvider,
-  useAudioConfig,
-} from "@/hooks/use-audio-config";
+import { AudioConfigProvider, useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import type { Orientation } from "@/lib/audio/types";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
-import type {
-  DivDOMProps,
-  SpanDOMProps,
-} from "@/lib/solid/jsx-types";
+import type { DivDOMProps, SpanDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import type { RefTarget } from "@/lib/solid/ref";
@@ -36,30 +30,23 @@ interface ChannelStripContextValue {
   readonly titleId: string;
 }
 
-const ChannelStripContext =
-  createContext<ChannelStripContextValue | null>(null);
+const ChannelStripContext = createContext<ChannelStripContextValue | null>(
+  null
+);
 
-const useChannelStripContext = (
-  part: string
-): ChannelStripContextValue => {
-  const context =
-    useContext(ChannelStripContext);
+const useChannelStripContext = (part: string): ChannelStripContextValue => {
+  const context = useContext(ChannelStripContext);
 
   if (!context) {
-    throw new Error(
-      `${part} must be used inside ChannelStrip.`
-    );
+    throw new Error(`${part} must be used inside ChannelStrip.`);
   }
 
   return context;
 };
 
 /** The state of the surrounding channel strip, for custom parts. */
-export const useChannelStrip =
-  (): ChannelStripContextValue =>
-    useChannelStripContext(
-      "useChannelStrip"
-    );
+export const useChannelStrip = (): ChannelStripContextValue =>
+  useChannelStripContext("useChannelStrip");
 
 const channelStripVariants = cva(
   "group/channel-strip data-selected:ring-ring/40 relative min-w-0 transition-[opacity,box-shadow] outline-none data-disabled:opacity-60 data-selected:ring-2",
@@ -70,65 +57,46 @@ const channelStripVariants = cva(
     },
     variants: {
       orientation: {
-        horizontal:
-          "@container/channel-strip w-full",
+        horizontal: "@container/channel-strip w-full",
         vertical:
           "flex h-full min-h-72 w-[var(--channel-strip-width,6.5rem)] shrink-0 flex-col",
       },
       variant: {
-        card:
-          "bg-card text-card-foreground rounded-xl border p-3 shadow-xs",
-        default:
-          "bg-muted/40 rounded-xl p-3",
+        card: "bg-card text-card-foreground rounded-xl border p-3 shadow-xs",
+        default: "bg-muted/40 rounded-xl p-3",
         ghost: "p-2",
-        master:
-          "bg-muted/60 ring-primary/10 rounded-xl border p-3 ring-1",
+        master: "bg-muted/60 ring-primary/10 rounded-xl border p-3 ring-1",
       },
     },
   }
 );
 
-const channelStripLayoutVariants = cva(
-  "grid gap-x-3 gap-y-1.5",
-  {
-    defaultVariants: {
-      orientation:
-        "horizontal",
+const channelStripLayoutVariants = cva("grid gap-x-3 gap-y-1.5", {
+  defaultVariants: {
+    orientation: "horizontal",
+  },
+  variants: {
+    orientation: {
+      horizontal: [
+        "w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center [grid-template-areas:'header_header_header'_'meter_value_controls']",
+        "has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'notice_notice_notice']",
+        "has-[>[data-slot=channel-strip-fader]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'fader_value_controls']",
+        "has-[>[data-slot=channel-strip-fader]]:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'fader_value_controls'_'notice_notice_notice']",
+        "@xl/channel-strip:grid-cols-[minmax(0,var(--channel-strip-header-width,12rem))_minmax(0,1fr)_auto_auto] @xl/channel-strip:[grid-template-areas:'header_meter_value_controls']",
+        "@xl/channel-strip:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_meter_value_controls'_'notice_notice_notice_notice']",
+        "@xl/channel-strip:has-[>[data-slot=channel-strip-fader]]:[grid-template-areas:'header_meter_value_controls'_'header_fader_value_controls']",
+        "@xl/channel-strip:has-[>[data-slot=channel-strip-fader]]:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_meter_value_controls'_'header_fader_value_controls'_'notice_notice_notice_notice']",
+      ],
+      vertical:
+        "flex-1 grid-cols-[1fr_auto_auto_1fr] grid-rows-[auto_minmax(0,1fr)_auto_auto_auto] justify-items-center [grid-template-areas:'header_header_header_header'_'._meter_fader_.'_'value_value_value_value'_'controls_controls_controls_controls'_'notice_notice_notice_notice']",
     },
-    variants: {
-      orientation: {
-        horizontal: [
-          "w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center [grid-template-areas:'header_header_header'_'meter_value_controls']",
-          "has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'notice_notice_notice']",
-          "has-[>[data-slot=channel-strip-fader]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'fader_value_controls']",
-          "has-[>[data-slot=channel-strip-fader]]:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_header_header'_'meter_value_controls'_'fader_value_controls'_'notice_notice_notice']",
-          "@xl/channel-strip:grid-cols-[minmax(0,var(--channel-strip-header-width,12rem))_minmax(0,1fr)_auto_auto] @xl/channel-strip:[grid-template-areas:'header_meter_value_controls']",
-          "@xl/channel-strip:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_meter_value_controls'_'notice_notice_notice_notice']",
-          "@xl/channel-strip:has-[>[data-slot=channel-strip-fader]]:[grid-template-areas:'header_meter_value_controls'_'header_fader_value_controls']",
-          "@xl/channel-strip:has-[>[data-slot=channel-strip-fader]]:has-[>[data-slot=channel-strip-notice]]:[grid-template-areas:'header_meter_value_controls'_'header_fader_value_controls'_'notice_notice_notice_notice']",
-        ],
-        vertical:
-          "flex-1 grid-cols-[1fr_auto_auto_1fr] grid-rows-[auto_minmax(0,1fr)_auto_auto_auto] justify-items-center [grid-template-areas:'header_header_header_header'_'._meter_fader_.'_'value_value_value_value'_'controls_controls_controls_controls'_'notice_notice_notice_notice']",
-      },
-    },
-  }
-);
+  },
+});
 
 export interface ChannelStripProps
-  extends Omit<
-      DivDOMProps,
-      | "children"
-      | "class"
-      | "className"
-      | "ref"
-      | "style"
-    >,
-    Omit<
-      VariantProps<
-        typeof channelStripVariants
-      >,
-      "orientation"
-    > {
+  extends
+    Omit<DivDOMProps, "children" | "class" | "className" | "ref" | "style">,
+    Omit<VariantProps<typeof channelStripVariants>, "orientation"> {
   accent?: string;
   children?: DivDOMProps["children"];
   class?: string;
@@ -161,104 +129,61 @@ const STRIP_OWN = [
   "variant",
 ] as const;
 
-export const ChannelStrip = (
-  props: ChannelStripProps
-) => {
-  const rest = omitProps(
-    props,
-    STRIP_OWN
-  );
+export const ChannelStrip = (props: ChannelStripProps) => {
+  const rest = omitProps(props, STRIP_OWN);
 
-  const config =
-    useAudioConfig();
+  const config = useAudioConfig();
 
   const orientation = () =>
-    props.orientation ??
-    config.orientation ??
-    "horizontal";
+    props.orientation ?? config.orientation ?? "horizontal";
 
-  const size = () =>
-    props.size ??
-    config.size ??
-    "default";
+  const size = () => props.size ?? config.size ?? "default";
 
-  const disabled = () =>
-    props.disabled ??
-    config.disabled ??
-    false;
+  const disabled = () => props.disabled ?? config.disabled ?? false;
 
-  const muted = () =>
-    props.muted ?? false;
+  const muted = () => props.muted ?? false;
 
-  const solo = () =>
-    props.solo ?? false;
+  const solo = () => props.solo ?? false;
 
-  const dimmed = () =>
-    props.dimmed ?? false;
+  const dimmed = () => props.dimmed ?? false;
 
-  const selected = () =>
-    props.selected ?? false;
+  const selected = () => props.selected ?? false;
 
-  const variant = () =>
-    props.variant ?? "default";
+  const variant = () => props.variant ?? "default";
 
-  const titleId =
-    `channel-strip-${createUniqueId()}-title`;
+  const titleId = `channel-strip-${createUniqueId()}-title`;
 
-  const [
-    rootElement,
-    setRootElement,
-  ] = createSignal<
-    HTMLDivElement | null
-  >(null);
-
-  createCompatEffect(
-    rootElement,
-    (root) => {
-      if (
-        !root ||
-        typeof MutationObserver ===
-          "undefined"
-      ) {
-        return;
-      }
-
-      const update = () => {
-        const clipping =
-          root.querySelector(
-            "[data-slot='level-meter'][data-clipping]"
-          ) !== null;
-
-        root.toggleAttribute(
-          "data-clipping",
-          clipping
-        );
-      };
-
-      const observer =
-        new MutationObserver(
-          update
-        );
-
-      observer.observe(
-        root,
-        {
-          attributeFilter: [
-            "data-clipping",
-          ],
-          attributes: true,
-          childList: true,
-          subtree: true,
-        }
-      );
-
-      update();
-
-      return () => {
-        observer.disconnect();
-      };
-    }
+  const [rootElement, setRootElement] = createSignal<HTMLDivElement | null>(
+    null
   );
+
+  createCompatEffect(rootElement, (root) => {
+    if (!root || typeof MutationObserver === "undefined") {
+      return;
+    }
+
+    const update = () => {
+      const clipping =
+        root.querySelector("[data-slot='level-meter'][data-clipping]") !== null;
+
+      root.toggleAttribute("data-clipping", clipping);
+    };
+
+    const observer = new MutationObserver(update);
+
+    observer.observe(root, {
+      attributeFilter: ["data-clipping"],
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
+
+    update();
+
+    return () => {
+      observer.disconnect();
+    };
+  });
 
   const context: ChannelStripContextValue = {
     get dimmed() {
@@ -278,10 +203,7 @@ export const ChannelStrip = (
 
   const childConfig = {
     get dimmed() {
-      return (
-        muted() ||
-        dimmed()
-      );
+      return muted() || dimmed();
     },
     get disabled() {
       return disabled();
@@ -294,140 +216,82 @@ export const ChannelStrip = (
     },
   };
 
-  return provideContext(
-    ChannelStripContext,
-    context,
-    () => (
-      <div
-        aria-labelledby={
-          titleId
-        }
-        class={cn(
-          channelStripVariants({
-            orientation:
-              orientation(),
-            variant:
-              variant(),
-          }),
-          props.accent
-            ? orientation() ===
-              "horizontal"
-              ? "before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-full before:bg-(--channel-accent)"
-              : "before:absolute before:inset-x-3 before:top-0 before:h-0.5 before:rounded-full before:bg-(--channel-accent)"
-            : undefined,
-          props.class,
-          props.className
-        )}
-        data-dimmed={
-          dimmed()
-            ? ""
-            : undefined
-        }
-        data-disabled={
-          disabled()
-            ? ""
-            : undefined
-        }
-        data-muted={
-          muted()
-            ? ""
-            : undefined
-        }
-        data-orientation={
-          orientation()
-        }
-        data-selected={
-          selected()
-            ? ""
-            : undefined
-        }
-        data-size={size()}
-        data-slot="channel-strip"
-        data-solo={
-          solo()
-            ? ""
-            : undefined
-        }
-        data-variant={variant()}
-        ref={(node) => {
-          setRootElement(
-            node
-          );
-          setRefValue(
-            props.ref,
-            node
-          );
-        }}
-        role="group"
-        style={mergeStyleVars(
-          props.style,
-          props.accent
-            ? {
-                "--channel-accent":
-                  props.accent,
-              }
-            : {}
-        )}
-        {...rest}
-      >
-        <AudioConfigProvider
-          value={childConfig}
+  return provideContext(ChannelStripContext, context, () => (
+    <div
+      aria-labelledby={titleId}
+      class={cn(
+        channelStripVariants({
+          orientation: orientation(),
+          variant: variant(),
+        }),
+        props.accent
+          ? orientation() === "horizontal"
+            ? "before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-full before:bg-(--channel-accent)"
+            : "before:absolute before:inset-x-3 before:top-0 before:h-0.5 before:rounded-full before:bg-(--channel-accent)"
+          : undefined,
+        props.class,
+        props.className
+      )}
+      data-dimmed={dimmed() ? "" : undefined}
+      data-disabled={disabled() ? "" : undefined}
+      data-muted={muted() ? "" : undefined}
+      data-orientation={orientation()}
+      data-selected={selected() ? "" : undefined}
+      data-size={size()}
+      data-slot="channel-strip"
+      data-solo={solo() ? "" : undefined}
+      data-variant={variant()}
+      ref={(node) => {
+        setRootElement(node);
+        setRefValue(props.ref, node);
+      }}
+      role="group"
+      style={mergeStyleVars(
+        props.style,
+        props.accent
+          ? {
+              "--channel-accent": props.accent,
+            }
+          : {}
+      )}
+      {...rest}
+    >
+      <AudioConfigProvider value={childConfig}>
+        <div
+          class={channelStripLayoutVariants({
+            orientation: orientation(),
+          })}
+          data-slot="channel-strip-layout"
         >
-          <div
-            class={channelStripLayoutVariants({
-              orientation:
-                orientation(),
-            })}
-            data-slot="channel-strip-layout"
-          >
-            {props.children}
-          </div>
-        </AudioConfigProvider>
-      </div>
-    )
-  );
+          {props.children}
+        </div>
+      </AudioConfigProvider>
+    </div>
+  ));
 };
 
-type DivPartProps = Omit<
-  DivDOMProps,
-  "class" | "className"
-> & {
+type DivPartProps = Omit<DivDOMProps, "class" | "className"> & {
   class?: string;
   className?: string;
 };
 
-type SpanPartProps = Omit<
-  SpanDOMProps,
-  "class" | "className"
-> & {
+type SpanPartProps = Omit<SpanDOMProps, "class" | "className"> & {
   class?: string;
   className?: string;
 };
 
-const CLASS_OWN = [
-  "class",
-  "className",
-] as const;
+const CLASS_OWN = ["class", "className"] as const;
 
-export const ChannelStripHeader = (
-  props: DivPartProps
-) => {
-  const context =
-    useChannelStripContext(
-      "ChannelStripHeader"
-    );
+export const ChannelStripHeader = (props: DivPartProps) => {
+  const context = useChannelStripContext("ChannelStripHeader");
 
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
       class={cn(
         "flex min-w-0 items-center gap-2 [grid-area:header]",
-        context.orientation ===
-          "vertical"
+        context.orientation === "vertical"
           ? "w-full flex-col text-center *:max-w-full"
           : "flex-wrap",
         props.class,
@@ -439,13 +303,8 @@ export const ChannelStripHeader = (
   );
 };
 
-export const ChannelStripIcon = (
-  props: SpanPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripIcon = (props: SpanPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <span
@@ -461,18 +320,10 @@ export const ChannelStripIcon = (
   );
 };
 
-export const ChannelStripTitle = (
-  props: SpanPartProps
-) => {
-  const context =
-    useChannelStripContext(
-      "ChannelStripTitle"
-    );
+export const ChannelStripTitle = (props: SpanPartProps) => {
+  const context = useChannelStripContext("ChannelStripTitle");
 
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <span
@@ -488,13 +339,8 @@ export const ChannelStripTitle = (
   );
 };
 
-export const ChannelStripDescription = (
-  props: SpanPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripDescription = (props: SpanPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <span
@@ -509,13 +355,8 @@ export const ChannelStripDescription = (
   );
 };
 
-export const ChannelStripText = (
-  props: DivPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripText = (props: DivPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
@@ -533,50 +374,28 @@ export const ChannelStripText = (
 const STATUS_CLASS = {
   default: "",
   error: "",
-  live:
-    "bg-meter-ok/15 text-meter-ok-foreground",
-  muted:
-    "bg-channel-mute/15 text-channel-mute-foreground",
-  warning:
-    "bg-meter-warn/20 text-foreground",
+  live: "bg-meter-ok/15 text-meter-ok-foreground",
+  muted: "bg-channel-mute/15 text-channel-mute-foreground",
+  warning: "bg-meter-warn/20 text-foreground",
 } as const;
 
-export interface ChannelStripStatusProps
-  extends BadgeProps {
-  tone?:
-    | "default"
-    | "live"
-    | "muted"
-    | "warning"
-    | "error";
+export interface ChannelStripStatusProps extends BadgeProps {
+  tone?: "default" | "live" | "muted" | "warning" | "error";
 }
 
-const STATUS_OWN = [
-  "tone",
-] as const;
+const STATUS_OWN = ["tone"] as const;
 
-export const ChannelStripStatus = (
-  props: ChannelStripStatusProps
-) => {
-  const rest = omitProps(
-    props,
-    STATUS_OWN
-  );
+export const ChannelStripStatus = (props: ChannelStripStatusProps) => {
+  const rest = omitProps(props, STATUS_OWN);
 
-  const tone = () =>
-    props.tone ??
-    "default";
+  const tone = () => props.tone ?? "default";
 
   const badgeVariant = () => {
-    if (
-      tone() === "error"
-    ) {
+    if (tone() === "error") {
       return "destructive" as const;
     }
 
-    if (
-      tone() === "default"
-    ) {
+    if (tone() === "default") {
       return "secondary" as const;
     }
 
@@ -586,30 +405,16 @@ export const ChannelStripStatus = (
   return (
     <Badge
       {...rest}
-      class={cn(
-        "shrink-0",
-        STATUS_CLASS[
-          tone()
-        ],
-        props.class,
-        props.className
-      )}
+      class={cn("shrink-0", STATUS_CLASS[tone()], props.class, props.className)}
       data-slot="channel-strip-status"
       data-tone={tone()}
-      variant={
-        badgeVariant()
-      }
+      variant={badgeVariant()}
     />
   );
 };
 
-export const ChannelStripActions = (
-  props: DivPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripActions = (props: DivPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
@@ -624,25 +429,16 @@ export const ChannelStripActions = (
   );
 };
 
-export const ChannelStripMeter = (
-  props: DivPartProps
-) => {
-  const context =
-    useChannelStripContext(
-      "ChannelStripMeter"
-    );
+export const ChannelStripMeter = (props: DivPartProps) => {
+  const context = useChannelStripContext("ChannelStripMeter");
 
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
       class={cn(
         "flex min-h-0 min-w-0 [grid-area:meter]",
-        context.orientation ===
-          "horizontal"
+        context.orientation === "horizontal"
           ? "w-full items-center"
           : "h-full justify-center",
         props.class,
@@ -654,25 +450,16 @@ export const ChannelStripMeter = (
   );
 };
 
-export const ChannelStripFader = (
-  props: DivPartProps
-) => {
-  const context =
-    useChannelStripContext(
-      "ChannelStripFader"
-    );
+export const ChannelStripFader = (props: DivPartProps) => {
+  const context = useChannelStripContext("ChannelStripFader");
 
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
       class={cn(
         "flex min-h-0 min-w-0 [grid-area:fader] [&_[data-slot=fader-control]]:p-0 [&_[data-slot=fader-scale]]:p-0",
-        context.orientation ===
-          "horizontal"
+        context.orientation === "horizontal"
           ? "w-full items-center [&_[data-slot=fader-control]:only-child]:my-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2)]"
           : "h-full justify-center [&_[data-slot=fader-control]:only-child]:mx-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2)]",
         props.class,
@@ -684,13 +471,8 @@ export const ChannelStripFader = (
   );
 };
 
-export const ChannelStripValue = (
-  props: DivPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripValue = (props: DivPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
@@ -705,13 +487,8 @@ export const ChannelStripValue = (
   );
 };
 
-export const ChannelStripControls = (
-  props: DivPartProps
-) => {
-  const rest = omitProps(
-    props,
-    CLASS_OWN
-  );
+export const ChannelStripControls = (props: DivPartProps) => {
+  const rest = omitProps(props, CLASS_OWN);
 
   return (
     <div
@@ -734,47 +511,29 @@ const noticeVariants = cva(
     },
     variants: {
       variant: {
-        default:
-          "bg-muted text-muted-foreground",
-        destructive:
-          "bg-destructive/10 text-destructive",
-        warning:
-          "bg-meter-warn/15 text-foreground",
+        default: "bg-muted text-muted-foreground",
+        destructive: "bg-destructive/10 text-destructive",
+        warning: "bg-meter-warn/15 text-foreground",
       },
     },
   }
 );
 
 export interface ChannelStripNoticeProps
-  extends DivPartProps,
-    VariantProps<
-      typeof noticeVariants
-    > {}
+  extends DivPartProps, VariantProps<typeof noticeVariants> {}
 
-const NOTICE_OWN = [
-  "class",
-  "className",
-  "variant",
-] as const;
+const NOTICE_OWN = ["class", "className", "variant"] as const;
 
-export const ChannelStripNotice = (
-  props: ChannelStripNoticeProps
-) => {
-  const rest = omitProps(
-    props,
-    NOTICE_OWN
-  );
+export const ChannelStripNotice = (props: ChannelStripNoticeProps) => {
+  const rest = omitProps(props, NOTICE_OWN);
 
-  const variant = () =>
-    props.variant ??
-    "default";
+  const variant = () => props.variant ?? "default";
 
   return (
     <div
       class={cn(
         noticeVariants({
-          variant:
-            variant(),
+          variant: variant(),
         }),
         "w-full",
         props.class,
@@ -782,18 +541,10 @@ export const ChannelStripNotice = (
       )}
       data-slot="channel-strip-notice"
       data-variant={variant()}
-      role={
-        variant() ===
-        "destructive"
-          ? "alert"
-          : "status"
-      }
+      role={variant() === "destructive" ? "alert" : "status"}
       {...rest}
     />
   );
 };
 
-export {
-  channelStripLayoutVariants,
-  channelStripVariants,
-};
+export { channelStripLayoutVariants, channelStripVariants };

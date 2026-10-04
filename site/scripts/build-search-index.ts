@@ -1,11 +1,9 @@
-import { create, insertMultiple, save, type RawData } from "@orama/orama";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 
-import {
-  searchSchema,
-  type SearchDocument,
-} from "../lib/search-schema";
+import { create, insertMultiple, save, type RawData } from "@orama/orama";
+
+import { searchSchema, type SearchDocument } from "../lib/search-schema";
 
 interface SearchIndexPayload {
   version: 1;
@@ -47,10 +45,7 @@ const frontmatterValue = (frontmatter: string, name: string): string => {
   const first = value[0];
   const last = value.at(-1);
 
-  if (
-    (first === '"' && last === '"') ||
-    (first === "'" && last === "'")
-  ) {
+  if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
     return value.slice(1, -1);
   }
 

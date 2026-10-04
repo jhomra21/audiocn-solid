@@ -1,5 +1,5 @@
-import { For, Show, createSignal, onCleanup, onSettled } from "solid-js";
 import type { JSX } from "@solidjs/web";
+import { For, Show, createSignal, onCleanup, onSettled } from "solid-js";
 
 import {
   ChevronDownIcon,
@@ -158,7 +158,7 @@ export const DocsShell = (props: DocsShellProps) => {
 
   const tocProgress = () => {
     const index = headings().findIndex(
-      (heading) => heading.id === activeHeading(),
+      (heading) => heading.id === activeHeading()
     );
 
     return headings().length > 0 ? (index + 1) / headings().length : 0;
@@ -182,14 +182,14 @@ export const DocsShell = (props: DocsShellProps) => {
           .filter((entry) => entry.isIntersecting)
           .sort(
             (left, right) =>
-              left.boundingClientRect.top - right.boundingClientRect.top,
+              left.boundingClientRect.top - right.boundingClientRect.top
           )[0];
 
         if (visible && visible.target instanceof HTMLElement) {
           setActiveHeading(visible.target.id);
         }
       },
-      { rootMargin: "-10% 0px -80% 0px" },
+      { rootMargin: "-10% 0px -80% 0px" }
     );
 
     setHeadings(values);
@@ -260,7 +260,7 @@ export const DocsShell = (props: DocsShellProps) => {
                 </button>
               </div>
               <div
-                class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [scrollbar-width:none] mask-[linear-gradient(to_bottom,transparent,white_12px,white_calc(100%-12px),transparent)]"
+                class="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto overscroll-contain mask-[linear-gradient(to_bottom,transparent,white_12px,white_calc(100%-12px),transparent)] p-4"
                 ref={revealCurrentLink}
               >
                 <DocsNavigation currentPath={props.currentPath} />
@@ -314,7 +314,7 @@ export const DocsShell = (props: DocsShellProps) => {
                     stroke-width="2"
                   />
                   <circle
-                    class="stroke-primary -rotate-90 origin-center transition-all"
+                    class="stroke-primary origin-center -rotate-90 transition-all"
                     cx="9"
                     cy="9"
                     fill="none"
@@ -344,7 +344,7 @@ export const DocsShell = (props: DocsShellProps) => {
         </Show>
 
         <main class="grid justify-items-center [grid-area:main]">
-          <article class="flex w-full max-w-[900px] min-w-0 flex-col gap-4 px-4 py-6 md:px-6 md:pt-8 xl:px-8 xl:pt-14 md:in-data-[sidebar-collapsed=true]:pt-16 xl:in-data-[sidebar-collapsed=true]:pt-14">
+          <article class="flex w-full max-w-[900px] min-w-0 flex-col gap-4 px-4 py-6 md:px-6 md:pt-8 md:in-data-[sidebar-collapsed=true]:pt-16 xl:px-8 xl:pt-14 xl:in-data-[sidebar-collapsed=true]:pt-14">
             <h1 class="text-[1.75em] font-semibold">{props.title}</h1>
             <p class="text-muted-foreground mb-8 text-lg">
               {props.description}
@@ -360,7 +360,7 @@ export const DocsShell = (props: DocsShellProps) => {
                 <TextAlignStartIcon class="size-4" />
                 On this page
               </h2>
-              <div class="ms-px min-h-0 overflow-auto overscroll-contain py-3 [scrollbar-width:none] mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)]">
+              <div class="ms-px min-h-0 [scrollbar-width:none] overflow-auto overscroll-contain mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-3">
                 <TableOfContents
                   active={activeHeading()}
                   headings={headings()}

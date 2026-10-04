@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import CustomEngineDoc, {
   frontmatter,
 } from "@/site/content/docs/concepts/custom-engine.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function CustomEnginePage() {
   return (

@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import ComponentsDoc, {
   frontmatter,
 } from "@/site/content/docs/components/index.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function ComponentsPage() {
   return (

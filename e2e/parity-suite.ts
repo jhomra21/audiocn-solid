@@ -1,7 +1,8 @@
-import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+
+import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 interface ParitySuiteOptions {
   runtime: "solid-1" | "solid-2";
@@ -26,12 +27,16 @@ export const runParitySuite = ({
   runtime,
   artifactDir,
 }: ParitySuiteOptions) => {
-  test("renders all upstream examples with real meter styles", async ({ page }) => {
+  test("renders all upstream examples with real meter styles", async ({
+    page,
+  }) => {
     const failures = captureConsoleFailures(page);
     await page.goto("/");
 
     await expect(page.locator(`[data-runtime="${runtime}"]`)).toBeVisible();
-    await expect(page.locator('[data-slot="component-preview"]')).toHaveCount(16);
+    await expect(page.locator('[data-slot="component-preview"]')).toHaveCount(
+      16
+    );
 
     const demo = page.locator('[data-example="level-meter-demo"]');
     const meter = demo.locator('[data-slot="level-meter"]');
@@ -61,12 +66,14 @@ export const runParitySuite = ({
       .toBeGreaterThan(0);
 
     expect(
-      await page.locator("body").evaluate((node) => getComputedStyle(node).fontFamily)
+      await page
+        .locator("body")
+        .evaluate((node) => getComputedStyle(node).fontFamily)
     ).toContain("DM Sans Variable");
 
-    await expect(
-      demo.locator('[data-slot="component-preview"]')
-    ).toHaveClass(/text-foreground\/90/);
+    await expect(demo.locator('[data-slot="component-preview"]')).toHaveClass(
+      /text-foreground\/90/
+    );
     expect(
       await demo
         .locator('[data-slot="db-readout"]')
@@ -88,16 +95,20 @@ export const runParitySuite = ({
     }
 
     await variants.scrollIntoViewIfNeeded();
-    const variantChannels = variants.locator('[data-slot="level-meter-channel"]');
+
+    const variantChannels = variants.locator(
+      '[data-slot="level-meter-channel"]'
+    );
 
     await expect
       .poll(async () =>
-        variantChannels.evaluateAll((nodes) =>
-          nodes.filter(
-            (node) =>
-              node instanceof HTMLElement &&
-              node.style.getPropertyValue("--meter-level") !== ""
-          ).length
+        variantChannels.evaluateAll(
+          (nodes) =>
+            nodes.filter(
+              (node) =>
+                node instanceof HTMLElement &&
+                node.style.getPropertyValue("--meter-level") !== ""
+            ).length
         )
       )
       .toBe(6);
@@ -127,7 +138,11 @@ export const runParitySuite = ({
       root.dataset.theme = "ocean";
       const ocean = getComputedStyle(root).getPropertyValue("--primary").trim();
       root.classList.add("dark");
-      const dark = getComputedStyle(root).getPropertyValue("--background").trim();
+
+      const dark = getComputedStyle(root)
+        .getPropertyValue("--background")
+        .trim();
+
       root.classList.remove("dark");
       delete root.dataset.theme;
 
@@ -166,7 +181,10 @@ export const runParitySuite = ({
       page.locator('[data-contract="value-floor"] [data-slot="db-readout"]')
     ).toHaveText("−∞ dB");
 
-    const override = page.locator('[data-contract="readout-overrides"] [role="status"]');
+    const override = page.locator(
+      '[data-contract="readout-overrides"] [role="status"]'
+    );
+
     await expect(override).toHaveAttribute("data-slot", "custom-readout");
     await expect(override).toHaveAttribute("data-zone", "mine");
 
@@ -180,7 +198,10 @@ export const runParitySuite = ({
       /(?:^|\s)text-muted-foreground(?:\s|$)/
     );
 
-    const tick = page.locator('[data-contract="scale-style"] [data-slot="db-scale-tick"]');
+    const tick = page.locator(
+      '[data-contract="scale-style"] [data-slot="db-scale-tick"]'
+    );
+
     await expect
       .poll(async () => tick.getAttribute("style"))
       .toContain("--tick-position:");
@@ -195,7 +216,10 @@ export const runParitySuite = ({
     await expect(hold).not.toHaveClass(/hold-x/);
     await expect(hold.locator(".hold-x")).toHaveCount(1);
 
-    const customMeter = page.locator('[data-contract="meter-overrides"] [data-slot="custom-meter"]');
+    const customMeter = page.locator(
+      '[data-contract="meter-overrides"] [data-slot="custom-meter"]'
+    );
+
     await expect(customMeter).toHaveAttribute("role", "progressbar");
     await expect(customMeter).toHaveAttribute("aria-valuemin", "-100");
 

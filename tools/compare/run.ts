@@ -23,7 +23,10 @@ const preview = spawn(
 
 const viewer = spawn(
   "bun",
-  ["-e", "Bun.serve({ port: 4181, fetch: () => new Response(Bun.file('tools/compare/index.html')) });"],
+  [
+    "-e",
+    "Bun.serve({ port: 4181, fetch: () => new Response(Bun.file('tools/compare/index.html')) });",
+  ],
   { cwd: new URL("../..", import.meta.url), stdio: "inherit" }
 );
 

@@ -157,7 +157,9 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
         docsNav.getByRole("link", { name: "Level Meter", exact: true })
       ).toHaveAttribute("aria-current", "page");
 
-      await page.getByRole("button", { name: "Search docs", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Search docs", exact: true })
+        .click();
 
       const dialog = page.getByRole("dialog", {
         name: "Search documentation",

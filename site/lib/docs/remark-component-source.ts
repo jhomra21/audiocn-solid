@@ -14,7 +14,7 @@ const isLiteralAttribute = (value: MdxJsxAttribute["value"]): value is string =>
 
 const attribute = (node: MdxJsxFlowElement, name: string) => {
   const match = node.attributes.find(
-    (entry) => entry.type === "mdxJsxAttribute" && entry.name === name,
+    (entry) => entry.type === "mdxJsxAttribute" && entry.name === name
   );
 
   return isLiteralAttribute(match?.value) ? match.value : undefined;

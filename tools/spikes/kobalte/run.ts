@@ -1,11 +1,6 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import {
-  mkdir,
-  mkdtemp,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -159,9 +154,7 @@ const viteConfigFor = (runtime: RuntimeName): string => {
     runtime === "solid2" ? "@solidjs/vite-plugin" : "vite-plugin-solid";
 
   const dedupe =
-    runtime === "solid2"
-      ? '\n    dedupe: ["solid-js", "@solidjs/web"],'
-      : "";
+    runtime === "solid2" ? '\n    dedupe: ["solid-js", "@solidjs/web"],' : "";
 
   return `import solid from "${plugin}";
 import { defineConfig } from "vite";
@@ -233,23 +226,12 @@ const waitForServer = async (url: string): Promise<void> => {
   throw new Error(`Timed out waiting for ${url}.`);
 };
 
-const runE2E = async (
-  fixture: string,
-  port: number
-): Promise<void> => {
+const runE2E = async (fixture: string, port: number): Promise<void> => {
   const baseUrl = `http://127.0.0.1:${port}`;
 
   const preview = spawn(
     "bun",
-    [
-      "run",
-      "preview",
-      "--",
-      "--host",
-      "127.0.0.1",
-      "--port",
-      String(port),
-    ],
+    ["run", "preview", "--", "--host", "127.0.0.1", "--port", String(port)],
     {
       cwd: fixture,
       env: process.env,
@@ -297,10 +279,7 @@ const runE2E = async (
 const writeReport = async (report: Spike4Report): Promise<void> => {
   await mkdir(dirname(artifactPath), { recursive: true });
 
-  await writeFile(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
+  await writeFile(artifactPath, `${JSON.stringify(report, null, 2)}\n`);
 };
 
 const report: Spike4Report = {
@@ -312,8 +291,7 @@ const report: Spike4Report = {
   },
   versions: {
     solid1: "@kobalte/core@0.13.14 + solid-js@1.9.15",
-    solid2:
-      "@kobalte/core@2.0.0-alpha.2 + solid-js/@solidjs/web@2.0.0-rc.13",
+    solid2: "@kobalte/core@2.0.0-alpha.2 + solid-js/@solidjs/web@2.0.0-rc.13",
   },
   apiDifferences: [
     {
@@ -327,8 +305,7 @@ const report: Spike4Report = {
       surface: "tested primitive names",
       solid1:
         "Slider/Select/Popover/Switch/Tabs/Tooltip/ContextMenu parts used by the fixture",
-      solid2:
-        "Same public part names for the fixture subset",
+      solid2: "Same public part names for the fixture subset",
       consequence:
         "No runtime branch is needed in the shared component source.",
     },
@@ -388,8 +365,7 @@ try {
       await runE2E(fixture, runtime.port);
       result.e2e = true;
     } catch (error) {
-      result.error =
-        error instanceof Error ? error.message : String(error);
+      result.error = error instanceof Error ? error.message : String(error);
 
       throw error;
     }
@@ -397,8 +373,7 @@ try {
 
   report.pass = true;
 } catch (error) {
-  report.error =
-    error instanceof Error ? error.message : String(error);
+  report.error = error instanceof Error ? error.message : String(error);
 
   throw error;
 } finally {

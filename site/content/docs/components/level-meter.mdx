@@ -137,21 +137,56 @@ meter.current?.paint({ channels: [{ peakDb: -9.1 }] });
 
 <PropsTable
   rows={[
-    ["source", "FrameSource<MeterFrame> | null", null, "Subscribes and paints without component rerenders."],
+    [
+      "source",
+      "FrameSource<MeterFrame> | null",
+      null,
+      "Subscribes and paints without component rerenders.",
+    ],
     ["peakDb", "number", null, "Mono peak level in dBFS, for declarative use."],
     ["rmsDb", "number", null, "Mono RMS level in dBFS."],
-    ["channels", "ChannelLevel[]", null, "Levels per channel, for declarative multi-channel use."],
+    [
+      "channels",
+      "ChannelLevel[]",
+      null,
+      "Levels per channel, for declarative multi-channel use.",
+    ],
     ["channelCount", "number", "1", "Tracks to render before data arrives."],
     ["minDb", "number", "-60", "Bottom of the displayed range."],
     ["maxDb", "number", "0", "Top of the displayed range."],
-    ["zones", "MeterZone[]", "DEFAULT_ZONES", "Colour zones: ok, warn from −20, clip from −9."],
-    ["ballistics", "\"peak\" | \"vu\" | \"instant\" | Partial<BallisticsOptions>", "\"peak\"", "How the meter moves."],
-    ["taper", "\"linear\" | \"audio\" | Taper", "\"linear\"", "Scale law."],
-    ["orientation", "\"horizontal\" | \"vertical\"", "\"horizontal\"", "Inherited from a channel strip."],
-    ["variant", "\"solid\" | \"segmented\" | \"gradient\"", "\"solid\"", "segmented is an LED ladder."],
+    [
+      "zones",
+      "MeterZone[]",
+      "DEFAULT_ZONES",
+      "Colour zones: ok, warn from −20, clip from −9.",
+    ],
+    [
+      "ballistics",
+      '"peak" | "vu" | "instant" | Partial<BallisticsOptions>',
+      '"peak"',
+      "How the meter moves.",
+    ],
+    ["taper", '"linear" | "audio" | Taper', '"linear"', "Scale law."],
+    [
+      "orientation",
+      '"horizontal" | "vertical"',
+      '"horizontal"',
+      "Inherited from a channel strip.",
+    ],
+    [
+      "variant",
+      '"solid" | "segmented" | "gradient"',
+      '"solid"',
+      "segmented is an LED ladder.",
+    ],
     ["segments", "number", "24", "Segments for the segmented variant."],
-    ["size", "\"sm\" | \"default\" | \"lg\"", "\"default\"", "Track thickness."],
-    ["actionsRef", "RefTarget<LevelMeterActions>", null, "{ paint(frame), reset() }."],
+    ["size", '"sm" | "default" | "lg"', '"default"', "Track thickness."],
+    [
+      "actionsRef",
+      "RefTarget<LevelMeterActions>",
+      null,
+      "{ paint(frame), reset() }.",
+    ],
   ]}
 />
 
@@ -167,7 +202,7 @@ meter.current?.paint({ channels: [{ peakDb: -9.1 }] });
 
 <PropsTable
   rows={[
-    ["measure", "\"peak\" | \"rms\"", "\"peak\"", "Which measurement the bar shows."],
+    ["measure", '"peak" | "rms"', '"peak"', "Which measurement the bar shows."],
   ]}
 />
 

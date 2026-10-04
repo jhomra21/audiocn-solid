@@ -1,8 +1,5 @@
 import type { Code, Root } from "mdast";
-import type {
-  MdxJsxAttribute,
-  MdxJsxFlowElement,
-} from "mdast-util-mdx-jsx";
+import type { MdxJsxAttribute, MdxJsxFlowElement } from "mdast-util-mdx-jsx";
 import { visit } from "unist-util-visit";
 
 const isNpmCode = (node: Code): boolean => node.lang === "npm";
@@ -23,12 +20,14 @@ const toInstallCommand = (node: Code): MdxJsxFlowElement => {
 };
 
 /** Converts upstream ```npm blocks into the docs InstallCommand component. */
-export const remarkInstallCommand = () => (tree: Root): void => {
-  visit(tree, "code", (node, index, parent) => {
-    if (!isNpmCode(node) || index === undefined || !parent) {
-      return;
-    }
+export const remarkInstallCommand =
+  () =>
+  (tree: Root): void => {
+    visit(tree, "code", (node, index, parent) => {
+      if (!isNpmCode(node) || index === undefined || !parent) {
+        return;
+      }
 
-    parent.children[index] = toInstallCommand(node);
-  });
-};
+      parent.children[index] = toInstallCommand(node);
+    });
+  };

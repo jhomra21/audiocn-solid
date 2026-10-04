@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseDemoSignalDoc, { frontmatter } from "@/site/content/docs/hooks/use-demo-signal.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseDemoSignalDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-demo-signal.mdx";
 
 export default function UseDemoSignalPage() {
   return (

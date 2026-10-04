@@ -1,6 +1,7 @@
-import { expect, test } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+
+import { expect, test } from "@playwright/test";
 
 const artifactDirectory = join(import.meta.dirname, "../artifacts/shell");
 

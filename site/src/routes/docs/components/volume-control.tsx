@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import VolumeControlDoc, { frontmatter } from "@/site/content/docs/components/volume-control.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import VolumeControlDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/volume-control.mdx";
 
 export default function VolumeControlPage() {
   return (

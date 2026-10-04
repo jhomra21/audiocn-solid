@@ -5,12 +5,12 @@ import {
   MoonIcon,
   SunIcon,
 } from "@/site/components/docs/icons";
-import { isTheme, THEMES } from "@/site/lib/docs/site-themes";
-import { siteConfig } from "@/site/lib/site";
 import {
   useAppearance,
   useColorTheme,
 } from "@/site/components/docs/theme-controls";
+import { isTheme, THEMES } from "@/site/lib/docs/site-themes";
+import { siteConfig } from "@/site/lib/site";
 
 const APPEARANCE_ICON_CLASS =
   "size-6.5 rounded-md p-1.5 text-muted-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground";

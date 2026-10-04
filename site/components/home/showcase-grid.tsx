@@ -1,14 +1,14 @@
 import { For } from "solid-js";
 
-import { ShowcaseCard } from "@/site/components/home/showcase-card";
+import { cn } from "@/lib/utils";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
+import { ShowcaseCard } from "@/site/components/home/showcase-card";
 import ChannelTile from "@/site/components/home/tiles/channel-tile";
 import EqTile from "@/site/components/home/tiles/eq-tile";
 import FadersTile from "@/site/components/home/tiles/faders-tile";
 import KnobsTile from "@/site/components/home/tiles/knobs-tile";
 import MetersTile from "@/site/components/home/tiles/meters-tile";
 import MixerTile from "@/site/components/home/tiles/mixer-tile";
-import { cn } from "@/lib/utils";
 
 const TILES = new Map([
   ["channel", ChannelTile],
@@ -29,7 +29,11 @@ const WIDE: ShowcaseItem[] = [
   { href: "/docs/components/mixer", label: "Mixer", tile: "mixer" },
   { href: "/docs/components/waveform", label: "Waveform", tile: "waveform" },
   { href: "/docs/blocks/music-player", label: "Music player", tile: "music" },
-  { href: "/docs/components/sound-pad", label: "Sound pads", tile: "sound-pads" },
+  {
+    href: "/docs/components/sound-pad",
+    label: "Sound pads",
+    tile: "sound-pads",
+  },
 ];
 
 const LEFT: ShowcaseItem[] = [

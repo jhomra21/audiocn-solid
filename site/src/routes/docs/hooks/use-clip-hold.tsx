@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseClipHoldDoc, { frontmatter } from "@/site/content/docs/hooks/use-clip-hold.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseClipHoldDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-clip-hold.mdx";
 
 export default function UseClipHoldPage() {
   return (

@@ -1,18 +1,24 @@
-import { For, createContext, createMemo, createSignal, useContext } from "solid-js";
+import {
+  For,
+  createContext,
+  createMemo,
+  createSignal,
+  useContext,
+} from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
-import type { DivDOMProps } from "@/lib/solid/jsx-types";
 import { DEFAULT_MAX_DB, DEFAULT_MIN_DB, formatDb } from "@/lib/audio/decibels";
-import { omitProps } from "@/lib/solid/props";
-import { setRefValue } from "@/lib/solid/ref";
-import type { RefTarget } from "@/lib/solid/ref";
-import { provideContext } from "@/lib/solid/context";
-import { createCompatEffect } from "@/lib/solid/effect";
-import { mergeStyleVars } from "@/lib/solid/style";
-import type { StyleValue } from "@/lib/solid/style";
 import { resolveTaper } from "@/lib/audio/taper";
 import type { TaperInput } from "@/lib/audio/taper";
 import type { Orientation, Taper } from "@/lib/audio/types";
+import { provideContext } from "@/lib/solid/context";
+import { createCompatEffect } from "@/lib/solid/effect";
+import type { DivDOMProps } from "@/lib/solid/jsx-types";
+import { omitProps } from "@/lib/solid/props";
+import { setRefValue } from "@/lib/solid/ref";
+import type { RefTarget } from "@/lib/solid/ref";
+import { mergeStyleVars } from "@/lib/solid/style";
+import type { StyleValue } from "@/lib/solid/style";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_TICKS = [12, 6, 0, -6, -12, -18, -24, -36, -48, -60, -72, -90];
@@ -329,9 +335,7 @@ export const DbScale = (props: DbScaleProps) => {
       {...rest}
     >
       {props.children ?? (
-        <For each={values()}>
-          {(tick) => <DbScaleTick value={tick} />}
-        </For>
+        <For each={values()}>{(tick) => <DbScaleTick value={tick} />}</For>
       )}
     </div>
   ));

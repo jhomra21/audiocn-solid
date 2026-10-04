@@ -1,3 +1,5 @@
+import { dynamic } from "@solidjs/web";
+import type { ComponentProps, JSX } from "@solidjs/web";
 import {
   Errored,
   For,
@@ -7,15 +9,29 @@ import {
   omit,
   onCleanup,
 } from "solid-js";
-import { dynamic } from "@solidjs/web";
-import type { ComponentProps, JSX } from "@solidjs/web";
 
+import ChannelStripConsole from "@/components/examples/channel-strip-console";
+import ChannelStripDemo from "@/components/examples/channel-strip-demo";
+import ChannelStripNotices from "@/components/examples/channel-strip-notices";
+import ChannelToggleDemo from "@/components/examples/channel-toggle-demo";
+import ChannelToggleVariants from "@/components/examples/channel-toggle-variants";
 import { ClipIndicatorDemo } from "@/components/examples/clip-indicator-demo";
 import { ClipIndicatorLatching } from "@/components/examples/clip-indicator-latching";
 import { DbReadoutDemo } from "@/components/examples/db-readout-demo";
 import { DbReadoutZones } from "@/components/examples/db-readout-zones";
 import { DbScaleDemo } from "@/components/examples/db-scale-demo";
 import { DbScaleVertical } from "@/components/examples/db-scale-vertical";
+import FaderBipolar from "@/components/examples/fader-bipolar";
+import FaderDemo from "@/components/examples/fader-demo";
+import FaderSilence from "@/components/examples/fader-silence";
+import FaderSizes from "@/components/examples/fader-sizes";
+import FaderVertical from "@/components/examples/fader-vertical";
+import FaderWithMeter from "@/components/examples/fader-with-meter";
+import KnobDemo from "@/components/examples/knob-demo";
+import KnobDragDirections from "@/components/examples/knob-drag-directions";
+import KnobMetal from "@/components/examples/knob-metal";
+import KnobSizes from "@/components/examples/knob-sizes";
+import KnobVolume from "@/components/examples/knob-volume";
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
 import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
 import { LevelMeterCustomColors } from "@/components/examples/level-meter-custom-colors";
@@ -26,29 +42,13 @@ import { LevelMeterSimple } from "@/components/examples/level-meter-simple";
 import { LevelMeterValues } from "@/components/examples/level-meter-values";
 import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
-import FaderSizes from "@/components/examples/fader-sizes";
-import FaderBipolar from "@/components/examples/fader-bipolar";
-import FaderDemo from "@/components/examples/fader-demo";
-import FaderSilence from "@/components/examples/fader-silence";
-import FaderVertical from "@/components/examples/fader-vertical";
-import FaderWithMeter from "@/components/examples/fader-with-meter";
-import KnobDemo from "@/components/examples/knob-demo";
-import KnobDragDirections from "@/components/examples/knob-drag-directions";
-import KnobMetal from "@/components/examples/knob-metal";
-import KnobSizes from "@/components/examples/knob-sizes";
-import KnobVolume from "@/components/examples/knob-volume";
 import MixerConsole from "@/components/examples/mixer-console";
 import MixerDemo from "@/components/examples/mixer-demo";
 import MixerEmptyDemo from "@/components/examples/mixer-empty";
-import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
 import PanControlDemo from "@/components/examples/pan-control-demo";
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import ParameterSliderDemo from "@/components/examples/parameter-slider-demo";
-import ChannelStripConsole from "@/components/examples/channel-strip-console";
-import ChannelStripDemo from "@/components/examples/channel-strip-demo";
-import ChannelStripNotices from "@/components/examples/channel-strip-notices";
-import ChannelToggleDemo from "@/components/examples/channel-toggle-demo";
-import ChannelToggleVariants from "@/components/examples/channel-toggle-variants";
+import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import {
   CheckIcon,
@@ -173,7 +173,7 @@ export const MdxPre = (props: PreProps) => {
   let viewport: HTMLDivElement | undefined;
 
   const [copied, copy] = createCopy(
-    () => viewport?.querySelector("pre")?.textContent ?? undefined,
+    () => viewport?.querySelector("pre")?.textContent ?? undefined
   );
 
   const copyButton = () => (
@@ -425,7 +425,7 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
             <button
               aria-controls={`${id}-${tab}-panel`}
               aria-selected={selected() === tab ? "true" : "false"}
-              class="text-muted-foreground aria-selected:text-foreground relative h-9 px-2 text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full aria-selected:after:bg-foreground"
+              class="text-muted-foreground aria-selected:text-foreground aria-selected:after:bg-foreground relative h-9 px-2 text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full"
               id={`${id}-${tab}-tab`}
               onClick={() => setSelected(tab)}
               onKeyDown={onTabKeyDown}
@@ -466,7 +466,7 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
       </div>
       <div
         aria-labelledby={`${id}-code-tab`}
-        class="[&_figure]:my-0 [&_.fd-scroll-container]:max-h-[32rem]"
+        class="[&_.fd-scroll-container]:max-h-[32rem] [&_figure]:my-0"
         hidden={selected() !== "code"}
         id={`${id}-code-panel`}
         role="tabpanel"
@@ -529,7 +529,7 @@ const InstallTabs = (props: InstallCommandProps) => {
           {([manager]) => (
             <button
               aria-pressed={selected() === manager ? "true" : "false"}
-              class="aria-pressed:text-foreground relative h-10 px-2 font-mono text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 aria-pressed:after:bg-foreground"
+              class="aria-pressed:text-foreground aria-pressed:after:bg-foreground relative h-10 px-2 font-mono text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5"
               onClick={() => setSelected(manager)}
               type="button"
             >

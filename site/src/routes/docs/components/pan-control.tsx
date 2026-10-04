@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import PanControlDoc, { frontmatter } from "@/site/content/docs/components/pan-control.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import PanControlDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/pan-control.mdx";
 
 export default function PanControlPage() {
   return (

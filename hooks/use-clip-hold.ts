@@ -1,7 +1,7 @@
 import { createSignal, onCleanup, untrack } from "solid-js";
 
-import { createCompatEffect } from "@/lib/solid/effect";
 import { CLIP_HOLD_MS, CLIP_THRESHOLD_DB } from "@/lib/audio/zones";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export interface UseClipHoldOptions {
   /** Levels at or above this count as a clip. Default −1 dBFS. */

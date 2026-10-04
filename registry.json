@@ -8,10 +8,7 @@
       "type": "registry:lib",
       "title": "Audio core",
       "description": "Framework-neutral audio primitives plus the Solid compatibility helpers used by the installable components.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "cn"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "cn"],
       "files": [
         {
           "path": "lib/audio/types.ts",
@@ -152,11 +149,7 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "Solid button primitive using the same base-rhea styling as the site.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority",
-        "cn"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority", "cn"],
       "files": [
         {
           "path": "components/ui/button.tsx",
@@ -189,12 +182,8 @@
       "type": "registry:hook",
       "title": "useFrameSource",
       "description": "Subscribe to a frame source with automatic Solid lifecycle cleanup.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "hooks/use-frame-source.ts",
@@ -207,12 +196,8 @@
       "type": "registry:hook",
       "title": "useClipHold",
       "description": "Clip detection with hold time, count, and reset.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "hooks/use-clip-hold.ts",
@@ -225,9 +210,7 @@
       "type": "registry:hook",
       "title": "useReducedMotion",
       "description": "Tracks the operating system reduced-motion preference.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "files": [
         {
           "path": "hooks/use-reduced-motion.ts",
@@ -244,9 +227,7 @@
       "type": "registry:hook",
       "title": "useVisibility",
       "description": "Tracks whether an element intersects the viewport.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "files": [
         {
           "path": "hooks/use-visibility.ts",
@@ -263,12 +244,8 @@
       "type": "registry:hook",
       "title": "useDemoSignal",
       "description": "Synthetic speech, music, tone, or noise frame sources for demos and tests.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "hooks/use-demo-signal.ts",
@@ -281,9 +258,7 @@
       "type": "registry:hook",
       "title": "useAudioContext",
       "description": "A shared AudioContext with a provider for supplying an existing context.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "files": [
         {
           "path": "hooks/use-audio-context.tsx",
@@ -308,9 +283,7 @@
       "type": "registry:hook",
       "title": "useAudioAnalyser",
       "description": "Meter and visual frame sources backed by Web Audio AnalyserNode.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-context"
@@ -327,9 +300,7 @@
       "type": "registry:hook",
       "title": "useMicrophone",
       "description": "Open a microphone MediaStream with browser processing disabled by default.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "files": [
         {
           "path": "hooks/use-microphone.ts",
@@ -346,12 +317,8 @@
       "type": "registry:hook",
       "title": "useAudioConfig",
       "description": "Shared meter and control configuration context.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "hooks/use-audio-config.tsx",
@@ -364,9 +331,7 @@
       "type": "registry:ui",
       "title": "dB Scale",
       "description": "Tick marks and labels for a decibel range.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config"
@@ -383,9 +348,7 @@
       "type": "registry:ui",
       "title": "dB Readout",
       "description": "A stable-width numeric level readout.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-frame-source"
@@ -402,9 +365,7 @@
       "type": "registry:ui",
       "title": "Clip Indicator",
       "description": "A clip light with hold, count, and reset behavior.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-clip-hold",
@@ -422,10 +383,7 @@
       "type": "registry:ui",
       "title": "Level Meter",
       "description": "Composable peak and RMS level meter with stereo, hold, scale, readout, and clip indication.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config",
@@ -499,10 +457,7 @@
       "type": "registry:ui",
       "title": "Knob",
       "description": "A composable rotary parameter control with linear or circular dragging, keyboard and wheel input, editable values, scales, metal caps, and optional detent clicks.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config",
@@ -545,10 +500,7 @@
       "type": "registry:ui",
       "title": "Channel Toggle",
       "description": "Audio channel toggle buttons with neutral, mute, solo, and monitor tones plus inherited disabled state.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config"
@@ -565,10 +517,7 @@
       "type": "registry:ui",
       "title": "Volume Control",
       "description": "A composable volume control with mute restore, perceptual or linear curves, horizontal and vertical sliders, and accessible level text.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "@kobalte/core@0.13.14"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config"
@@ -589,13 +538,8 @@
       "type": "registry:ui",
       "title": "Badge",
       "description": "A compact status badge with default, secondary, destructive, outline, ghost, and link variants.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "components/ui/badge.tsx",
@@ -608,10 +552,7 @@
       "type": "registry:ui",
       "title": "Channel Strip",
       "description": "A composable horizontal or console-style channel strip with shared audio config, status parts, responsive layout, and clipping reflection.",
-      "dependencies": [
-        "solid-js@^1.9.15",
-        "class-variance-authority"
-      ],
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config",
@@ -629,9 +570,7 @@
       "type": "registry:ui",
       "title": "Mixer",
       "description": "A horizontal or console-style mixer layout with shared audio configuration, empty state, master area, and keyboard focus navigation between channel controls.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-config"
@@ -648,12 +587,8 @@
       "type": "registry:hook",
       "title": "useMixer",
       "description": "Mixer state controller for channel gain, mute, solo, pan, monitoring, master controls, audibility, dynamic channels, reset, controlled state, and optional localStorage persistence.",
-      "dependencies": [
-        "solid-js@^1.9.15"
-      ],
-      "registryDependencies": [
-        "@audiocn-solid/core"
-      ],
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
       "files": [
         {
           "path": "hooks/use-mixer.ts",

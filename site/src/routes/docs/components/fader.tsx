@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import FaderDoc, { frontmatter } from "@/site/content/docs/components/fader.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import FaderDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/fader.mdx";
 
 export default function FaderPage() {
   return (

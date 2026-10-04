@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import ParameterSliderDoc, { frontmatter } from "@/site/content/docs/components/parameter-slider.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import ParameterSliderDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/parameter-slider.mdx";
 
 export default function ParameterSliderPage() {
   return (

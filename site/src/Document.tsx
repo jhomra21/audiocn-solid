@@ -16,10 +16,7 @@ export default function Document(props: { children: JSX.Element }) {
     <html class="font-sans antialiased" lang="en">
       <head>
         <meta charset="utf-8" />
-        <meta
-          content="width=device-width, initial-scale=1"
-          name="viewport"
-        />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
         <script innerHTML={themeBootstrap} />
         <HydrationScript />
       </head>

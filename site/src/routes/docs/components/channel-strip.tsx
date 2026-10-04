@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import ChannelStripDoc, { frontmatter } from "@/site/content/docs/components/channel-strip.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import ChannelStripDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/channel-strip.mdx";
 
 export default function ChannelStripPage() {
   return (

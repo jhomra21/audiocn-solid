@@ -19,7 +19,11 @@ const ChannelToggleDemo = () => {
       <SoloToggle onPressedChange={setSolo} pressed={solo()}>
         S
       </SoloToggle>
-      <MonitorToggle onPressedChange={setMonitor} pressed={monitor()} size="icon">
+      <MonitorToggle
+        onPressedChange={setMonitor}
+        pressed={monitor()}
+        size="icon"
+      >
         ◖
       </MonitorToggle>
     </div>

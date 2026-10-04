@@ -9,7 +9,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@kobalte/core/slider": fileURLToPath(
-        new URL("./node_modules/@kobalte/core-solid1/dist/slider/index.jsx", import.meta.url)
+        new URL(
+          "./node_modules/@kobalte/core-solid1/dist/slider/index.jsx",
+          import.meta.url
+        )
       ),
       "@": fileURLToPath(new URL(".", import.meta.url)),
     },

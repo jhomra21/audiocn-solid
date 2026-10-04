@@ -60,7 +60,9 @@ export default function App() {
             <Slider.Thumb
               class="slider-thumb"
               data-testid="slider-thumb"
-              ref={(element) => setSliderRefReady(element instanceof HTMLElement)}
+              ref={(element) =>
+                setSliderRefReady(element instanceof HTMLElement)
+              }
               onKeyDown={(event) => setSliderKey(event.key)}
             >
               <Slider.Input />
@@ -157,7 +159,10 @@ export default function App() {
       <section>
         <h2>Context menu</h2>
         <ContextMenu.Root>
-          <ContextMenu.Trigger class="context-target" data-testid="context-trigger">
+          <ContextMenu.Trigger
+            class="context-target"
+            data-testid="context-trigger"
+          >
             Context target
           </ContextMenu.Trigger>
           <ContextMenu.Portal>

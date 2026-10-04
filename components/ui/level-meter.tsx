@@ -1,3 +1,5 @@
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import {
   For,
   createContext,
@@ -6,11 +8,8 @@ import {
   untrack,
   useContext,
 } from "solid-js";
-import { cva } from "class-variance-authority";
-import type { VariantProps } from "class-variance-authority";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
-import type { DivDOMProps } from "@/lib/solid/jsx-types";
 import type { ClipIndicatorProps } from "@/components/ui/clip-indicator";
 import { DbReadout, readChannel } from "@/components/ui/db-readout";
 import type { DbReadoutProps } from "@/components/ui/db-readout";
@@ -47,11 +46,12 @@ import {
   DEFAULT_ZONES,
   zoneForDb,
 } from "@/lib/audio/zones";
+import { provideContext } from "@/lib/solid/context";
+import { createCompatEffect } from "@/lib/solid/effect";
+import type { DivDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import type { MutableRef, RefTarget } from "@/lib/solid/ref";
-import { provideContext } from "@/lib/solid/context";
-import { createCompatEffect } from "@/lib/solid/effect";
 import { mergeStyleVars } from "@/lib/solid/style";
 import type { StyleValue } from "@/lib/solid/style";
 import { cn } from "@/lib/utils";
@@ -444,9 +444,7 @@ export const LevelMeterChannels = (props: DivProps) => {
     <div
       class={cn(
         "relative flex min-h-0 min-w-0 flex-1 gap-(--meter-gap)",
-        context.orientation() === "horizontal"
-          ? "flex-col"
-          : "h-full flex-row",
+        context.orientation() === "horizontal" ? "flex-col" : "h-full flex-row",
         props.class,
         props.className
       )}
@@ -661,11 +659,7 @@ export const LevelMeterValue = (props: LevelMeterValueProps) => {
     const declared = context.declared();
 
     return declared
-      ? readChannel(
-          declared,
-          props.measure ?? "peak",
-          props.channel ?? "max"
-        )
+      ? readChannel(declared, props.measure ?? "peak", props.channel ?? "max")
       : undefined;
   });
 
@@ -713,7 +707,8 @@ export const levelMeterVariants = cva(
 );
 
 export interface LevelMeterProps
-  extends DivProps,
+  extends
+    DivProps,
     Omit<VariantProps<typeof levelMeterVariants>, "orientation"> {
   source?: FrameSource<MeterFrame> | null;
   peakDb?: number;
@@ -860,9 +855,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
 
   const resolvedBallistics = createMemo(() => resolveBallistics(ballistics()));
 
-  const ballisticsKey = createMemo(() =>
-    JSON.stringify(resolvedBallistics())
-  );
+  const ballisticsKey = createMemo(() => JSON.stringify(resolvedBallistics()));
 
   const scale = createMemo<MeterScale>(() => ({
     maxDb: maxDb(),
@@ -983,7 +976,9 @@ export const LevelMeter = (props: LevelMeterProps) => {
     >
       {props.children ?? (
         <LevelMeterChannels>
-          <For each={Array.from({ length: channelCount() }, (_, index) => index)}>
+          <For
+            each={Array.from({ length: channelCount() }, (_, index) => index)}
+          >
             {(index) => (
               <LevelMeterChannel index={index}>
                 <LevelMeterTrack>

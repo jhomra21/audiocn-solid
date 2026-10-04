@@ -13,8 +13,8 @@ test("static search finds docs by title and body content", async ({ page }) => {
     failures.push(`pageerror: ${error.message}`);
   });
 
-  const indexRequest = page.waitForResponse(
-    (response) => response.url().endsWith("/search-index.json")
+  const indexRequest = page.waitForResponse((response) =>
+    response.url().endsWith("/search-index.json")
   );
 
   await page.goto("/spikes/search");

@@ -25,10 +25,9 @@ export interface MixerState {
   master: MixerMasterState;
 }
 
-export type MixerChannelInit =
-  Partial<MixerChannelState> & {
-    id: string;
-  };
+export type MixerChannelInit = Partial<MixerChannelState> & {
+  id: string;
+};
 
 export interface UseMixerOptions {
   /** Initial channels. Missing fields get defaults. */
@@ -37,9 +36,7 @@ export interface UseMixerOptions {
   master?: Partial<MixerMasterState>;
   /** Controlled state. */
   state?: MixerState;
-  onStateChange?: (
-    state: MixerState
-  ) => void;
+  onStateChange?: (state: MixerState) => void;
   /** Save state to localStorage under this key. */
   persistKey?: string;
 }
@@ -52,12 +49,7 @@ type MixerAction =
   | {
       type: "channel";
       id: string;
-      patch: Partial<
-        Omit<
-          MixerChannelState,
-          "id"
-        >
-      >;
+      patch: Partial<Omit<MixerChannelState, "id">>;
     }
   | {
       type: "solo";
@@ -83,9 +75,7 @@ const DEFAULT_MASTER: MixerMasterState = {
   muted: false,
 };
 
-const createChannel = (
-  init: MixerChannelInit
-): MixerChannelState => ({
+const createChannel = (init: MixerChannelInit): MixerChannelState => ({
   gainDb: 0,
   monitor: false,
   muted: false,
@@ -98,10 +88,7 @@ const createState = (
   channels: MixerChannelInit[] = [],
   master: Partial<MixerMasterState> = {}
 ): MixerState => ({
-  channels:
-    channels.map(
-      createChannel
-    ),
+  channels: channels.map(createChannel),
   master: {
     ...DEFAULT_MASTER,
     ...master,
@@ -121,64 +108,44 @@ export const mixerReducer = (
     case "channel": {
       return {
         ...state,
-        channels:
-          state.channels.map(
-            (channel) => {
-              if (
-                channel.id !==
-                action.id
-              ) {
-                return channel;
-              }
+        channels: state.channels.map((channel) => {
+          if (channel.id !== action.id) {
+            return channel;
+          }
 
-              const next = {
-                ...channel,
-                ...action.patch,
-              };
+          const next = {
+            ...channel,
+            ...action.patch,
+          };
 
-              return {
-                ...next,
-                pan: clamp(
-                  next.pan,
-                  -1,
-                  1
-                ),
-              };
-            }
-          ),
+          return {
+            ...next,
+            pan: clamp(next.pan, -1, 1),
+          };
+        }),
       };
     }
 
     case "solo": {
       return {
         ...state,
-        channels:
-          state.channels.map(
-            (channel) => {
-              if (
-                channel.id ===
-                action.id
-              ) {
-                return {
-                  ...channel,
-                  solo:
-                    action.solo,
-                };
-              }
+        channels: state.channels.map((channel) => {
+          if (channel.id === action.id) {
+            return {
+              ...channel,
+              solo: action.solo,
+            };
+          }
 
-              if (
-                action.exclusive &&
-                action.solo
-              ) {
-                return {
-                  ...channel,
-                  solo: false,
-                };
-              }
+          if (action.exclusive && action.solo) {
+            return {
+              ...channel,
+              solo: false,
+            };
+          }
 
-              return channel;
-            }
-          ),
+          return channel;
+        }),
       };
     }
 
@@ -193,36 +160,20 @@ export const mixerReducer = (
     }
 
     case "add": {
-      if (
-        state.channels.some(
-          (channel) =>
-            channel.id ===
-            action.channel.id
-        )
-      ) {
+      if (state.channels.some((channel) => channel.id === action.channel.id)) {
         return state;
       }
 
       return {
         ...state,
-        channels: [
-          ...state.channels,
-          createChannel(
-            action.channel
-          ),
-        ],
+        channels: [...state.channels, createChannel(action.channel)],
       };
     }
 
     case "remove": {
       return {
         ...state,
-        channels:
-          state.channels.filter(
-            (channel) =>
-              channel.id !==
-              action.id
-          ),
+        channels: state.channels.filter((channel) => channel.id !== action.id),
       };
     }
 
@@ -233,161 +184,96 @@ export const mixerReducer = (
 };
 
 /** Whether a channel is heard: not muted, and soloed if anything is soloed. */
-export const isChannelAudible = (
-  state: MixerState,
-  id: string
-): boolean => {
-  const channel =
-    state.channels.find(
-      (item) =>
-        item.id === id
-    );
+export const isChannelAudible = (state: MixerState, id: string): boolean => {
+  const channel = state.channels.find((item) => item.id === id);
 
-  if (
-    !channel ||
-    channel.muted
-  ) {
+  if (!channel || channel.muted) {
     return false;
   }
 
-  const anySolo =
-    state.channels.some(
-      (item) =>
-        item.solo
-    );
+  const anySolo = state.channels.some((item) => item.solo);
 
-  return (
-    !anySolo ||
-    channel.solo
-  );
+  return !anySolo || channel.solo;
 };
 
-const isMixerChannelState = (
-  value: unknown
-): value is MixerChannelState => {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
+const isMixerChannelState = (value: unknown): value is MixerChannelState => {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
 
   return (
     "id" in value &&
-    typeof value.id ===
-      "string" &&
+    typeof value.id === "string" &&
     "gainDb" in value &&
-    typeof value.gainDb ===
-      "number" &&
+    typeof value.gainDb === "number" &&
     "muted" in value &&
-    typeof value.muted ===
-      "boolean" &&
+    typeof value.muted === "boolean" &&
     "solo" in value &&
-    typeof value.solo ===
-      "boolean" &&
+    typeof value.solo === "boolean" &&
     "pan" in value &&
-    typeof value.pan ===
-      "number" &&
+    typeof value.pan === "number" &&
     "monitor" in value &&
-    typeof value.monitor ===
-      "boolean"
+    typeof value.monitor === "boolean"
   );
 };
 
-const isMixerMasterState = (
-  value: unknown
-): value is MixerMasterState => {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
+const isMixerMasterState = (value: unknown): value is MixerMasterState => {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
 
   return (
     "gainDb" in value &&
-    typeof value.gainDb ===
-      "number" &&
+    typeof value.gainDb === "number" &&
     "muted" in value &&
-    typeof value.muted ===
-      "boolean"
+    typeof value.muted === "boolean"
   );
 };
 
-const isMixerState = (
-  value: unknown
-): value is MixerState => {
+const isMixerState = (value: unknown): value is MixerState => {
   if (
     typeof value !== "object" ||
     value === null ||
     !("channels" in value) ||
-    !Array.isArray(
-      value.channels
-    ) ||
+    !Array.isArray(value.channels) ||
     !("master" in value)
   ) {
     return false;
   }
 
   return (
-    value.channels.every(
-      isMixerChannelState
-    ) &&
-    isMixerMasterState(
-      value.master
-    )
+    value.channels.every(isMixerChannelState) &&
+    isMixerMasterState(value.master)
   );
 };
 
-const readPersisted = (
-  key: string
-): MixerState | null => {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
+const readPersisted = (key: string): MixerState | null => {
+  if (typeof window === "undefined") {
     return null;
   }
 
   try {
-    const raw =
-      window.localStorage.getItem(
-        key
-      );
+    const raw = window.localStorage.getItem(key);
 
     if (!raw) {
       return null;
     }
 
-    const parsed: unknown =
-      JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
 
-    return isMixerState(
-      parsed
-    )
-      ? parsed
-      : null;
+    return isMixerState(parsed) ? parsed : null;
   } catch {
     return null;
   }
 };
 
-const writePersisted = (
-  key: string,
-  state: MixerState
-) => {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
+const writePersisted = (key: string, state: MixerState) => {
+  if (typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage.setItem(
-      key,
-      JSON.stringify(state)
-    );
+    window.localStorage.setItem(key, JSON.stringify(state));
   } catch {
     // Storage can be full or blocked; the mixer keeps working without it.
   }
@@ -397,19 +283,9 @@ export interface Mixer {
   readonly state: MixerState;
   readonly channels: MixerChannelState[];
   readonly master: MixerMasterState;
-  channel: (
-    id: string
-  ) =>
-    | MixerChannelState
-    | undefined;
-  setGain: (
-    id: string,
-    gainDb: number
-  ) => void;
-  setMuted: (
-    id: string,
-    muted: boolean
-  ) => void;
+  channel: (id: string) => MixerChannelState | undefined;
+  setGain: (id: string, gainDb: number) => void;
+  setMuted: (id: string, muted: boolean) => void;
   setSolo: (
     id: string,
     solo: boolean,
@@ -417,144 +293,75 @@ export interface Mixer {
       exclusive?: boolean;
     }
   ) => void;
-  setPan: (
-    id: string,
-    pan: number
-  ) => void;
-  setMonitor: (
-    id: string,
-    monitor: boolean
-  ) => void;
-  setMasterGain: (
-    gainDb: number
-  ) => void;
-  setMasterMuted: (
-    muted: boolean
-  ) => void;
+  setPan: (id: string, pan: number) => void;
+  setMonitor: (id: string, monitor: boolean) => void;
+  setMasterGain: (gainDb: number) => void;
+  setMasterMuted: (muted: boolean) => void;
   /** False when muted, or when another channel is soloed. */
-  isAudible: (
-    id: string
-  ) => boolean;
+  isAudible: (id: string) => boolean;
   /** True when a channel is silenced only because another is soloed. */
-  isDimmed: (
-    id: string
-  ) => boolean;
-  addChannel: (
-    channel: MixerChannelInit
-  ) => void;
-  removeChannel: (
-    id: string
-  ) => void;
+  isDimmed: (id: string) => boolean;
+  addChannel: (channel: MixerChannelInit) => void;
+  removeChannel: (id: string) => void;
   reset: () => void;
 }
 
 /** State for a mixer: gain, mute, solo, pan and monitor per channel, plus a master. */
-export const useMixer = (
-  options: UseMixerOptions = {}
-): Mixer => {
-  const initial = createState(
-    options.channels,
-    options.master
-  );
+export const useMixer = (options: UseMixerOptions = {}): Mixer => {
+  const initial = createState(options.channels, options.master);
 
-  const [
-    uncontrolled,
-    setUncontrolled,
-  ] = createSignal<MixerState>(
-    initial
-  );
+  const [uncontrolled, setUncontrolled] = createSignal<MixerState>(initial);
 
-  const state = () =>
-    options.state ??
-    uncontrolled();
+  const state = () => options.state ?? uncontrolled();
 
   let latest = state();
 
-  createCompatEffect(
-    state,
-    (next) => {
-      latest = next;
-    }
-  );
+  createCompatEffect(state, (next) => {
+    latest = next;
+  });
 
   createCompatEffect(
     () => ({
-      controlled:
-        options.state !==
-        undefined,
-      persistKey:
-        options.persistKey,
+      controlled: options.state !== undefined,
+      persistKey: options.persistKey,
     }),
-    ({
-      controlled,
-      persistKey,
-    }) => {
-      if (
-        controlled ||
-        !persistKey
-      ) {
+    ({ controlled, persistKey }) => {
+      if (controlled || !persistKey) {
         return;
       }
 
-      const persisted =
-        readPersisted(
-          persistKey
-        );
+      const persisted = readPersisted(persistKey);
 
       if (!persisted) {
         return;
       }
 
-      latest =
-        persisted;
+      latest = persisted;
 
-      setUncontrolled(
-        persisted
-      );
+      setUncontrolled(persisted);
     }
   );
 
-  const commit = (
-    next: MixerState
-  ) => {
-    if (
-      next === latest
-    ) {
+  const commit = (next: MixerState) => {
+    if (next === latest) {
       return;
     }
 
     latest = next;
 
-    if (
-      options.state ===
-      undefined
-    ) {
+    if (options.state === undefined) {
       setUncontrolled(next);
 
-      if (
-        options.persistKey
-      ) {
-        writePersisted(
-          options.persistKey,
-          next
-        );
+      if (options.persistKey) {
+        writePersisted(options.persistKey, next);
       }
     }
 
-    options.onStateChange?.(
-      next
-    );
+    options.onStateChange?.(next);
   };
 
-  const dispatch = (
-    action: MixerAction
-  ) => {
-    commit(
-      mixerReducer(
-        latest,
-        action
-      )
-    );
+  const dispatch = (action: MixerAction) => {
+    commit(mixerReducer(latest, action));
   };
 
   const controller: Mixer = {
@@ -566,10 +373,7 @@ export const useMixer = (
     },
 
     channel(id) {
-      return state().channels.find(
-        (channel) =>
-          channel.id === id
-      );
+      return state().channels.find((channel) => channel.id === id);
     },
 
     get channels() {
@@ -577,34 +381,17 @@ export const useMixer = (
     },
 
     isAudible(id) {
-      return isChannelAudible(
-        state(),
-        id
-      );
+      return isChannelAudible(state(), id);
     },
 
     isDimmed(id) {
-      const current =
-        state();
+      const current = state();
 
-      const channel =
-        current.channels.find(
-          (item) =>
-            item.id === id
-        );
+      const channel = current.channels.find((item) => item.id === id);
 
-      const anySolo =
-        current.channels.some(
-          (item) =>
-            item.solo
-        );
+      const anySolo = current.channels.some((item) => item.solo);
 
-      return Boolean(
-        channel &&
-          !channel.muted &&
-          anySolo &&
-          !channel.solo
-      );
+      return Boolean(channel && !channel.muted && anySolo && !channel.solo);
     },
 
     get master() {
@@ -622,10 +409,7 @@ export const useMixer = (
       commit(initial);
     },
 
-    setGain(
-      id,
-      gainDb
-    ) {
+    setGain(id, gainDb) {
       dispatch({
         id,
         patch: {
@@ -635,9 +419,7 @@ export const useMixer = (
       });
     },
 
-    setMasterGain(
-      gainDb
-    ) {
+    setMasterGain(gainDb) {
       dispatch({
         patch: {
           gainDb,
@@ -646,9 +428,7 @@ export const useMixer = (
       });
     },
 
-    setMasterMuted(
-      muted
-    ) {
+    setMasterMuted(muted) {
       dispatch({
         patch: {
           muted,
@@ -657,10 +437,7 @@ export const useMixer = (
       });
     },
 
-    setMonitor(
-      id,
-      monitor
-    ) {
+    setMonitor(id, monitor) {
       dispatch({
         id,
         patch: {
@@ -670,10 +447,7 @@ export const useMixer = (
       });
     },
 
-    setMuted(
-      id,
-      muted
-    ) {
+    setMuted(id, muted) {
       dispatch({
         id,
         patch: {
@@ -683,10 +457,7 @@ export const useMixer = (
       });
     },
 
-    setPan(
-      id,
-      pan
-    ) {
+    setPan(id, pan) {
       dispatch({
         id,
         patch: {
@@ -696,15 +467,9 @@ export const useMixer = (
       });
     },
 
-    setSolo(
-      id,
-      solo,
-      soloOptions = {}
-    ) {
+    setSolo(id, solo, soloOptions = {}) {
       dispatch({
-        exclusive:
-          soloOptions.exclusive ??
-          false,
+        exclusive: soloOptions.exclusive ?? false,
         id,
         solo,
         type: "solo",

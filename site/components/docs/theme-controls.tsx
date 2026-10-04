@@ -1,9 +1,6 @@
 import { createSignal, onSettled } from "solid-js";
 
-import {
-  isTheme,
-  type ThemeName,
-} from "@/site/lib/docs/site-themes";
+import { isTheme, type ThemeName } from "@/site/lib/docs/site-themes";
 
 type Appearance = "dark" | "light";
 

@@ -1,4 +1,7 @@
-import { MicrophoneIcon, MicrophoneSlashIcon } from "@/components/icons/phosphor";
+import {
+  MicrophoneIcon,
+  MicrophoneSlashIcon,
+} from "@/components/icons/phosphor";
 import { Button } from "@/components/ui/button";
 import {
   LevelMeter,
@@ -23,7 +26,10 @@ export const LevelMeterMicrophone = () => {
       <LevelMeter aria-label="Microphone level" source={analyser.meter}>
         <LevelMeterChannels>
           <LevelMeterChannel>
-            <LevelMeterTrack><LevelMeterBar /><LevelMeterHold /></LevelMeterTrack>
+            <LevelMeterTrack>
+              <LevelMeterBar />
+              <LevelMeterHold />
+            </LevelMeterTrack>
           </LevelMeterChannel>
         </LevelMeterChannels>
         <LevelMeterValue />

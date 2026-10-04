@@ -1,14 +1,6 @@
 import { once } from "node:events";
-import {
-  createReadStream,
-  existsSync,
-} from "node:fs";
-import {
-  mkdir,
-  mkdtemp,
-  readFile,
-  writeFile,
-} from "node:fs/promises";
+import { createReadStream, existsSync } from "node:fs";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
@@ -44,9 +36,9 @@ const packageJsonFor = (runtime: string) => {
       devDependencies: {
         "@solidjs/vite-plugin": "3.0.0-next.47",
         "@tailwindcss/vite": "^4.3.3",
-        "tailwindcss": "^4.3.3",
-        "typescript": "^7.0.2",
-        "vite": "^8.0.0",
+        tailwindcss: "^4.3.3",
+        typescript: "^7.0.2",
+        vite: "^8.0.0",
       },
     };
   }
@@ -64,9 +56,9 @@ const packageJsonFor = (runtime: string) => {
     },
     devDependencies: {
       "@tailwindcss/vite": "^4.3.3",
-      "tailwindcss": "^4.3.3",
-      "typescript": "^7.0.2",
-      "vite": "^7.3.6",
+      tailwindcss: "^4.3.3",
+      typescript: "^7.0.2",
+      vite: "^7.3.6",
       "vite-plugin-solid": "2.11.14",
     },
   };
@@ -100,9 +92,7 @@ const viteConfigFor = (runtime: string) => {
     runtime === "solid2" ? "@solidjs/vite-plugin" : "vite-plugin-solid";
 
   const dedupe =
-    runtime === "solid2"
-      ? '\n    dedupe: ["solid-js", "@solidjs/web"],'
-      : "";
+    runtime === "solid2" ? '\n    dedupe: ["solid-js", "@solidjs/web"],' : "";
 
   return `import { fileURLToPath, URL } from "node:url";
 
@@ -134,7 +124,7 @@ render(() => <App />, document.getElementById("root")!);
 };
 
 const componentsJsonFor = (runtime: string) => ({
-  "$schema": "https://ui.shadcn.com/schema.json",
+  $schema: "https://ui.shadcn.com/schema.json",
   style: "base-rhea",
   rsc: false,
   tsx: true,
@@ -160,9 +150,7 @@ const componentsJsonFor = (runtime: string) => ({
 });
 
 const createFixture = async (runtime: string): Promise<string> => {
-  const workspace = await mkdtemp(
-    join(tmpdir(), `audiocn-solid-${runtime}-`)
-  );
+  const workspace = await mkdtemp(join(tmpdir(), `audiocn-solid-${runtime}-`));
 
   await mkdir(join(workspace, "src"), { recursive: true });
 
@@ -181,10 +169,7 @@ const createFixture = async (runtime: string): Promise<string> => {
     `${JSON.stringify(componentsJsonFor(runtime), null, 2)}\n`
   );
 
-  await writeFile(
-    join(workspace, "vite.config.ts"),
-    viteConfigFor(runtime)
-  );
+  await writeFile(join(workspace, "vite.config.ts"), viteConfigFor(runtime));
 
   await writeFile(
     join(workspace, "index.html"),
@@ -193,13 +178,10 @@ const createFixture = async (runtime: string): Promise<string> => {
 
   await writeFile(
     join(workspace, "src/App.tsx"),
-    'export default function App() { return <main>registry fixture</main>; }\n'
+    "export default function App() { return <main>registry fixture</main>; }\n"
   );
 
-  await writeFile(
-    join(workspace, "src/main.tsx"),
-    mainFor(runtime)
-  );
+  await writeFile(join(workspace, "src/main.tsx"), mainFor(runtime));
 
   await writeFile(
     join(workspace, "src/styles.css"),
@@ -307,8 +289,5 @@ try {
 } finally {
   server.close();
 
-  await writeJson(
-    artifactPath,
-    `${JSON.stringify(report, null, 2)}\n`
-  );
+  await writeJson(artifactPath, `${JSON.stringify(report, null, 2)}\n`);
 }

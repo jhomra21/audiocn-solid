@@ -26,10 +26,7 @@ export default defineConfig({
         jsx: true,
         providerImportSource: "@/site/src/mdx-provider",
         stylePropertyNameCase: "css",
-        rehypePlugins: [
-          rehypeSlug,
-          [rehypeShiki, codeHighlightOptions],
-        ],
+        rehypePlugins: [rehypeSlug, [rehypeShiki, codeHighlightOptions]],
         remarkPlugins: [
           remarkFrontmatter,
           remarkMdxFrontmatter,
@@ -52,7 +49,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@kobalte/core/slider": fileURLToPath(
-        new URL("../node_modules/@kobalte/core-solid2/dist/slider/index.jsx", import.meta.url)
+        new URL(
+          "../node_modules/@kobalte/core-solid2/dist/slider/index.jsx",
+          import.meta.url
+        )
       ),
       "@": fileURLToPath(new URL("..", import.meta.url)),
     },

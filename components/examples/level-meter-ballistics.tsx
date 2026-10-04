@@ -13,8 +13,14 @@ export const LevelMeterBallistics = () => {
       <For each={presets}>
         {(preset) => (
           <div class="grid grid-cols-[4rem_1fr] items-center gap-3">
-            <span class="text-muted-foreground font-mono text-xs">{preset}</span>
-            <LevelMeter aria-label={`${preset} ballistics`} ballistics={preset} source={signal.meter} />
+            <span class="text-muted-foreground font-mono text-xs">
+              {preset}
+            </span>
+            <LevelMeter
+              aria-label={`${preset} ballistics`}
+              ballistics={preset}
+              source={signal.meter}
+            />
           </div>
         )}
       </For>

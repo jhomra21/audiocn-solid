@@ -1,16 +1,16 @@
 import { For, createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
-import type { SpanDOMProps } from "@/lib/solid/jsx-types";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
+import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
+import { createCompatEffect } from "@/lib/solid/effect";
+import type { SpanDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
 import type { RefTarget } from "@/lib/solid/ref";
-import { createCompatEffect } from "@/lib/solid/effect";
 import { mergeStyleVars } from "@/lib/solid/style";
 import type { StyleValue } from "@/lib/solid/style";
-import { DEFAULT_ZONES, zoneForDb } from "@/lib/audio/zones";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_INTERVAL_MS = 250;
@@ -19,10 +19,7 @@ const DEFAULT_FLOOR_DB = -60;
 
 const WIDEST_MAGNITUDE_DB = 88.8;
 
-type SpanProps = Omit<
-  SpanDOMProps,
-  "class" | "className" | "ref" | "style"
-> & {
+type SpanProps = Omit<SpanDOMProps, "class" | "className" | "ref" | "style"> & {
   class?: string;
   className?: string;
   style?: StyleValue;
@@ -250,7 +247,6 @@ export const DbReadout = (props: DbReadoutProps) => {
       };
     }
   );
-
 
   const style = createMemo<StyleValue>(() =>
     mergeStyleVars(props.style, {

@@ -14,7 +14,12 @@ export const LevelMeterVariants = () => {
         {(variant) => (
           <div class="grid gap-1.5">
             <span class="text-muted-foreground text-xs">{variant}</span>
-            <LevelMeter aria-label={`${variant} meter`} size="lg" source={signal.meter} variant={variant} />
+            <LevelMeter
+              aria-label={`${variant} meter`}
+              size="lg"
+              source={signal.meter}
+              variant={variant}
+            />
           </div>
         )}
       </For>

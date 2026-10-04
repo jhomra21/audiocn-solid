@@ -23,7 +23,7 @@ test("MDX pipeline prerenders docs content and custom components", async ({
   expect(docsResponse.ok()).toBe(true);
   expect(docsHtml).toContain("Level Meter for Solid");
   expect(docsHtml).toContain(
-    "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
+    "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light."
   );
   expect(docsHtml).toContain('id="installation"');
   expect(docsHtml).toContain("<table");
@@ -34,16 +34,16 @@ test("MDX pipeline prerenders docs content and custom components", async ({
   const mdx = page.locator('[data-spike="mdx"]');
 
   await expect(
-    mdx.getByRole("heading", { name: "MDX Component Fixture", level: 1 }),
+    mdx.getByRole("heading", { name: "MDX Component Fixture", level: 1 })
   ).toBeVisible();
   await expect(mdx.locator('a[href="#callout"]').first()).toBeVisible();
   await expect(
-    mdx.locator('[data-docs-component="component-source"] figure.shiki'),
+    mdx.locator('[data-docs-component="component-source"] figure.shiki')
   ).toBeVisible();
 
   for (const name of docsComponents) {
     await expect(
-      mdx.locator(`[data-docs-component="${name}"]`).first(),
+      mdx.locator(`[data-docs-component="${name}"]`).first()
     ).toBeVisible();
   }
 });

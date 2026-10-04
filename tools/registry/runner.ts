@@ -5,13 +5,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { chromium, expect } from "@playwright/test";
-
 import type { Page } from "@playwright/test";
 
-export const root = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.."
-);
+export const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const artifacts = join(root, "artifacts");
 
@@ -97,7 +93,10 @@ export const runAcceptance = async (test: AcceptanceTest): Promise<void> => {
   await mkdir(artifacts, { recursive: true });
 
   try {
-    for (const [index, { fixture, runtime }] of installReport.runtimes.entries()) {
+    for (const [
+      index,
+      { fixture, runtime },
+    ] of installReport.runtimes.entries()) {
       const port = test.port + index;
       const baseUrl = `http://127.0.0.1:${port}`;
       const screenshot = join(artifacts, `${test.name}-${runtime}.png`);

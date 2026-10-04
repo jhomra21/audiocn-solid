@@ -15,13 +15,23 @@ export const LevelMeterDemo = () => {
   const signal = useDemoSignal({ channels: 2, kind: "music" });
 
   return (
-    <LevelMeter aria-label="Program level" class="max-w-md" source={signal.meter}>
+    <LevelMeter
+      aria-label="Program level"
+      class="max-w-md"
+      source={signal.meter}
+    >
       <LevelMeterChannels>
         <LevelMeterChannel index={0}>
-          <LevelMeterTrack><LevelMeterBar /><LevelMeterHold /></LevelMeterTrack>
+          <LevelMeterTrack>
+            <LevelMeterBar />
+            <LevelMeterHold />
+          </LevelMeterTrack>
         </LevelMeterChannel>
         <LevelMeterChannel index={1}>
-          <LevelMeterTrack><LevelMeterBar /><LevelMeterHold /></LevelMeterTrack>
+          <LevelMeterTrack>
+            <LevelMeterBar />
+            <LevelMeterHold />
+          </LevelMeterTrack>
         </LevelMeterChannel>
         <LevelMeterScale />
       </LevelMeterChannels>

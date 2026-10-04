@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseAudioContextDoc, { frontmatter } from "@/site/content/docs/hooks/use-audio-context.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseAudioContextDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-audio-context.mdx";
 
 export default function UseAudioContextPage() {
   return (

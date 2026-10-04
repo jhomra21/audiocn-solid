@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("shared Kobalte source supports pointer and keyboard behavior", async ({ page }) => {
+test("shared Kobalte source supports pointer and keyboard behavior", async ({
+  page,
+}) => {
   const failures: string[] = [];
 
   page.on("console", (message) => {
@@ -63,7 +65,9 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   await tabs.nth(0).press("ArrowRight");
   await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
   await expect.poll(async () => page.getByRole("tabpanel").count()).toBe(1);
-  await expect(page.getByRole("tabpanel", { name: "Two" })).toContainText("Body two");
+  await expect(page.getByRole("tabpanel", { name: "Two" })).toContainText(
+    "Body two"
+  );
 
   const tooltipTrigger = page.getByTestId("tooltip-trigger");
   await tooltipTrigger.focus();

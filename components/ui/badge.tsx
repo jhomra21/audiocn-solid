@@ -13,14 +13,12 @@ const badgeVariants = cva(
     },
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         destructive:
           "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link:
-          "text-primary underline-offset-4 hover:underline",
+        link: "text-primary underline-offset-4 hover:underline",
         outline:
           "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
         secondary:
@@ -31,38 +29,24 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends Omit<
-      SpanDOMProps,
-      "children" | "class" | "className"
-    >,
+  extends
+    Omit<SpanDOMProps, "children" | "class" | "className">,
     VariantProps<typeof badgeVariants> {
   children?: SpanDOMProps["children"];
   class?: string;
   className?: string;
 }
 
-const BADGE_OWN = [
-  "children",
-  "class",
-  "className",
-  "variant",
-] as const;
+const BADGE_OWN = ["children", "class", "className", "variant"] as const;
 
-export const Badge = (
-  props: BadgeProps
-) => {
-  const rest = omitProps(
-    props,
-    BADGE_OWN
-  );
+export const Badge = (props: BadgeProps) => {
+  const rest = omitProps(props, BADGE_OWN);
 
   return (
     <span
       class={cn(
         badgeVariants({
-          variant:
-            props.variant ??
-            "default",
+          variant: props.variant ?? "default",
         }),
         props.class,
         props.className

@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseAudioAnalyserDoc, { frontmatter } from "@/site/content/docs/hooks/use-audio-analyser.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseAudioAnalyserDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-audio-analyser.mdx";
 
 export default function UseAudioAnalyserPage() {
   return (

@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseMixerDoc, { frontmatter } from "@/site/content/docs/hooks/use-mixer.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseMixerDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-mixer.mdx";
 
 export default function UseMixerPage() {
   return (

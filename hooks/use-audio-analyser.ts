@@ -1,12 +1,12 @@
 import { useAudioContext } from "@/hooks/use-audio-context";
-import { readMaybeAccessor } from "@/lib/solid/accessor";
-import type { MaybeAccessor } from "@/lib/solid/accessor";
 import { bandsFromSpectrum, logBandEdges } from "@/lib/audio/bands";
 import { dbToLevel, peakDb, rmsDb } from "@/lib/audio/decibels";
 import { subscribeFrame } from "@/lib/audio/frame-loop";
 import { createFrameRelay } from "@/lib/audio/frame-source";
 import { appendHistory } from "@/lib/audio/history";
 import type { FrameSource, MeterFrame, VisualFrame } from "@/lib/audio/types";
+import { readMaybeAccessor } from "@/lib/solid/accessor";
+import type { MaybeAccessor } from "@/lib/solid/accessor";
 import { createCompatEffect } from "@/lib/solid/effect";
 
 export type AnalyserInput = MediaStream | HTMLMediaElement | AudioNode | null;
@@ -311,10 +311,7 @@ export const useAudioAnalyser = (
         return;
       }
 
-      const { node, owned } = createInputNode(
-        current.context,
-        current.input
-      );
+      const { node, owned } = createInputNode(current.context, current.input);
 
       const tap = createAnalyserTap(current.context, node, {
         bands: current.bands,

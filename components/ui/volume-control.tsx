@@ -1,24 +1,19 @@
 import * as SliderPrimitive from "@kobalte/core/slider";
-import {
-  createContext,
-  createMemo,
-  createSignal,
-  useContext,
-} from "solid-js";
+import { createContext, createMemo, createSignal, useContext } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
-import { roundValue } from "@/lib/number";
 import type { Orientation } from "@/lib/audio/types";
+import { roundValue } from "@/lib/number";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
-import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
   SpanDOMProps,
 } from "@/lib/solid/jsx-types";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import { omitProps } from "@/lib/solid/props";
 import { cn } from "@/lib/utils";
 
@@ -30,11 +25,7 @@ const MEDIUM_LEVEL = 0.67;
 
 const PERCEPTUAL_EXPONENT = 2;
 
-export type VolumeLevel =
-  | "muted"
-  | "low"
-  | "medium"
-  | "high";
+export type VolumeLevel = "muted" | "low" | "medium" | "high";
 
 const curves = {
   linear: {
@@ -42,10 +33,8 @@ const curves = {
     toVolume: (position: number) => position,
   },
   perceptual: {
-    toPosition: (volume: number) =>
-      volume ** (1 / PERCEPTUAL_EXPONENT),
-    toVolume: (position: number) =>
-      position ** PERCEPTUAL_EXPONENT,
+    toPosition: (volume: number) => volume ** (1 / PERCEPTUAL_EXPONENT),
+    toVolume: (position: number) => position ** PERCEPTUAL_EXPONENT,
   },
 } as const;
 
@@ -64,28 +53,21 @@ interface VolumeControlContextValue {
   volume: () => number;
 }
 
-const VolumeControlContext =
-  createContext<VolumeControlContextValue | null>(null);
+const VolumeControlContext = createContext<VolumeControlContextValue | null>(
+  null
+);
 
-const useVolumeControl = (
-  part: string
-): VolumeControlContextValue => {
-  const context =
-    useContext(VolumeControlContext);
+const useVolumeControl = (part: string): VolumeControlContextValue => {
+  const context = useContext(VolumeControlContext);
 
   if (!context) {
-    throw new Error(
-      `${part} must be used inside VolumeControl.`
-    );
+    throw new Error(`${part} must be used inside VolumeControl.`);
   }
 
   return context;
 };
 
-const levelFor = (
-  volume: number,
-  muted: boolean
-): VolumeLevel => {
+const levelFor = (volume: number, muted: boolean): VolumeLevel => {
   if (muted || volume <= 0) {
     return "muted";
   }
@@ -108,14 +90,10 @@ interface VolumeSliderCompatProps {
   orientation: () => Orientation;
 }
 
-const VolumeSliderCompat = (
-  props: VolumeSliderCompatProps
-) => {
-  const context =
-    SliderPrimitive.useSliderContext();
+const VolumeSliderCompat = (props: VolumeSliderCompatProps) => {
+  const context = SliderPrimitive.useSliderContext();
 
-  let dragPosition =
-    props.currentPosition();
+  let dragPosition = props.currentPosition();
 
   let pointerVolume = 0;
 
@@ -155,11 +133,7 @@ const VolumeSliderCompat = (
           ? -1
           : 1;
 
-      dragPosition = clamp(
-        dragPosition + direction * (delta / size),
-        0,
-        1
-      );
+      dragPosition = clamp(dragPosition + direction * (delta / size), 0, 1);
       pointerVolume = props.changeFromPointer(dragPosition);
     },
     onSlideStart: (originalSlideStart, index, position) => {
@@ -178,14 +152,10 @@ const VolumeSliderCompat = (
   return null;
 };
 
-export interface VolumeControlProps
-  extends Omit<
-    DivDOMProps,
-    | "children"
-    | "class"
-    | "className"
-    | "onChange"
-  > {
+export interface VolumeControlProps extends Omit<
+  DivDOMProps,
+  "children" | "class" | "className" | "onChange"
+> {
   children?: DivDOMProps["children"];
   class?: string;
   className?: string;
@@ -221,245 +191,129 @@ const VOLUME_CONTROL_OWN = [
   "value",
 ] as const;
 
-export const VolumeControl = (
-  props: VolumeControlProps
-) => {
-  const rest = omitProps(
-    props,
-    VOLUME_CONTROL_OWN
-  );
+export const VolumeControl = (props: VolumeControlProps) => {
+  const rest = omitProps(props, VOLUME_CONTROL_OWN);
 
   const config = useAudioConfig();
 
-  const orientation = () =>
-    props.orientation ??
-    "horizontal";
+  const orientation = () => props.orientation ?? "horizontal";
 
-  const size = () =>
-    props.size ??
-    config.size ??
-    "default";
+  const size = () => props.size ?? config.size ?? "default";
 
-  const disabled = () =>
-    props.disabled ??
-    config.disabled ??
-    false;
+  const disabled = () => props.disabled ?? config.disabled ?? false;
 
-  const step = () =>
-    props.step ?? 0.05;
+  const step = () => props.step ?? 0.05;
 
-  const mapping = () =>
-    curves[
-      props.curve ??
-        "perceptual"
-    ];
+  const mapping = () => curves[props.curve ?? "perceptual"];
 
-  const [uncontrolledVolume, setUncontrolledVolume] =
-    createSignal(
-      clamp(
-        props.defaultValue ?? 1,
-        0,
-        1
-      )
-    );
-
-  const [uncontrolledMuted, setUncontrolledMuted] =
-    createSignal(
-      props.defaultMuted ?? false
-    );
-
-  const volume = () =>
-    props.value ??
-    uncontrolledVolume();
-
-  const muted = () =>
-    props.muted ??
-    uncontrolledMuted();
-
-  let lastAudible =
-    volume() > 0
-      ? volume()
-      : 1;
-
-  createCompatEffect(
-    volume,
-    (next) => {
-      if (next > 0) {
-        lastAudible = next;
-      }
-    }
+  const [uncontrolledVolume, setUncontrolledVolume] = createSignal(
+    clamp(props.defaultValue ?? 1, 0, 1)
   );
 
-  const setVolume = (
-    next: number
-  ): number => {
-    const clamped =
-      roundValue(
-        clamp(next, 0, 1)
-      );
+  const [uncontrolledMuted, setUncontrolledMuted] = createSignal(
+    props.defaultMuted ?? false
+  );
+
+  const volume = () => props.value ?? uncontrolledVolume();
+
+  const muted = () => props.muted ?? uncontrolledMuted();
+
+  let lastAudible = volume() > 0 ? volume() : 1;
+
+  createCompatEffect(volume, (next) => {
+    if (next > 0) {
+      lastAudible = next;
+    }
+  });
+
+  const setVolume = (next: number): number => {
+    const clamped = roundValue(clamp(next, 0, 1));
 
     if (clamped > 0) {
-      lastAudible =
-        clamped;
+      lastAudible = clamped;
     }
 
-    if (
-      props.value ===
-      undefined
-    ) {
-      setUncontrolledVolume(
-        clamped
-      );
+    if (props.value === undefined) {
+      setUncontrolledVolume(clamped);
     }
 
-    props.onValueChange?.(
-      clamped
-    );
+    props.onValueChange?.(clamped);
 
     return clamped;
   };
 
-  const setMuted = (
-    next: boolean
-  ) => {
-    if (
-      props.muted ===
-      undefined
-    ) {
-      setUncontrolledMuted(
-        next
-      );
+  const setMuted = (next: boolean) => {
+    if (props.muted === undefined) {
+      setUncontrolledMuted(next);
     }
 
-    props.onMutedChange?.(
-      next
-    );
+    props.onMutedChange?.(next);
   };
 
-  const position = () =>
-    mapping().toPosition(
-      volume()
-    );
+  const position = () => mapping().toPosition(volume());
 
-  const shownPosition = () =>
-    muted()
-      ? 0
-      : position();
+  const shownPosition = () => (muted() ? 0 : position());
 
-  const quantizePosition = (
-    next: number
-  ): number => {
-    const increment =
-      step();
+  const quantizePosition = (next: number): number => {
+    const increment = step();
 
-    return roundValue(
-      clamp(
-        Math.round(
-          next / increment
-        ) * increment,
-        0,
-        1
-      )
-    );
+    return roundValue(clamp(Math.round(next / increment) * increment, 0, 1));
   };
 
-  const setPosition = (
-    next: number
-  ): number => {
-    const quantized =
-      quantizePosition(next);
+  const setPosition = (next: number): number => {
+    const quantized = quantizePosition(next);
 
-    const changed =
-      setVolume(
-        mapping().toVolume(
-          quantized
-        )
-      );
+    const changed = setVolume(mapping().toVolume(quantized));
 
-    if (
-      muted() &&
-      quantized > 0
-    ) {
+    if (muted() && quantized > 0) {
       setMuted(false);
     }
 
     return changed;
   };
 
-  const commit = (
-    next: number
-  ) => {
-    props.onValueCommitted?.(
-      next
-    );
+  const commit = (next: number) => {
+    props.onValueCommitted?.(next);
   };
 
   const toggleMuted = () => {
-    if (
-      muted() &&
-      volume() <= 0
-    ) {
-      setVolume(
-        lastAudible
-      );
+    if (muted() && volume() <= 0) {
+      setVolume(lastAudible);
     }
 
-    setMuted(
-      !muted()
-    );
+    setMuted(!muted());
   };
 
-  const pageStep = () =>
-    Math.max(
-      step(),
-      0.1
-    );
+  const pageStep = () => Math.max(step(), 0.1);
 
-  const handleKeyDown = (
-    event: KeyboardEvent
-  ) => {
-    const current =
-      shownPosition();
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const current = shownPosition();
 
-    let next:
-      | number
-      | undefined;
+    let next: number | undefined;
 
     switch (event.key) {
       case "ArrowRight":
       case "ArrowUp": {
-        next =
-          current +
-          (event.shiftKey
-            ? pageStep()
-            : step());
+        next = current + (event.shiftKey ? pageStep() : step());
 
         break;
       }
 
       case "ArrowLeft":
       case "ArrowDown": {
-        next =
-          current -
-          (event.shiftKey
-            ? pageStep()
-            : step());
+        next = current - (event.shiftKey ? pageStep() : step());
 
         break;
       }
 
       case "PageUp": {
-        next =
-          current +
-          pageStep();
+        next = current + pageStep();
 
         break;
       }
 
       case "PageDown": {
-        next =
-          current -
-          pageStep();
+        next = current - pageStep();
 
         break;
       }
@@ -483,17 +337,12 @@ export const VolumeControl = (
 
     event.preventDefault();
 
-    const changed =
-      setPosition(next);
+    const changed = setPosition(next);
 
     commit(changed);
   };
 
-  const level = () =>
-    levelFor(
-      volume(),
-      muted()
-    );
+  const level = () => levelFor(volume(), muted());
 
   const context: VolumeControlContextValue = {
     commit,
@@ -510,69 +359,46 @@ export const VolumeControl = (
     volume,
   };
 
-  return provideContext(
-    VolumeControlContext,
-    context,
-    () => (
-      <div
-        aria-label="Volume"
-        class={cn(
-          "group/volume-control flex items-center gap-2 data-disabled:opacity-50",
-          orientation() ===
-            "vertical"
-            ? "flex-col-reverse"
-            : undefined,
-          size() === "sm"
-            ? "[--volume-thumb-size:0.75rem] [--volume-track-size:0.1875rem]"
-            : undefined,
-          size() === "default"
-            ? "[--volume-thumb-size:0.875rem] [--volume-track-size:0.25rem]"
-            : undefined,
-          size() === "lg"
-            ? "[--volume-thumb-size:1rem] [--volume-track-size:0.375rem]"
-            : undefined,
-          props.class,
-          props.className
-        )}
-        data-disabled={
-          disabled()
-            ? ""
-            : undefined
-        }
-        data-level={level()}
-        data-muted={
-          muted()
-            ? ""
-            : undefined
-        }
-        data-orientation={
-          orientation()
-        }
-        data-slot="volume-control"
-        role="group"
-        {...rest}
-      >
-        {props.children ?? (
-          <>
-            <VolumeControlMute />
-            <VolumeControlSlider />
-          </>
-        )}
-      </div>
-    )
-  );
+  return provideContext(VolumeControlContext, context, () => (
+    <div
+      aria-label="Volume"
+      class={cn(
+        "group/volume-control flex items-center gap-2 data-disabled:opacity-50",
+        orientation() === "vertical" ? "flex-col-reverse" : undefined,
+        size() === "sm"
+          ? "[--volume-thumb-size:0.75rem] [--volume-track-size:0.1875rem]"
+          : undefined,
+        size() === "default"
+          ? "[--volume-thumb-size:0.875rem] [--volume-track-size:0.25rem]"
+          : undefined,
+        size() === "lg"
+          ? "[--volume-thumb-size:1rem] [--volume-track-size:0.375rem]"
+          : undefined,
+        props.class,
+        props.className
+      )}
+      data-disabled={disabled() ? "" : undefined}
+      data-level={level()}
+      data-muted={muted() ? "" : undefined}
+      data-orientation={orientation()}
+      data-slot="volume-control"
+      role="group"
+      {...rest}
+    >
+      {props.children ?? (
+        <>
+          <VolumeControlMute />
+          <VolumeControlSlider />
+        </>
+      )}
+    </div>
+  ));
 };
 
-export interface VolumeControlMuteProps
-  extends Omit<
-    ButtonDOMProps,
-    | "children"
-    | "class"
-    | "className"
-    | "disabled"
-    | "onClick"
-    | "type"
-  > {
+export interface VolumeControlMuteProps extends Omit<
+  ButtonDOMProps,
+  "children" | "class" | "className" | "disabled" | "onClick" | "type"
+> {
   children?: ButtonDOMProps["children"];
   class?: string;
   className?: string;
@@ -580,184 +406,105 @@ export interface VolumeControlMuteProps
   type?: "button" | "submit" | "reset";
 }
 
-const MUTE_OWN = [
-  "children",
-  "class",
-  "className",
-  "onClick",
-  "type",
-] as const;
+const MUTE_OWN = ["children", "class", "className", "onClick", "type"] as const;
 
-export const VolumeControlMute = (
-  props: VolumeControlMuteProps
-) => {
-  const context =
-    useVolumeControl(
-      "VolumeControlMute"
-    );
+export const VolumeControlMute = (props: VolumeControlMuteProps) => {
+  const context = useVolumeControl("VolumeControlMute");
 
-  const rest = omitProps(
-    props,
-    MUTE_OWN
-  );
+  const rest = omitProps(props, MUTE_OWN);
 
-  const label = () =>
-    context.muted()
-      ? "Unmute"
-      : "Mute";
+  const label = () => (context.muted() ? "Unmute" : "Mute");
 
   return (
     <button
       aria-label={label()}
-      aria-pressed={
-        context.muted()
-          ? "true"
-          : "false"
-      }
+      aria-pressed={context.muted() ? "true" : "false"}
       class={cn(
         "text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring/30 inline-flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors outline-none focus-visible:ring-3 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
-        props.children
-          ? undefined
-          : "w-auto px-2",
+        props.children ? undefined : "w-auto px-2",
         props.class,
         props.className
       )}
-      data-level={
-        context.level()
-      }
-      data-muted={
-        context.muted()
-          ? ""
-          : undefined
-      }
+      data-level={context.level()}
+      data-muted={context.muted() ? "" : undefined}
       data-slot="volume-control-mute"
-      disabled={
-        context.disabled()
-      }
+      disabled={context.disabled()}
       onClick={(event) => {
-        props.onClick?.(
-          event
-        );
+        props.onClick?.(event);
 
-        if (
-          event.defaultPrevented
-        ) {
+        if (event.defaultPrevented) {
           return;
         }
 
         context.toggleMuted();
       }}
-      type={
-        props.type ??
-        "button"
-      }
+      type={props.type ?? "button"}
       {...rest}
     >
-      {props.children ?? (
-        <span class="text-xs">
-          {label()}
-        </span>
-      )}
+      {props.children ?? <span class="text-xs">{label()}</span>}
     </button>
   );
 };
 
-type SliderRootProps =
-  Parameters<typeof SliderPrimitive.Root>[0];
+type SliderRootProps = Parameters<typeof SliderPrimitive.Root>[0];
 
-export type VolumeControlSliderProps =
-  Omit<
-    SliderRootProps,
-    | "children"
-    | "class"
-    | "className"
-    | "defaultValue"
-    | "disabled"
-    | "getValueLabel"
-    | "maxValue"
-    | "minValue"
-    | "onChange"
-    | "onChangeEnd"
-    | "orientation"
-    | "step"
-    | "value"
-  > & {
-    class?: string;
-    className?: string;
-  };
+export type VolumeControlSliderProps = Omit<
+  SliderRootProps,
+  | "children"
+  | "class"
+  | "className"
+  | "defaultValue"
+  | "disabled"
+  | "getValueLabel"
+  | "maxValue"
+  | "minValue"
+  | "onChange"
+  | "onChangeEnd"
+  | "orientation"
+  | "step"
+  | "value"
+> & {
+  class?: string;
+  className?: string;
+};
 
-const SLIDER_OWN = [
-  "class",
-  "className",
-] as const;
+const SLIDER_OWN = ["class", "className"] as const;
 
-export const VolumeControlSlider = (
-  props: VolumeControlSliderProps
-) => {
-  const context =
-    useVolumeControl(
-      "VolumeControlSlider"
-    );
+export const VolumeControlSlider = (props: VolumeControlSliderProps) => {
+  const context = useVolumeControl("VolumeControlSlider");
 
-  const rest = omitProps(
-    props,
-    SLIDER_OWN
-  );
+  const rest = omitProps(props, SLIDER_OWN);
 
-  const horizontal = () =>
-    context.orientation() ===
-    "horizontal";
+  const horizontal = () => context.orientation() === "horizontal";
 
-  const sliderValue =
-    createMemo(() => [
-      context.shownPosition(),
-    ]);
+  const sliderValue = createMemo(() => [context.shownPosition()]);
 
   return (
     <SliderPrimitive.Root
       class={cn(
         "relative flex touch-none items-center select-none",
-        horizontal()
-          ? "w-full min-w-20"
-          : "h-24 flex-col",
+        horizontal() ? "w-full min-w-20" : "h-24 flex-col",
         props.class,
         props.className
       )}
       data-slot="volume-control-slider"
-      disabled={
-        context.disabled()
-      }
+      disabled={context.disabled()}
       getValueLabel={() =>
-        context.muted()
-          ? "Muted"
-          : `${Math.round(
-              context.volume() *
-                PERCENT
-            )}%`
+        context.muted() ? "Muted" : `${Math.round(context.volume() * PERCENT)}%`
       }
       maxValue={1}
       minValue={0}
       onChange={() => undefined}
-      orientation={
-        context.orientation()
-      }
+      orientation={context.orientation()}
       step={context.step()}
       value={sliderValue()}
       {...rest}
     >
       <VolumeSliderCompat
-        changeFromPointer={
-          context.setPosition
-        }
-        commitPointer={
-          context.commit
-        }
-        currentPosition={
-          context.shownPosition
-        }
-        orientation={
-          context.orientation
-        }
+        changeFromPointer={context.setPosition}
+        commitPointer={context.commit}
+        currentPosition={context.shownPosition}
+        orientation={context.orientation}
       />
 
       <SliderPrimitive.Track
@@ -781,20 +528,16 @@ export const VolumeControlSlider = (
             aria-hidden="true"
             class={cn(
               "bg-primary absolute rounded-full",
-              horizontal()
-                ? "inset-y-0 left-0"
-                : "inset-x-0 bottom-0"
+              horizontal() ? "inset-y-0 left-0" : "inset-x-0 bottom-0"
             )}
             data-slot="volume-control-range"
             style={
               horizontal()
                 ? {
-                    width:
-                      `${context.shownPosition() * PERCENT}%`,
+                    width: `${context.shownPosition() * PERCENT}%`,
                   }
                 : {
-                    height:
-                      `${context.shownPosition() * PERCENT}%`,
+                    height: `${context.shownPosition() * PERCENT}%`,
                   }
             }
           />
@@ -805,16 +548,11 @@ export const VolumeControlSlider = (
           aria-valuetext={
             context.muted()
               ? "Muted"
-              : `${Math.round(
-                  context.volume() *
-                    PERCENT
-                )}%`
+              : `${Math.round(context.volume() * PERCENT)}%`
           }
           class="bg-background ring-foreground/15 hover:ring-ring/30 focus-visible:ring-ring/40 data-dragging:ring-ring/30 block size-(--volume-thumb-size) shrink-0 rounded-full shadow-sm ring-1 outline-hidden transition-[box-shadow] hover:ring-4 focus-visible:ring-4 data-dragging:ring-4"
           data-slot="volume-control-thumb"
-          onKeyDown={
-            context.handleKeyDown
-          }
+          onKeyDown={context.handleKeyDown}
         >
           <SliderPrimitive.Input />
         </SliderPrimitive.Thumb>
@@ -823,32 +561,20 @@ export const VolumeControlSlider = (
   );
 };
 
-export interface VolumeControlValueProps
-  extends Omit<
-    SpanDOMProps,
-    "children" | "class" | "className"
-  > {
+export interface VolumeControlValueProps extends Omit<
+  SpanDOMProps,
+  "children" | "class" | "className"
+> {
   class?: string;
   className?: string;
 }
 
-const VALUE_OWN = [
-  "class",
-  "className",
-] as const;
+const VALUE_OWN = ["class", "className"] as const;
 
-export const VolumeControlValue = (
-  props: VolumeControlValueProps
-) => {
-  const context =
-    useVolumeControl(
-      "VolumeControlValue"
-    );
+export const VolumeControlValue = (props: VolumeControlValueProps) => {
+  const context = useVolumeControl("VolumeControlValue");
 
-  const rest = omitProps(
-    props,
-    VALUE_OWN
-  );
+  const rest = omitProps(props, VALUE_OWN);
 
   return (
     <span
@@ -860,12 +586,7 @@ export const VolumeControlValue = (
       data-slot="volume-control-value"
       {...rest}
     >
-      {context.muted()
-        ? "0%"
-        : `${Math.round(
-            context.position() *
-              PERCENT
-          )}%`}
+      {context.muted() ? "0%" : `${Math.round(context.position() * PERCENT)}%`}
     </span>
   );
 };

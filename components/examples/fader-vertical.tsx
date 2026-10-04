@@ -24,7 +24,9 @@ const FaderVertical = () => {
       {channels.map((channel) => (
         <Fader
           class="flex-col items-center"
-          onValueChange={(value) => setLevels({ ...levels(), [channel]: value })}
+          onValueChange={(value) =>
+            setLevels({ ...levels(), [channel]: value })
+          }
           orientation="vertical"
           taper="audio"
           value={levels()[channel]}

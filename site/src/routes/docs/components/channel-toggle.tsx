@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import ChannelToggleDoc, { frontmatter } from "@/site/content/docs/components/channel-toggle.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import ChannelToggleDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/channel-toggle.mdx";
 
 export default function ChannelTogglePage() {
   return (

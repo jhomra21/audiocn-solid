@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import ClipIndicatorDoc, { frontmatter } from "@/site/content/docs/components/clip-indicator.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import ClipIndicatorDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/clip-indicator.mdx";
 
 export default function ClipIndicatorPage() {
   return (

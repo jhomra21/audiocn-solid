@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import InstallationDoc, {
   frontmatter,
 } from "@/site/content/docs/installation.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function InstallationPage() {
   return (

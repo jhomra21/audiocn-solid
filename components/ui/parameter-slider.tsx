@@ -11,12 +11,11 @@ import {
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
-import { roundValue, widestFormattedValue } from "@/lib/number";
 import { linearTaper, logTaper } from "@/lib/audio/taper";
 import type { Taper } from "@/lib/audio/types";
+import { roundValue, widestFormattedValue } from "@/lib/number";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
-import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import type {
   ButtonDOMProps,
   DivDOMProps,
@@ -24,6 +23,7 @@ import type {
   ParagraphDOMProps,
   SpanDOMProps,
 } from "@/lib/solid/jsx-types";
+import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import { omitProps } from "@/lib/solid/props";
 import { mergeStyleVars } from "@/lib/solid/style";
 import type { StyleValue } from "@/lib/solid/style";
@@ -31,16 +31,11 @@ import { cn } from "@/lib/utils";
 
 const POSITION_STEP = 0.0005;
 
-
 const WIDTH_SAMPLES = 24;
 
 const SCRUB_PIXELS_PER_STEP = 4;
 
-export type ParameterChangeReason =
-  | "drag"
-  | "keyboard"
-  | "input"
-  | "reset";
+export type ParameterChangeReason = "drag" | "keyboard" | "input" | "reset";
 
 export interface ParameterChangeDetails {
   reason: ParameterChangeReason;
@@ -79,9 +74,7 @@ interface ParameterSliderContextValue {
 const ParameterSliderContext =
   createContext<ParameterSliderContextValue | null>(null);
 
-const useParameterSlider = (
-  part: string
-): ParameterSliderContextValue => {
+const useParameterSlider = (part: string): ParameterSliderContextValue => {
   const context = useContext(ParameterSliderContext);
 
   if (!context) {
@@ -109,11 +102,7 @@ type SliderRootProps = Parameters<typeof SliderPrimitive.Root>[0];
 
 type ParameterSliderDOMProps = Omit<
   DivDOMProps,
-  | "children"
-  | "class"
-  | "className"
-  | "onChange"
-  | "ref"
+  "children" | "class" | "className" | "onChange" | "ref"
 >;
 
 export interface ParameterSliderProps extends ParameterSliderDOMProps {
@@ -128,10 +117,7 @@ export interface ParameterSliderProps extends ParameterSliderDOMProps {
   marks?: ParameterMark[];
   max?: number;
   min?: number;
-  onValueChange?: (
-    value: number,
-    details: ParameterChangeDetails
-  ) => void;
+  onValueChange?: (value: number, details: ParameterChangeDetails) => void;
   onValueCommitted?: (value: number) => void;
   origin?: number;
   resetValue?: number;
@@ -176,8 +162,7 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   const largeStep = () => props.largeStep ?? 10;
   const decimals = () => props.decimals ?? decimalsOf(step());
 
-  const resetValue = () =>
-    props.resetValue ?? props.defaultValue ?? min();
+  const resetValue = () => props.resetValue ?? props.defaultValue ?? min();
 
   const disabled = () => props.disabled ?? config.disabled ?? false;
   const unit = () => props.unit;
@@ -185,11 +170,7 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   const scale = () => props.scale ?? "linear";
 
   const [uncontrolled, setUncontrolled] = createSignal(
-    clamp(
-      props.defaultValue ?? resetValue(),
-      min(),
-      max()
-    )
+    clamp(props.defaultValue ?? resetValue(), min(), max())
   );
 
   const value = () => props.value ?? uncontrolled();
@@ -200,9 +181,7 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   });
 
   const taper = createMemo(() =>
-    scale() === "log"
-      ? logTaper(min(), max())
-      : linearTaper(min(), max())
+    scale() === "log" ? logTaper(min(), max()) : linearTaper(min(), max())
   );
 
   const format = () => {
@@ -218,16 +197,12 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   };
 
   const quantize = (next: number): number => {
-    const stepped =
-      min() + Math.round((next - min()) / step()) * step();
+    const stepped = min() + Math.round((next - min()) / step()) * step();
 
     return roundValue(clamp(stepped, min(), max()));
   };
 
-  const change = (
-    next: number,
-    details: ParameterChangeDetails
-  ) => {
+  const change = (next: number, details: ParameterChangeDetails) => {
     if (next === latestValue) {
       return;
     }
@@ -317,9 +292,7 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   const position = () => taper().toPosition(value());
 
   const originPosition = () =>
-    taper().toPosition(
-      clamp(props.origin ?? min(), min(), max())
-    );
+    taper().toPosition(clamp(props.origin ?? min(), min(), max()));
 
   const context: ParameterSliderContextValue = {
     change,
@@ -364,11 +337,10 @@ export const ParameterSlider = (props: ParameterSliderProps) => {
   ));
 };
 
-export interface ParameterSliderHeaderProps
-  extends Omit<
-    DivDOMProps,
-    "children" | "class" | "className"
-  > {
+export interface ParameterSliderHeaderProps extends Omit<
+  DivDOMProps,
+  "children" | "class" | "className"
+> {
   class?: string;
   className?: string;
   children?: DivDOMProps["children"];
@@ -376,9 +348,7 @@ export interface ParameterSliderHeaderProps
 
 const HEADER_OWN = ["children", "class", "className"] as const;
 
-export const ParameterSliderHeader = (
-  props: ParameterSliderHeaderProps
-) => {
+export const ParameterSliderHeader = (props: ParameterSliderHeaderProps) => {
   const rest = omitProps(props, HEADER_OWN);
 
   return (
@@ -396,11 +366,10 @@ export const ParameterSliderHeader = (
   );
 };
 
-export interface ParameterSliderLabelProps
-  extends Omit<
-    SpanDOMProps,
-    "children" | "class" | "className"
-  > {
+export interface ParameterSliderLabelProps extends Omit<
+  SpanDOMProps,
+  "children" | "class" | "className"
+> {
   class?: string;
   className?: string;
   children?: SpanDOMProps["children"];
@@ -408,19 +377,13 @@ export interface ParameterSliderLabelProps
 
 const LABEL_OWN = ["children", "class", "className", "id"] as const;
 
-export const ParameterSliderLabel = (
-  props: ParameterSliderLabelProps
-) => {
+export const ParameterSliderLabel = (props: ParameterSliderLabelProps) => {
   const context = useParameterSlider("ParameterSliderLabel");
   const rest = omitProps(props, LABEL_OWN);
 
   return (
     <span
-      class={cn(
-        "mr-auto text-sm font-medium",
-        props.class,
-        props.className
-      )}
+      class={cn("mr-auto text-sm font-medium", props.class, props.className)}
       data-slot="parameter-slider-label"
       id={context.labelId}
       {...rest}
@@ -430,49 +393,38 @@ export const ParameterSliderLabel = (
   );
 };
 
-export interface ParameterSliderInputProps
-  extends Omit<
-    InputDOMProps,
-    | "class"
-    | "className"
-    | "defaultValue"
-    | "max"
-    | "min"
-    | "onChange"
-    | "onInput"
-    | "step"
-    | "type"
-    | "value"
-  > {
+export interface ParameterSliderInputProps extends Omit<
+  InputDOMProps,
+  | "class"
+  | "className"
+  | "defaultValue"
+  | "max"
+  | "min"
+  | "onChange"
+  | "onInput"
+  | "step"
+  | "type"
+  | "value"
+> {
   class?: string;
   className?: string;
   scrub?: boolean;
 }
 
-const INPUT_OWN = [
-  "class",
-  "className",
-  "scrub",
-] as const;
+const INPUT_OWN = ["class", "className", "scrub"] as const;
 
-export const ParameterSliderInput = (
-  props: ParameterSliderInputProps
-) => {
+export const ParameterSliderInput = (props: ParameterSliderInputProps) => {
   const context = useParameterSlider("ParameterSliderInput");
   const rest = omitProps(props, INPUT_OWN);
   const [draft, setDraft] = createSignal<string | null>(null);
   let scrubStartX = 0;
   let scrubStartValue = 0;
 
-  const numericText = () =>
-    context.value().toFixed(context.decimals());
+  const numericText = () => context.value().toFixed(context.decimals());
 
   const displayValue = () => draft() ?? numericText();
 
-  const applyDraft = (
-    reason: ParameterChangeReason,
-    event?: Event
-  ) => {
+  const applyDraft = (reason: ParameterChangeReason, event?: Event) => {
     const current = draft();
 
     if (current === null) {
@@ -502,19 +454,13 @@ export const ParameterSliderInput = (
       aria-hidden="true"
       class={cn(
         "text-muted-foreground px-1.5 text-xs",
-        (props.scrub ?? true) &&
-          unit() &&
-          !context.disabled()
+        (props.scrub ?? true) && unit() && !context.disabled()
           ? "cursor-ew-resize select-none"
           : undefined
       )}
       data-slot="parameter-slider-unit"
       onPointerDown={(event: PointerEvent) => {
-        if (
-          !(props.scrub ?? true) ||
-          !unit() ||
-          context.disabled()
-        ) {
+        if (!(props.scrub ?? true) || !unit() || context.disabled()) {
           return;
         }
 
@@ -542,13 +488,10 @@ export const ParameterSliderInput = (
         }
 
         const steps = Math.round(
-          (event.clientX - scrubStartX) /
-            SCRUB_PIXELS_PER_STEP
+          (event.clientX - scrubStartX) / SCRUB_PIXELS_PER_STEP
         );
 
-        const next = context.quantize(
-          scrubStartValue + steps * context.step()
-        );
+        const next = context.quantize(scrubStartValue + steps * context.step());
 
         context.change(next, {
           event,
@@ -620,11 +563,10 @@ export const ParameterSliderInput = (
   );
 };
 
-export interface ParameterSliderValueProps
-  extends Omit<
-    SpanDOMProps,
-    "children" | "class" | "className" | "style"
-  > {
+export interface ParameterSliderValueProps extends Omit<
+  SpanDOMProps,
+  "children" | "class" | "className" | "style"
+> {
   class?: string;
   className?: string;
   style?: StyleValue;
@@ -632,18 +574,14 @@ export interface ParameterSliderValueProps
 
 const VALUE_OWN = ["class", "className", "style"] as const;
 
-export const ParameterSliderValue = (
-  props: ParameterSliderValueProps
-) => {
+export const ParameterSliderValue = (props: ParameterSliderValueProps) => {
   const context = useParameterSlider("ParameterSliderValue");
   const rest = omitProps(props, VALUE_OWN);
 
   const valueWidth = createMemo(() =>
     widestFormattedValue(
       Array.from({ length: WIDTH_SAMPLES + 1 }, (_, index) =>
-        context.quantize(
-          context.taper().toValue(index / WIDTH_SAMPLES)
-        )
+        context.quantize(context.taper().toValue(index / WIDTH_SAMPLES))
       ),
       context.format()
     )
@@ -667,32 +605,23 @@ export const ParameterSliderValue = (
   );
 };
 
-export interface ParameterSliderResetProps
-  extends Omit<
-    ButtonDOMProps,
-    "children" | "class" | "className" | "onClick" | "type"
-  > {
+export interface ParameterSliderResetProps extends Omit<
+  ButtonDOMProps,
+  "children" | "class" | "className" | "onClick" | "type"
+> {
   class?: string;
   className?: string;
   children?: ButtonDOMProps["children"];
   onClick?: (event: MouseEvent) => void;
 }
 
-const RESET_OWN = [
-  "children",
-  "class",
-  "className",
-  "onClick",
-] as const;
+const RESET_OWN = ["children", "class", "className", "onClick"] as const;
 
-export const ParameterSliderReset = (
-  props: ParameterSliderResetProps
-) => {
+export const ParameterSliderReset = (props: ParameterSliderResetProps) => {
   const context = useParameterSlider("ParameterSliderReset");
   const rest = omitProps(props, RESET_OWN);
 
-  const modified = () =>
-    context.value() !== context.resetValue();
+  const modified = () => context.value() !== context.resetValue();
 
   return (
     <button
@@ -743,29 +672,19 @@ export type ParameterSliderControlProps = Omit<
 
 const CONTROL_OWN = ["class", "className"] as const;
 
-export const ParameterSliderControl = (
-  props: ParameterSliderControlProps
-) => {
+export const ParameterSliderControl = (props: ParameterSliderControlProps) => {
   const context = useParameterSlider("ParameterSliderControl");
   const rest = omitProps(props, CONTROL_OWN);
   let pointerEvent: PointerEvent | undefined;
 
   const quantizeFromPosition = (position: number): number =>
-    context.quantize(
-      context.taper().toValue(position)
-    );
+    context.quantize(context.taper().toValue(position));
 
   const start = () =>
-    Math.min(
-      context.originPosition(),
-      context.position()
-    ) * 100;
+    Math.min(context.originPosition(), context.position()) * 100;
 
   const end = () =>
-    Math.max(
-      context.originPosition(),
-      context.position()
-    ) * 100;
+    Math.max(context.originPosition(), context.position()) * 100;
 
   const sliderValue = createMemo(() => [context.position()]);
 
@@ -778,9 +697,7 @@ export const ParameterSliderControl = (
       )}
       data-slot="parameter-slider-control"
       disabled={context.disabled()}
-      getValueLabel={() =>
-        context.format()(context.value())
-      }
+      getValueLabel={() => context.format()(context.value())}
       maxValue={1}
       minValue={0}
       onChange={(next) => {
@@ -790,13 +707,10 @@ export const ParameterSliderControl = (
           return;
         }
 
-        context.change(
-          quantizeFromPosition(position),
-          {
-            event: pointerEvent,
-            reason: "drag",
-          }
-        );
+        context.change(quantizeFromPosition(position), {
+          event: pointerEvent,
+          reason: "drag",
+        });
       }}
       onChangeEnd={context.commitLatest}
       orientation="horizontal"
@@ -858,20 +772,17 @@ export const ParameterSliderControl = (
   );
 };
 
-export interface ParameterSliderMarksProps
-  extends Omit<
-    DivDOMProps,
-    "children" | "class" | "className"
-  > {
+export interface ParameterSliderMarksProps extends Omit<
+  DivDOMProps,
+  "children" | "class" | "className"
+> {
   class?: string;
   className?: string;
 }
 
 const MARKS_OWN = ["class", "className"] as const;
 
-export const ParameterSliderMarks = (
-  props: ParameterSliderMarksProps
-) => {
+export const ParameterSliderMarks = (props: ParameterSliderMarksProps) => {
   const context = useParameterSlider("ParameterSliderMarks");
   const rest = omitProps(props, MARKS_OWN);
 
@@ -892,13 +803,12 @@ export const ParameterSliderMarks = (
             <span
               class="absolute top-0 left-(--mark-position) -translate-x-1/2 whitespace-nowrap tabular-nums"
               style={{
-                "--mark-position": `${context
-                  .taper()
-                  .toPosition(mark.value) * 100}%`,
+                "--mark-position": `${
+                  context.taper().toPosition(mark.value) * 100
+                }%`,
               }}
             >
-              {mark.label ??
-                context.format()(mark.value)}
+              {mark.label ?? context.format()(mark.value)}
             </span>
           )}
         </For>
@@ -907,38 +817,27 @@ export const ParameterSliderMarks = (
   );
 };
 
-export interface ParameterSliderDescriptionProps
-  extends Omit<
-    ParagraphDOMProps,
-    "children" | "class" | "className"
-  > {
+export interface ParameterSliderDescriptionProps extends Omit<
+  ParagraphDOMProps,
+  "children" | "class" | "className"
+> {
   class?: string;
   className?: string;
   children?: ParagraphDOMProps["children"];
 }
 
-const DESCRIPTION_OWN = [
-  "children",
-  "class",
-  "className",
-  "id",
-] as const;
+const DESCRIPTION_OWN = ["children", "class", "className", "id"] as const;
 
 export const ParameterSliderDescription = (
   props: ParameterSliderDescriptionProps
 ) => {
-  const context =
-    useParameterSlider("ParameterSliderDescription");
+  const context = useParameterSlider("ParameterSliderDescription");
 
   const rest = omitProps(props, DESCRIPTION_OWN);
 
   return (
     <p
-      class={cn(
-        "text-muted-foreground text-xs",
-        props.class,
-        props.className
-      )}
+      class={cn("text-muted-foreground text-xs", props.class, props.className)}
       data-slot="parameter-slider-description"
       id={context.descriptionId}
       {...rest}

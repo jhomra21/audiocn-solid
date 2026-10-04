@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseVisibilityDoc, { frontmatter } from "@/site/content/docs/hooks/use-visibility.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseVisibilityDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-visibility.mdx";
 
 export default function UseVisibilityPage() {
   return (

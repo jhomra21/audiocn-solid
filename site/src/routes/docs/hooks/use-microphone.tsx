@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import UseMicrophoneDoc, { frontmatter } from "@/site/content/docs/hooks/use-microphone.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import UseMicrophoneDoc, {
+  frontmatter,
+} from "@/site/content/docs/hooks/use-microphone.mdx";
 
 export default function UseMicrophonePage() {
   return (

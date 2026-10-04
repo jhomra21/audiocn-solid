@@ -1,10 +1,5 @@
 import { spawnSync } from "node:child_process";
-import {
-  mkdir,
-  readFile,
-  readdir,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve, sep } from "node:path";
 
 interface Evidence {
@@ -135,9 +130,7 @@ const assertHtml = async (
       : html.slice(headStart, headEnd + "</head>".length);
 
   if (!head.includes("<title") || !head.includes(`>${title}</title>`)) {
-    throw new Error(
-      `Prerendered ${route} is missing its title. Head: ${head}`
-    );
+    throw new Error(`Prerendered ${route} is missing its title. Head: ${head}`);
   }
 
   if (!html.includes(description)) {

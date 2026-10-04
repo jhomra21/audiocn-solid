@@ -13,7 +13,12 @@ export const LevelMeterDual = () => {
   const signal = useDemoSignal({ kind: "speech", seed: 7 });
 
   return (
-    <LevelMeter aria-label="Voice level" class="max-w-md" size="lg" source={signal.meter}>
+    <LevelMeter
+      aria-label="Voice level"
+      class="max-w-md"
+      size="lg"
+      source={signal.meter}
+    >
       <LevelMeterChannels>
         <LevelMeterChannel>
           <LevelMeterTrack>

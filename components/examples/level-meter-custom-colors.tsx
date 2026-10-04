@@ -19,7 +19,12 @@ export const LevelMeterCustomColors = () => {
         source={signal.meter}
         variant="segmented"
       />
-      <LevelMeter aria-label="Meter with custom zones" size="lg" source={signal.meter} zones={zones} />
+      <LevelMeter
+        aria-label="Meter with custom zones"
+        size="lg"
+        source={signal.meter}
+        zones={zones}
+      />
     </div>
   );
 };

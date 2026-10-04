@@ -1,12 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "include": [
-    "components",
-    "hooks",
-    "lib",
-    "test"
-  ],
-  "exclude": [
-    "lib/solid/compat/solid2"
-  ]
+  "include": ["components", "hooks", "lib", "test"],
+  "exclude": ["lib/solid/compat/solid2"]
 }

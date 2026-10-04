@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import ThemingDoc, {
   frontmatter,
 } from "@/site/content/docs/concepts/theming.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function ThemingPage() {
   return (

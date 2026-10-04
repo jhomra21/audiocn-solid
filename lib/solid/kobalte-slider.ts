@@ -4,9 +4,7 @@ import { onCleanup } from "solid-js";
 import { createCompatEffect } from "@/lib/solid/effect";
 
 interface SliderCallbacks {
-  onSlideEnd?: (
-    original: SliderContextValue["onSlideEnd"]
-  ) => void;
+  onSlideEnd?: (original: SliderContextValue["onSlideEnd"]) => void;
   onSlideMove?: (
     original: SliderContextValue["onSlideMove"],
     delta: { deltaX: number; deltaY: number }
@@ -47,8 +45,7 @@ export const useKobalteSliderCompat = (
   }
 
   if (callbacks.onSlideEnd) {
-    context.onSlideEnd = () =>
-      callbacks.onSlideEnd?.(originals.onSlideEnd);
+    context.onSlideEnd = () => callbacks.onSlideEnd?.(originals.onSlideEnd);
   }
 
   if (callbacks.suppressStep) {

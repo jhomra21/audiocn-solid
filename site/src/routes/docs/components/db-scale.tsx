@@ -1,7 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
-import DbScaleDoc, { frontmatter } from "@/site/content/docs/components/db-scale.mdx";
 import { DocsShell } from "@/site/components/docs/docs-shell";
+import DbScaleDoc, {
+  frontmatter,
+} from "@/site/content/docs/components/db-scale.mdx";
 
 export default function DbScalePage() {
   return (

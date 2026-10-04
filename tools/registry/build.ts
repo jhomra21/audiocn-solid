@@ -1,10 +1,5 @@
 import { spawnSync } from "node:child_process";
-import {
-  readFile,
-  rm,
-  unlink,
-  writeFile,
-} from "node:fs/promises";
+import { readFile, rm, unlink, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,10 +9,7 @@ const registryPath = join(root, "registry.json");
 
 const jsxTypesPath = join(root, "lib/solid/jsx-types.ts");
 
-const solid2JsxTypesPath = join(
-  root,
-  "lib/solid/compat/solid2/jsx-types.ts"
-);
+const solid2JsxTypesPath = join(root, "lib/solid/compat/solid2/jsx-types.ts");
 
 const temporaryRegistryPath = join(root, ".registry-solid2.json");
 
@@ -86,12 +78,7 @@ await rm(join(root, "site/public/r/solid2"), {
 
 run(["registry", "validate", "registry.json"]);
 
-run([
-  "build",
-  "registry.json",
-  "--output",
-  "site/public/r/solid1",
-]);
+run(["build", "registry.json", "--output", "site/public/r/solid1"]);
 
 const solid2Registry = structuredClone(registry);
 
@@ -107,12 +94,7 @@ await writeFile(
 try {
   await writeFile(jsxTypesPath, solid2JsxTypes);
 
-  run([
-    "build",
-    ".registry-solid2.json",
-    "--output",
-    "site/public/r/solid2",
-  ]);
+  run(["build", ".registry-solid2.json", "--output", "site/public/r/solid2"]);
 } finally {
   await writeFile(jsxTypesPath, solid1JsxTypes);
   await unlink(temporaryRegistryPath).catch(() => undefined);

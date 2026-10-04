@@ -69,8 +69,7 @@ export const DOCS_PAGE_METADATA = {
   },
   "/docs/hooks/use-clip-hold": {
     title: "useClipHold",
-    description:
-      "Clip detection with a hold time, a clip count and a reset.",
+    description: "Clip detection with a hold time, a clip count and a reset.",
   },
   "/docs/hooks/use-reduced-motion": {
     title: "useReducedMotion",
@@ -127,13 +126,11 @@ export const DOCS_PAGE_METADATA = {
   },
   "/docs/hooks/use-sound": {
     title: "useSound",
-    description:
-      "Low-latency playback of short sounds decoded into memory.",
+    description: "Low-latency playback of short sounds decoded into memory.",
   },
   "/docs/hooks/use-waveform-data": {
     title: "useWaveformData",
-    description:
-      "Decode an audio file and reduce it to cached waveform peaks.",
+    description: "Decode an audio file and reduce it to cached waveform peaks.",
   },
   "/docs/components/bar-visualizer": {
     title: "Bar Visualizer",

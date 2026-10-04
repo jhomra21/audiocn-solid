@@ -13,12 +13,10 @@ type CompatContext<T> = Context<T> | Provider<T>;
 
 const hasProvider = <T>(
   context: CompatContext<T>
-): context is Context<T> & { Provider: Provider<T> } =>
-  "Provider" in context;
+): context is Context<T> & { Provider: Provider<T> } => "Provider" in context;
 
-const isProvider = <T>(
-  context: CompatContext<T>
-): context is Provider<T> => typeof context === "function";
+const isProvider = <T>(context: CompatContext<T>): context is Provider<T> =>
+  typeof context === "function";
 
 /**
  * Provides a context value across Solid 1 and Solid 2.

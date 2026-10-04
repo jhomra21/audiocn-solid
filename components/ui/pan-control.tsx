@@ -1,15 +1,12 @@
 import * as SliderPrimitive from "@kobalte/core/slider";
 import { cva } from "class-variance-authority";
-import {
-  createMemo,
-  createSignal,
-} from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { clamp } from "@/lib/audio/decibels";
-import { createCompatEffect } from "@/lib/solid/effect";
 import { roundValue } from "@/lib/number";
+import { createCompatEffect } from "@/lib/solid/effect";
 import { useKobalteSliderCompat } from "@/lib/solid/kobalte-slider";
 import { omitProps } from "@/lib/solid/props";
 import { cn } from "@/lib/utils";
@@ -17,7 +14,6 @@ import { cn } from "@/lib/utils";
 const PERCENT = 100;
 
 const DETENT_RANGE = 0.08;
-
 
 const CENTER_TEXT = /^c(?:enter|entre)?$/iu;
 
@@ -45,28 +41,17 @@ export const parsePan = (text: string): number | null => {
     return 0;
   }
 
-  const side = SIDE_PREFIX.test(trimmed)
-    ? trimmed[0]?.toUpperCase()
-    : null;
+  const side = SIDE_PREFIX.test(trimmed) ? trimmed[0]?.toUpperCase() : null;
 
-  const digits = (
-    side
-      ? trimmed.slice(1)
-      : trimmed
-  ).trim();
+  const digits = (side ? trimmed.slice(1) : trimmed).trim();
 
   const amount = Number(digits) / PERCENT;
 
-  if (
-    digits === "" ||
-    Number.isNaN(amount)
-  ) {
+  if (digits === "" || Number.isNaN(amount)) {
     return null;
   }
 
-  return side === "L"
-    ? -Math.abs(amount)
-    : amount;
+  return side === "L" ? -Math.abs(amount) : amount;
 };
 
 export const describePan = (value: number): string => {
@@ -79,7 +64,6 @@ export const describePan = (value: number): string => {
   return `${amount}% ${value < 0 ? "left" : "right"}`;
 };
 
-
 const panControlVariants = cva(
   "group/pan-control relative flex w-full touch-none items-center select-none data-disabled:opacity-50",
   {
@@ -88,12 +72,9 @@ const panControlVariants = cva(
     },
     variants: {
       size: {
-        default:
-          "[--pan-thumb-size:0.875rem] [--pan-track-size:0.25rem]",
-        lg:
-          "[--pan-thumb-size:1rem] [--pan-track-size:0.375rem]",
-        sm:
-          "[--pan-thumb-size:0.75rem] [--pan-track-size:0.1875rem]",
+        default: "[--pan-thumb-size:0.875rem] [--pan-track-size:0.25rem]",
+        lg: "[--pan-thumb-size:1rem] [--pan-track-size:0.375rem]",
+        sm: "[--pan-thumb-size:0.75rem] [--pan-track-size:0.1875rem]",
       },
     },
   }
@@ -105,16 +86,12 @@ interface SliderCompatProps {
   currentValue: () => number;
 }
 
-const SliderCompat = (
-  props: SliderCompatProps
-) => {
+const SliderCompat = (props: SliderCompatProps) => {
   const context = SliderPrimitive.useSliderContext();
 
-  let dragPosition =
-    props.currentValue();
+  let dragPosition = props.currentValue();
 
-  let pointerValue =
-    props.currentValue();
+  let pointerValue = props.currentValue();
 
   useKobalteSliderCompat(context, {
     onSlideEnd: (originalSlideEnd) => {
@@ -164,8 +141,7 @@ const SliderCompat = (
   return null;
 };
 
-type SliderRootProps =
-  Parameters<typeof SliderPrimitive.Root>[0];
+type SliderRootProps = Parameters<typeof SliderPrimitive.Root>[0];
 
 export type PanControlProps = Omit<
   SliderRootProps,
@@ -212,87 +188,45 @@ const PAN_CONTROL_OWN = [
   "value",
 ] as const;
 
-export const PanControl = (
-  props: PanControlProps
-) => {
-  const rest = omitProps(
-    props,
-    PAN_CONTROL_OWN
-  );
+export const PanControl = (props: PanControlProps) => {
+  const rest = omitProps(props, PAN_CONTROL_OWN);
 
   const config = useAudioConfig();
 
-  const size = () =>
-    props.size ??
-    config.size ??
-    "default";
+  const size = () => props.size ?? config.size ?? "default";
 
-  const disabled = () =>
-    props.disabled ??
-    config.disabled ??
-    false;
+  const disabled = () => props.disabled ?? config.disabled ?? false;
 
-  const step = () =>
-    props.step ?? 0.05;
+  const step = () => props.step ?? 0.05;
 
-  const largeStep = () =>
-    props.largeStep ?? 0.25;
+  const largeStep = () => props.largeStep ?? 0.25;
 
-  const detent = () =>
-    props.detent ?? true;
+  const detent = () => props.detent ?? true;
 
-  const format = () =>
-    props.format ?? formatPan;
+  const format = () => props.format ?? formatPan;
 
-  const [uncontrolled, setUncontrolled] =
-    createSignal(
-      clamp(
-        props.defaultValue ?? 0,
-        -1,
-        1
-      )
-    );
+  const [uncontrolled, setUncontrolled] = createSignal(
+    clamp(props.defaultValue ?? 0, -1, 1)
+  );
 
-  const value = () =>
-    props.value ?? uncontrolled();
+  const value = () => props.value ?? uncontrolled();
 
   let latestValue = value();
 
-  createCompatEffect(
-    value,
-    (next) => {
-      latestValue = next;
-    }
-  );
+  createCompatEffect(value, (next) => {
+    latestValue = next;
+  });
 
-  const quantize = (
-    next: number,
-    increment = step()
-  ): number => {
-    const stepped =
-      -1 +
-      Math.round(
-        (next + 1) / increment
-      ) *
-        increment;
+  const quantize = (next: number, increment = step()): number => {
+    const stepped = -1 + Math.round((next + 1) / increment) * increment;
 
-    return roundValue(
-      clamp(stepped, -1, 1)
-    );
+    return roundValue(clamp(stepped, -1, 1));
   };
 
-  const snapDrag = (
-    next: number
-  ): number =>
-    detent() &&
-    Math.abs(next) <
-      DETENT_RANGE
-      ? 0
-      : next;
+  const snapDrag = (next: number): number =>
+    detent() && Math.abs(next) < DETENT_RANGE ? 0 : next;
 
-  const change = (
-    next: number
-  ) => {
+  const change = (next: number) => {
     if (next === latestValue) {
       return;
     }
@@ -312,61 +246,40 @@ export const PanControl = (
     }
   };
 
-  const commit = (
-    next: number
-  ) => {
+  const commit = (next: number) => {
     props.onValueCommitted?.(
-      detent() &&
-        Math.abs(next) <
-          DETENT_RANGE
-        ? 0
-        : next
+      detent() && Math.abs(next) < DETENT_RANGE ? 0 : next
     );
   };
 
-  const handleKeyDown = (
-    event: KeyboardEvent
-  ) => {
-    const increment =
-      event.shiftKey
-        ? largeStep()
-        : step();
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const increment = event.shiftKey ? largeStep() : step();
 
-    let next:
-      | number
-      | undefined;
+    let next: number | undefined;
 
     switch (event.key) {
       case "ArrowUp":
       case "ArrowRight": {
-        next =
-          latestValue +
-          increment;
+        next = latestValue + increment;
 
         break;
       }
 
       case "ArrowDown":
       case "ArrowLeft": {
-        next =
-          latestValue -
-          increment;
+        next = latestValue - increment;
 
         break;
       }
 
       case "PageUp": {
-        next =
-          latestValue +
-          largeStep();
+        next = latestValue + largeStep();
 
         break;
       }
 
       case "PageDown": {
-        next =
-          latestValue -
-          largeStep();
+        next = latestValue - largeStep();
 
         break;
       }
@@ -390,35 +303,17 @@ export const PanControl = (
 
     event.preventDefault();
 
-    const quantized =
-      quantize(
-        next,
-        Math.min(
-          increment,
-          step()
-        )
-      );
+    const quantized = quantize(next, Math.min(increment, step()));
 
     change(quantized);
     commit(quantized);
   };
 
-  const start = () =>
-    Math.min(
-      0,
-      value()
-    );
+  const start = () => Math.min(0, value());
 
-  const end = () =>
-    Math.max(
-      0,
-      value()
-    );
+  const end = () => Math.max(0, value());
 
-  const sliderValue =
-    createMemo(() => [
-      value(),
-    ]);
+  const sliderValue = createMemo(() => [value()]);
 
   return (
     <SliderPrimitive.Root
@@ -429,32 +324,21 @@ export const PanControl = (
         props.class,
         props.className
       )}
-      data-centered={
-        value() === 0
-          ? ""
-          : undefined
-      }
+      data-centered={value() === 0 ? "" : undefined}
       data-size={size()}
       data-slot="pan-control"
       disabled={disabled()}
-      getValueLabel={() =>
-        format()(value())
-      }
+      getValueLabel={() => format()(value())}
       maxValue={1}
       minValue={-1}
       onChange={(next) => {
-        const current =
-          next[0];
+        const current = next[0];
 
-        if (
-          current === undefined
-        ) {
+        if (current === undefined) {
           return;
         }
 
-        change(
-          snapDrag(current)
-        );
+        change(snapDrag(current));
       }}
       orientation="horizontal"
       step={step()}
@@ -463,10 +347,7 @@ export const PanControl = (
     >
       <SliderCompat
         changeFromPointer={(next) => {
-          const changed =
-            snapDrag(
-              quantize(next)
-            );
+          const changed = snapDrag(quantize(next));
 
           change(changed);
 
@@ -476,9 +357,7 @@ export const PanControl = (
         currentValue={value}
       />
 
-      <SliderPrimitive.Track
-        class="relative flex h-(--pan-thumb-size) w-full items-center px-[calc(var(--pan-thumb-size)/2)] before:absolute before:inset-x-0 before:-inset-y-1.5 pointer-coarse:before:-inset-y-3"
-      >
+      <SliderPrimitive.Track class="relative flex h-(--pan-thumb-size) w-full items-center px-[calc(var(--pan-thumb-size)/2)] before:absolute before:inset-x-0 before:-inset-y-1.5 pointer-coarse:before:-inset-y-3">
         <div
           class="bg-input/90 relative h-(--pan-track-size) w-full grow rounded-full"
           data-slot="pan-control-track"
@@ -494,41 +373,29 @@ export const PanControl = (
             class="bg-primary absolute inset-y-0 left-(--pan-range-start) w-(--pan-range-size) rounded-full"
             data-slot="pan-control-range"
             style={{
-              "--pan-range-size":
-                `${((end() - start()) / 2) * PERCENT}%`,
-              "--pan-range-start":
-                `${((start() + 1) / 2) * PERCENT}%`,
+              "--pan-range-size": `${((end() - start()) / 2) * PERCENT}%`,
+              "--pan-range-start": `${((start() + 1) / 2) * PERCENT}%`,
             }}
           />
         </div>
 
         <SliderPrimitive.Thumb
           aria-label="Pan"
-          aria-valuetext={
-            describePan(
-              value()
-            )
-          }
+          aria-valuetext={describePan(value())}
           class="bg-background ring-foreground/15 hover:ring-ring/30 focus-visible:ring-ring/40 data-dragging:ring-ring/30 block size-(--pan-thumb-size) shrink-0 rounded-full shadow-sm ring-1 outline-hidden transition-[box-shadow] hover:ring-4 focus-visible:ring-4 data-dragging:ring-4"
           data-slot="pan-control-thumb"
-          onDblClick={(
-            event: MouseEvent
-          ) => {
+          onDblClick={(event: MouseEvent) => {
             event.preventDefault();
             change(0);
             commit(0);
           }}
-          onKeyDown={
-            handleKeyDown
-          }
+          onKeyDown={handleKeyDown}
         >
           <SliderPrimitive.Input />
         </SliderPrimitive.Thumb>
       </SliderPrimitive.Track>
 
-      <span class="sr-only">
-        {format()(value())}
-      </span>
+      <span class="sr-only">{format()(value())}</span>
     </SliderPrimitive.Root>
   );
 };

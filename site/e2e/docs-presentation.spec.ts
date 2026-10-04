@@ -24,7 +24,7 @@ test("docs previews expose source and mixer console controls stay reactive", asy
   await expect(solo).toHaveAttribute("aria-pressed", "false");
 
   await expect(
-    page.getByRole("navigation", { name: "On this page" }).locator("a"),
+    page.getByRole("navigation", { name: "On this page" }).locator("a")
   ).toHaveText([
     "Installation",
     "Usage",
@@ -42,14 +42,14 @@ test("docs previews expose source and mixer console controls stay reactive", asy
   await expect(preview.locator("pre")).toContainText("const MixerConsole");
   await expect(preview.locator("pre .line span").first()).toHaveAttribute(
     "style",
-    /--shiki/,
+    /--shiki/
   );
   await preview.getByRole("button", { name: "Copy Text", exact: true }).click();
   await expect(
-    preview.getByRole("button", { name: "Copied Text", exact: true }),
+    preview.getByRole("button", { name: "Copied Text", exact: true })
   ).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
-    "const MixerConsole",
+    "const MixerConsole"
   );
   await preview.getByRole("tab", { name: "Preview", exact: true }).click();
   await expect(strip).toBeVisible();
@@ -71,17 +71,21 @@ test("docs sidebar, appearance and mobile navigation work without page overflow"
 }) => {
   await page.goto("/docs/components/level-meter");
   await expect(
-    page.getByRole("navigation", { name: "Documentation" }),
+    page.getByRole("navigation", { name: "Documentation" })
   ).toBeVisible();
   const navigation = page.getByRole("navigation", { name: "Documentation" });
-  await expect(navigation.locator('[aria-current="page"]')).toHaveText("Level Meter");
-  expect(await navigation.getByRole("link", { name: "Introduction", exact: true }).evaluate(
-    (link) => getComputedStyle(link).backgroundColor,
-  )).toBe("rgba(0, 0, 0, 0)");
+  await expect(navigation.locator('[aria-current="page"]')).toHaveText(
+    "Level Meter"
+  );
+  expect(
+    await navigation
+      .getByRole("link", { name: "Introduction", exact: true })
+      .evaluate((link) => getComputedStyle(link).backgroundColor)
+  ).toBe("rgba(0, 0, 0, 0)");
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await page.getByRole("button", { name: "Collapse Sidebar" }).click();
   await expect(
-    page.getByRole("navigation", { name: "Documentation" }),
+    page.getByRole("navigation", { name: "Documentation" })
   ).toBeHidden();
   await page.getByRole("button", { name: "Expand Sidebar" }).click();
   await page
@@ -103,7 +107,7 @@ test("docs sidebar, appearance and mobile navigation work without page overflow"
     .click();
   await expect(page.locator("#docs-sidebar-mobile")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
-    390,
+    390
   );
   await page.screenshot({ path: "artifacts/docs-mobile-dark.png" });
 });

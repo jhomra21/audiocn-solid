@@ -161,11 +161,15 @@ await runAcceptance({
       .locator('[data-slot="knob"]')
       .filter({ has: page.getByText("Frequency", { exact: true }) });
 
-    await expect(frequencyRoot.locator('[data-slot="knob-tick"]')).toHaveCount(11);
+    await expect(frequencyRoot.locator('[data-slot="knob-tick"]')).toHaveCount(
+      11
+    );
     await expect(
       frequencyRoot.locator('[data-slot="knob-scale-label"]')
     ).toHaveCount(3);
-    await expect(frequencyRoot.locator('[data-slot="knob-cap"]')).toHaveCount(1);
+    await expect(frequencyRoot.locator('[data-slot="knob-cap"]')).toHaveCount(
+      1
+    );
 
     return {
       committed: await committed.textContent(),

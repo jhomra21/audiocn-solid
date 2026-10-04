@@ -1,7 +1,8 @@
-import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
+import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 interface PageMetrics {
   examples: number;
@@ -66,15 +67,16 @@ const inspectPage = async (page: Page): Promise<PageMetrics> =>
           return [];
         }
 
-      const text = (heading.textContent ?? "")
-        .replace("Copy Anchor Link", "")
-        .trim();
+        const text = (heading.textContent ?? "")
+          .replace("Copy Anchor Link", "")
+          .trim();
 
-      return {
-        level: Number(heading.tagName.slice(1)),
-        text,
-      };
-    });
+        return {
+          level: Number(heading.tagName.slice(1)),
+          text,
+        };
+      }
+    );
 
     const slots = [...main.querySelectorAll("[data-slot]")].reduce<
       Record<string, number>
@@ -114,8 +116,7 @@ test("compare upstream and local page structure", async ({ page }) => {
       await page.setViewportSize({
         height: viewport.height,
         width: viewport.width,
-      }
-    );
+      });
       await page.goto(`https://www.audiocn.dev${route}`, {
         waitUntil: "domcontentloaded",
       });
@@ -136,7 +137,9 @@ test("compare upstream and local page structure", async ({ page }) => {
 
       const differences = [];
 
-      if (JSON.stringify(upstream.headings) !== JSON.stringify(local.headings)) {
+      if (
+        JSON.stringify(upstream.headings) !== JSON.stringify(local.headings)
+      ) {
         differences.push({
           field: "headings",
           local: local.headings,
@@ -179,7 +182,10 @@ test("compare upstream and local page structure", async ({ page }) => {
     );
     summary.push({
       route,
-      unallowed: routeReport.reduce((count, result) => count + result.unallowed, 0),
+      unallowed: routeReport.reduce(
+        (count, result) => count + result.unallowed,
+        0
+      ),
     });
   }
 

@@ -342,10 +342,7 @@ const resolveProps = (props: WebThreadsProps): ResolvedProps => ({
   threadCount: props.threadCount ?? DEFAULTS.threadCount,
 });
 
-const applyUniforms = (
-  uniforms: Uniforms,
-  values: ResolvedProps
-): void => {
+const applyUniforms = (uniforms: Uniforms, values: ResolvedProps): void => {
   uniforms.uSpeed.value = values.speed;
   uniforms.uThreadCount.value = Math.round(values.threadCount);
   uniforms.uFrequency.value = values.frequency;

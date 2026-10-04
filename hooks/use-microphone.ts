@@ -49,10 +49,7 @@ const statusForError = (error: DOMException): MicrophoneStatus => {
     return "denied";
   }
 
-  if (
-    error.name === "NotFoundError" ||
-    error.name === "OverconstrainedError"
-  ) {
+  if (error.name === "NotFoundError" || error.name === "OverconstrainedError") {
     return "unavailable";
   }
 
@@ -96,7 +93,7 @@ export const useMicrophone = (
   const [manual, setManual] = createSignal<boolean | null>(null);
   const [result, setResult] = createSignal<MicrophoneResult | null>(null);
 
-  const wanted = createMemo(() => manual() ?? (options.enabled ?? false));
+  const wanted = createMemo(() => manual() ?? options.enabled ?? false);
 
   const constraints = createMemo(() =>
     buildConstraints({

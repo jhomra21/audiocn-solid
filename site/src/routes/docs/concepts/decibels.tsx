@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import DecibelsDoc, {
   frontmatter,
 } from "@/site/content/docs/concepts/decibels.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function DecibelsPage() {
   return (

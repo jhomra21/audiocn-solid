@@ -126,12 +126,12 @@ await runAcceptance({
     await second.press("Control+ArrowLeft");
     await expect(first).toBeFocused();
 
-    await expect(
-      mixer.locator('[data-slot="mixer-separator"]')
-    ).toHaveClass(/h-full/);
-    await expect(
-      mixer.locator('[data-slot="mixer-master"]')
-    ).toContainText("Master");
+    await expect(mixer.locator('[data-slot="mixer-separator"]')).toHaveClass(
+      /h-full/
+    );
+    await expect(mixer.locator('[data-slot="mixer-master"]')).toContainText(
+      "Master"
+    );
 
     const empty = page.getByRole("group", { name: "Empty mixer" });
 

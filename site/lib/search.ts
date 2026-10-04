@@ -1,14 +1,6 @@
-import {
-  create,
-  load,
-  search,
-  type RawData,
-} from "@orama/orama";
+import { create, load, search, type RawData } from "@orama/orama";
 
-import {
-  searchSchema,
-  type SearchDocument,
-} from "./search-schema";
+import { searchSchema, type SearchDocument } from "./search-schema";
 
 interface SearchIndexPayload {
   version: 1;
@@ -32,9 +24,7 @@ const isRawData = (value: unknown): value is RawData => {
   );
 };
 
-const isSearchIndexPayload = (
-  value: unknown
-): value is SearchIndexPayload => {
+const isSearchIndexPayload = (value: unknown): value is SearchIndexPayload => {
   if (typeof value !== "object" || value === null) {
     return false;
   }

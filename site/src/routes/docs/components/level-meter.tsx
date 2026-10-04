@@ -1,9 +1,9 @@
 import { Meta, Title } from "@solidjs/meta";
 
+import { DocsShell } from "@/site/components/docs/docs-shell";
 import LevelMeterDoc, {
   frontmatter,
 } from "@/site/content/docs/components/level-meter.mdx";
-import { DocsShell } from "@/site/components/docs/docs-shell";
 
 export default function LevelMeterPage() {
   return (

@@ -25,9 +25,7 @@ const artifactPath = join(siteRoot, "artifacts", "spike-5.json");
 
 const indexPath = join(siteRoot, "public", "search-index.json");
 
-const isSearchIndexSummary = (
-  value: unknown
-): value is SearchIndexSummary => {
+const isSearchIndexSummary = (value: unknown): value is SearchIndexSummary => {
   if (typeof value !== "object" || value === null) {
     return false;
   }

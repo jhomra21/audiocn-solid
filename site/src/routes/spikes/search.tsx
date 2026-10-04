@@ -41,7 +41,7 @@ export default function SearchSpikePage() {
 
         <dialog
           aria-labelledby="search-title"
-          class="relative m-0 grid w-full gap-4 rounded-xl border bg-background p-6 text-foreground"
+          class="bg-background text-foreground relative m-0 grid w-full gap-4 rounded-xl border p-6"
           open
         >
           <h2 class="font-heading text-2xl font-semibold" id="search-title">
@@ -53,7 +53,7 @@ export default function SearchSpikePage() {
               Search documentation
             </label>
             <input
-              class="min-w-0 flex-1 rounded-md border bg-background px-3 py-2"
+              class="bg-background min-w-0 flex-1 rounded-md border px-3 py-2"
               data-testid="search-input"
               id="docs-search"
               onInput={(event) => setQuery(event.currentTarget.value)}
@@ -80,10 +80,7 @@ export default function SearchSpikePage() {
 
           <Show when={state() === "done"}>
             <div aria-live="polite" data-testid="search-results">
-              <Show
-                fallback={<p>No results.</p>}
-                when={results().length > 0}
-              >
+              <Show fallback={<p>No results.</p>} when={results().length > 0}>
                 <ul class="grid gap-3">
                   <For each={results()}>
                     {(result) => (

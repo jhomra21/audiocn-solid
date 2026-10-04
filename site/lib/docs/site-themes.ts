@@ -10,5 +10,4 @@ export const THEMES = [
 export type ThemeName = (typeof THEMES)[number]["value"];
 
 export const isTheme = (value: unknown): value is ThemeName =>
-  typeof value === "string" &&
-  THEMES.some((theme) => theme.value === value);
+  typeof value === "string" && THEMES.some((theme) => theme.value === value);

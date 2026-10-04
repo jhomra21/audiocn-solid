@@ -3,18 +3,12 @@
   "compilerOptions": {
     "jsxImportSource": "@solidjs/web",
     "paths": {
-      "@/lib/solid/jsx-types": [
-        "./lib/solid/compat/solid2/jsx-types.ts"
-      ],
-      "@/*": [
-        "./*"
-      ],
+      "@/lib/solid/jsx-types": ["./lib/solid/compat/solid2/jsx-types.ts"],
+      "@/*": ["./*"],
       "@kobalte/core/slider": [
         "./node_modules/@kobalte/core-solid2/dist/slider/index.d.ts"
       ]
     }
   },
-  "exclude": [
-    "lib/solid/jsx-types.ts"
-  ]
+  "exclude": ["lib/solid/jsx-types.ts"]
 }

@@ -47,11 +47,7 @@ export const subscribeFrame = (
 ): (() => void) => {
   listeners[phase].add(listener);
 
-  if (
-    handle === null &&
-    !ticking &&
-    "requestAnimationFrame" in globalThis
-  ) {
+  if (handle === null && !ticking && "requestAnimationFrame" in globalThis) {
     handle = requestAnimationFrame(tick);
   }
 
