@@ -32,14 +32,17 @@ test("MDX pipeline prerenders docs content and custom components", async ({
 
   await page.goto("/spikes/mdx");
 
-  await expect(page.getByRole("heading", { name: "MDX Component Fixture", level: 1 }))
-    .toBeVisible();
-  await expect(page.locator('a[href="#callout"]')).toBeVisible();
-  await expect(page.locator("pre.shiki")).toBeVisible();
+  const mdx = page.locator('[data-spike="mdx"]');
+
+  await expect(
+    mdx.getByRole("heading", { name: "MDX Component Fixture", level: 1 })
+  ).toBeVisible();
+  await expect(mdx.locator('a[href="#callout"]')).toBeVisible();
+  await expect(mdx.locator("pre.shiki")).toBeVisible();
 
   for (const name of docsComponents) {
     await expect(
-      page.locator(`[data-docs-component="${name}"]`).first()
+      mdx.locator(`[data-docs-component="${name}"]`).first()
     ).toBeVisible();
   }
 });
