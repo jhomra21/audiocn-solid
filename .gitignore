@@ -4,3 +4,5 @@ playwright-report
 test-results
 .DS_Store
 site/artifacts
+site/public/r/solid1
+site/public/r/solid2
