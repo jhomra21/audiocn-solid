@@ -1,6 +1,6 @@
 import type { Context } from "solid-js";
 
-import type { JSXElement } from "@compat/jsx-types";
+import type { JSXElement } from "@/lib/solid/jsx-types";
 
 interface ProviderProps<T> {
   value: T;
