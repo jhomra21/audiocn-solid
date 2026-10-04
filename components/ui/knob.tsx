@@ -20,7 +20,6 @@ import { createCompatEffect } from "@/lib/solid/effect";
 import type {
   DivDOMProps,
   GroupDOMProps,
-  InputDOMProps,
   LineDOMProps,
   PathDOMProps,
   SpanDOMProps,
@@ -255,7 +254,7 @@ const roundCoordinate = (value: number): number =>
 const pointAt = (
   angle: number,
   radius: number
-): { x: number; y: number } => {
+) => {
   const radians = angle * DEGREES_TO_RADIANS;
 
   return {
@@ -281,7 +280,9 @@ const arcPath = (
   }
 
   const from = pointAt(start, radius);
+
   const to = pointAt(end, radius);
+
   const largeArc =
     end - start > HALF_TURN ? 1 : 0;
 
@@ -294,18 +295,37 @@ const keyTarget = (
   increment: number,
   dial: KnobDialContextValue
 ): number | null => {
-  const targets: Record<string, number> = {
-    ArrowDown: current - increment,
-    ArrowLeft: current - increment,
-    ArrowRight: current + increment,
-    ArrowUp: current + increment,
-    End: dial.max(),
-    Home: dial.min(),
-    PageDown: current - dial.largeStep(),
-    PageUp: current + dial.largeStep(),
-  };
+  switch (key) {
+    case "ArrowDown":
+    case "ArrowLeft": {
+      return current - increment;
+    }
 
-  return targets[key] ?? null;
+    case "ArrowRight":
+    case "ArrowUp": {
+      return current + increment;
+    }
+
+    case "End": {
+      return dial.max();
+    }
+
+    case "Home": {
+      return dial.min();
+    }
+
+    case "PageDown": {
+      return current - dial.largeStep();
+    }
+
+    case "PageUp": {
+      return current + dial.largeStep();
+    }
+
+    default: {
+      return null;
+    }
+  }
 };
 
 const incrementFor = (
@@ -339,9 +359,11 @@ const pointerAngle = (
   element: HTMLElement
 ): number | null => {
   const rect = element.getBoundingClientRect();
+
   const x =
     event.clientX -
     (rect.left + rect.width / 2);
+
   const y =
     event.clientY -
     (rect.top + rect.height / 2);
@@ -532,6 +554,7 @@ const resumeContext = async (
 
 const playClick = (): void => {
   const now = performance.now();
+
   const context =
     getSharedAudioContext();
 
@@ -690,6 +713,7 @@ export const Knob = (
   );
 
   const config = useAudioConfig();
+
   const labelId =
     `knob-${createUniqueId()}-label`;
 
@@ -1158,8 +1182,9 @@ export const KnobDial = (
   return (
     <div
       aria-disabled={
-        context.disabled() ||
-        undefined
+        context.disabled()
+          ? "true"
+          : undefined
       }
       aria-labelledby={
         context.labelId
@@ -1309,6 +1334,7 @@ export const KnobDial = (
       ) => {
         const target =
           event.currentTarget;
+
         const last = drag;
 
         if (
@@ -1805,9 +1831,9 @@ export const KnobScale = (
             class="fill-muted-foreground"
             data-slot="knob-scale-label"
             dominant-baseline="central"
-            font-size={
+            font-size={String(
               SCALE.labelSize
-            }
+            )}
             text-anchor="middle"
             transform={`rotate(${label.angle} ${label.point.x} ${label.point.y})`}
             x={label.point.x}
