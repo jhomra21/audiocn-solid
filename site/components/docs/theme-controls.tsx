@@ -8,13 +8,17 @@ import {
 type Appearance = "dark" | "light";
 
 const COLOR_STORAGE_KEY = "audiocn-theme";
+
 const COLOR_CHANGE_EVENT = "audiocn-theme-change";
+
 const APPEARANCE_STORAGE_KEY = "audiocn-appearance";
+
 const APPEARANCE_CHANGE_EVENT = "audiocn-appearance-change";
 
 const applyColorTheme = (theme: ThemeName) => {
   if (theme === "stone") {
     delete document.documentElement.dataset.theme;
+
     return;
   }
 
