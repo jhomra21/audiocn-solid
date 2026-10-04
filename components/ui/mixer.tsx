@@ -16,7 +16,7 @@ import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
 import type {
   DivDOMProps,
-  SpanDOMProps,
+  HeadingDOMProps,
 } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { cn } from "@/lib/utils";
@@ -208,7 +208,7 @@ export const MixerHeader = (
 
 export interface MixerTitleProps
   extends Omit<
-    SpanDOMProps,
+    HeadingDOMProps,
     "class" | "className"
   > {
   class?: string;

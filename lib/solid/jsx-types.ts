@@ -6,6 +6,8 @@ export type DivDOMProps = JSX.HTMLAttributes<HTMLDivElement>;
 
 export type GroupDOMProps = JSX.IntrinsicElements["g"];
 
+export type HeadingDOMProps = JSX.HTMLAttributes<HTMLHeadingElement>;
+
 export type InputDOMProps = JSX.InputHTMLAttributes<HTMLInputElement>;
 
 export type LineDOMProps = JSX.IntrinsicElements["line"];
