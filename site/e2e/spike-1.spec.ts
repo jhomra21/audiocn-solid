@@ -62,6 +62,18 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       await expect(page.locator('[data-slot="showcase-card"]')).toHaveCount(14);
       await expect(page.locator("[data-not-yet-ported]")).toHaveCount(13);
 
+      const heroCanvas = page.locator("[data-home-threads] canvas");
+
+      await expect(heroCanvas).toBeVisible();
+      await expect
+        .poll(async () =>
+          heroCanvas.evaluate((canvas) => ({
+            height: (canvas as HTMLCanvasElement).height,
+            width: (canvas as HTMLCanvasElement).width,
+          }))
+        )
+        .toEqual(expect.objectContaining({ height: expect.any(Number), width: expect.any(Number) }));
+
       await page.getByRole("button", { name: "Ocean" }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
 
