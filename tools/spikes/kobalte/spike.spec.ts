@@ -21,6 +21,13 @@ test("shared Kobalte source supports pointer and keyboard behavior", async ({ pa
   await expect(slider).toHaveAttribute("aria-valuenow", "25");
   await slider.focus();
   await slider.press("ArrowRight");
+  const telemetry = page.getByTestId("slider-telemetry");
+  console.log("slider telemetry", {
+    ariaValue: await slider.getAttribute("aria-valuenow"),
+    key: await telemetry.getAttribute("data-key"),
+    changeValue: await telemetry.getAttribute("data-value"),
+    refReady: await telemetry.getAttribute("data-ref-ready"),
+  });
   await expect(slider).toHaveAttribute("aria-valuenow", "30");
 
   const track = page.getByTestId("slider-track");
