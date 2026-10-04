@@ -408,6 +408,7 @@ export const WebThreads = (props: WebThreadsProps) => {
     container.append(canvas);
 
     const nextUniforms = createUniforms();
+
     uniforms = nextUniforms;
     applyUniforms(nextUniforms, resolveProps(props));
 
