@@ -61,6 +61,7 @@ jobs:
       - run: cd site && bunx playwright install --with-deps chromium
       - run: bun run site:spike:1
       - run: cd site && bun run spike:2
+      - run: bun run registry:spike:3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -68,6 +69,7 @@ jobs:
           path: |
             site/artifacts/spike-1.json
             site/artifacts/spike-2.json
+            artifacts/registry-install.json
             site/dist/client
             site/dist/server
             site/test-results
