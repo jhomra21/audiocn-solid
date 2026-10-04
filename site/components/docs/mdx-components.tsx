@@ -23,11 +23,15 @@ import KnobMetal from "@/components/examples/knob-metal";
 import KnobSizes from "@/components/examples/knob-sizes";
 import KnobVolume from "@/components/examples/knob-volume";
 import MixerConsole from "@/components/examples/mixer-console";
+import MixerDemo from "@/components/examples/mixer-demo";
 import MixerEmptyDemo from "@/components/examples/mixer-empty";
 import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
 import PanControlDemo from "@/components/examples/pan-control-demo";
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import ParameterSliderDemo from "@/components/examples/parameter-slider-demo";
+import ChannelStripConsole from "@/components/examples/channel-strip-console";
+import ChannelStripDemo from "@/components/examples/channel-strip-demo";
+import ChannelStripNotices from "@/components/examples/channel-strip-notices";
 import ChannelToggleDemo from "@/components/examples/channel-toggle-demo";
 import ChannelToggleVariants from "@/components/examples/channel-toggle-variants";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
@@ -146,11 +150,15 @@ const examples = {
   "knob-sizes": KnobSizes,
   "knob-volume": KnobVolume,
   "mixer-console": MixerConsole,
+  "mixer-demo": MixerDemo,
   "mixer-empty": MixerEmptyDemo,
   "parameter-slider-frequency": ParameterSliderFrequency,
   "pan-control-demo": PanControlDemo,
   "pan-control-knob": PanControlKnob,
   "parameter-slider-demo": ParameterSliderDemo,
+  "channel-strip-console": ChannelStripConsole,
+  "channel-strip-demo": ChannelStripDemo,
+  "channel-strip-notices": ChannelStripNotices,
   "channel-toggle-demo": ChannelToggleDemo,
   "channel-toggle-variants": ChannelToggleVariants,
   "volume-control-demo": VolumeControlDemo,

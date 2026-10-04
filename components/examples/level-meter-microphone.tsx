@@ -1,4 +1,4 @@
-import { MicrophoneIcon, MicrophoneSlashIcon } from "@/components/icons/microphone";
+import { MicrophoneIcon, MicrophoneSlashIcon } from "@/components/icons/phosphor";
 import { Button } from "@/components/ui/button";
 import {
   LevelMeter,
