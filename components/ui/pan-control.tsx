@@ -101,14 +101,113 @@ const panControlVariants = cva(
   }
 );
 
-const SliderCompat = () => {
-  const context = SliderPrimitive.useSliderContext();
-  const originalStepHandler = context.onStepKeyDown;
+interface SliderCompatProps {
+  changeFromPointer: (value: number) => void;
+  currentValue: () => number;
+}
 
-  context.onStepKeyDown = () => undefined;
+const SliderCompat = (
+  props: SliderCompatProps
+) => {
+  const context = SliderPrimitive.useSliderContext();
+
+  const originalSlideStart =
+    context.onSlideStart;
+
+  const originalSlideMove =
+    context.onSlideMove;
+
+  const originalStepHandler =
+    context.onStepKeyDown;
+
+  let dragPosition =
+    props.currentValue();
+
+  context.onStepKeyDown =
+    () => undefined;
+
+  context.onSlideStart = (
+    index,
+    value
+  ) => {
+    originalSlideStart?.(
+      index,
+      value
+    );
+
+    if (
+      context.state.isDisabled()
+    ) {
+      return;
+    }
+
+    dragPosition = clamp(
+      value,
+      -1,
+      1
+    );
+
+    props.changeFromPointer(
+      dragPosition
+    );
+  };
+
+  context.onSlideMove = ({
+    deltaX,
+  }) => {
+    if (
+      context.state.isDisabled()
+    ) {
+      return;
+    }
+
+    const track =
+      context.trackRef();
+
+    if (!track) {
+      originalSlideMove?.({
+        deltaX,
+        deltaY: 0,
+      });
+
+      return;
+    }
+
+    const { width } =
+      track.getBoundingClientRect();
+
+    if (width <= 0) {
+      return;
+    }
+
+    const direction =
+      context.isSlidingFromLeft()
+        ? 1
+        : -1;
+
+    dragPosition = clamp(
+      dragPosition +
+        direction *
+          (deltaX / width) *
+          2,
+      -1,
+      1
+    );
+
+    props.changeFromPointer(
+      dragPosition
+    );
+  };
 
   onCleanup(() => {
-    context.onStepKeyDown = originalStepHandler;
+    context.onSlideStart =
+      originalSlideStart;
+
+    context.onSlideMove =
+      originalSlideMove;
+
+    context.onStepKeyDown =
+      originalStepHandler;
   });
 
   createCompatEffect(
@@ -433,7 +532,16 @@ export const PanControl = (
       value={sliderValue()}
       {...rest}
     >
-      <SliderCompat />
+      <SliderCompat
+        changeFromPointer={(next) => {
+          change(
+            snapDrag(
+              quantize(next)
+            )
+          );
+        }}
+        currentValue={value}
+      />
 
       <SliderPrimitive.Track
         class="relative flex h-(--pan-thumb-size) w-full items-center px-[calc(var(--pan-thumb-size)/2)] before:absolute before:inset-x-0 before:-inset-y-1.5 pointer-coarse:before:-inset-y-3"
