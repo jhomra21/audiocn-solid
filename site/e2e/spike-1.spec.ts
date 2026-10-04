@@ -5,8 +5,15 @@ const captureConsoleFailures = (page: Page) => {
   const failures: string[] = [];
 
   page.on("console", (message) => {
-    if (message.type() === "warning" || message.type() === "error") {
-      failures.push(`${message.type()}: ${message.text()}`);
+    const type = message.type();
+    const text = message.text();
+    const isWebGlDriverNoise =
+      type === "warning" &&
+      text.includes("GL Driver Message") &&
+      text.includes("GPU stall due to ReadPixels");
+
+    if ((type === "warning" || type === "error") && !isWebGlDriverNoise) {
+      failures.push(`${type}: ${text}`);
     }
   });
 
