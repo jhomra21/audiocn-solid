@@ -551,15 +551,18 @@ export const ParameterSliderInput = (
         }
 
         event.preventDefault();
-        event.currentTarget.setPointerCapture(event.pointerId);
+
+        const target = event.currentTarget as HTMLSpanElement;
+
+        target.setPointerCapture(event.pointerId);
         scrubStartX = event.clientX;
         scrubStartValue = context.value();
         setDraft(null);
       }}
       onPointerMove={(event: PointerEvent) => {
-        if (
-          !event.currentTarget.hasPointerCapture(event.pointerId)
-        ) {
+        const target = event.currentTarget as HTMLSpanElement;
+
+        if (!target.hasPointerCapture(event.pointerId)) {
           return;
         }
 
@@ -578,13 +581,13 @@ export const ParameterSliderInput = (
         });
       }}
       onPointerUp={(event: PointerEvent) => {
-        if (
-          !event.currentTarget.hasPointerCapture(event.pointerId)
-        ) {
+        const target = event.currentTarget as HTMLSpanElement;
+
+        if (!target.hasPointerCapture(event.pointerId)) {
           return;
         }
 
-        event.currentTarget.releasePointerCapture(event.pointerId);
+        target.releasePointerCapture(event.pointerId);
         context.commitLatest();
       }}
     >
@@ -610,7 +613,7 @@ export const ParameterSliderInput = (
         )}
         data-slot="parameter-slider-input"
         disabled={context.disabled()}
-        inputMode="decimal"
+        inputmode="decimal"
         max={context.max()}
         min={context.min()}
         onBlur={(event) => finish(event)}
