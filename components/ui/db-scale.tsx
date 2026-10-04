@@ -1,7 +1,7 @@
 import { For, createContext, createMemo, createSignal, useContext } from "solid-js";
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
-import type { DivDOMProps } from "@compat/jsx-types";
+import type { DivDOMProps } from "@/lib/solid/jsx-types";
 import { DEFAULT_MAX_DB, DEFAULT_MIN_DB, formatDb } from "@/lib/audio/decibels";
 import { omitProps } from "@/lib/solid/props";
 import { setRefValue } from "@/lib/solid/ref";
