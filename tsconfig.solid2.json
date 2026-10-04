@@ -8,6 +8,9 @@
       ],
       "@/*": [
         "./*"
+      ],
+      "@kobalte/core/slider": [
+        "./node_modules/@kobalte/core-solid2/dist/slider/index.d.ts"
       ]
     }
   },

@@ -27,7 +27,8 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "solid-js": "^1.9.15",
-    "@kobalte/core": "0.13.14"
+    "@kobalte/core-solid1": "npm:@kobalte/core@0.13.14",
+    "@kobalte/core-solid2": "npm:@kobalte/core@2.0.0-alpha.2"
   },
   "devDependencies": {
     "@oxlint/plugins": "1.86.0",

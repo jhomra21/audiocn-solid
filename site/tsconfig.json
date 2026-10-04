@@ -32,6 +32,9 @@
       ],
       "@/lib/solid/jsx-types": [
         "../lib/solid/compat/solid2/jsx-types.ts"
+      ],
+      "@kobalte/core/slider": [
+        "../node_modules/@kobalte/core-solid2/dist/slider/index.d.ts"
       ]
     },
     "types": [

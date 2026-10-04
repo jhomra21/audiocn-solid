@@ -150,9 +150,11 @@ const SliderCompat = () => {
   return null;
 };
 
+type SliderLabelProps = Parameters<typeof SliderPrimitive.Label>[0];
+
 type FaderLabelProps = Omit<
-  SpanDOMProps,
-  "children" | "class" | "className" | "ref"
+  SliderLabelProps,
+  "children" | "class" | "className"
 > & {
   class?: string;
   className?: string;
@@ -175,15 +177,16 @@ export const FaderLabel = (props: FaderLabelProps) => {
   );
 };
 
+type SliderTrackProps = Parameters<typeof SliderPrimitive.Track>[0];
+
 type FaderTrackProps = Omit<
-  DivDOMProps,
+  SliderTrackProps,
   | "children"
   | "class"
   | "className"
   | "onPointerDown"
   | "onPointerMove"
   | "onPointerUp"
-  | "ref"
 > & {
   class?: string;
   className?: string;
@@ -217,10 +220,10 @@ export const FaderTrack = (props: FaderTrackProps) => {
           props.className
         )}
         data-slot="fader-track"
-        onPointerDown={(event) => {
+        onPointerDown={(event: PointerEvent) => {
           context.pointer("track-press", event);
         }}
-        onPointerMove={(event) => {
+        onPointerMove={(event: PointerEvent) => {
           context.pointer("track-press", event);
         }}
         {...rest}
@@ -245,8 +248,10 @@ const RANGE_OWN = ["class", "className", "style"] as const;
 export const FaderRange = (props: FaderRangeProps) => {
   const context = useFader("FaderRange");
   const rest = omitProps(props, RANGE_OWN);
+
   const start = () =>
     Math.min(context.originPosition(), context.position()) * 100;
+
   const end = () =>
     Math.max(context.originPosition(), context.position()) * 100;
 
@@ -305,16 +310,16 @@ const thumbVariants = cva(
   }
 );
 
-type FaderThumbProps = Omit<
-  SpanDOMProps,
-  | "children"
+type SliderThumbProps = Parameters<typeof SliderPrimitive.Thumb>[0];
+
+export type FaderThumbProps = Omit<
+  SliderThumbProps,
   | "class"
   | "className"
   | "onDoubleClick"
   | "onKeyDown"
   | "onPointerDown"
   | "onPointerMove"
-  | "ref"
 > & {
   class?: string;
   className?: string;
@@ -325,7 +330,6 @@ type FaderThumbProps = Omit<
 };
 
 const THUMB_OWN = [
-  "children",
   "class",
   "className",
   "onDoubleClick",
@@ -351,7 +355,7 @@ export const FaderThumb = (props: FaderThumbProps) => {
         props.className
       )}
       data-slot="fader-thumb"
-      onDoubleClick={(event) => {
+      onDoubleClick={(event: MouseEvent) => {
         props.onDoubleClick?.(event);
         context.change(context.resetValue(), {
           event,
@@ -359,18 +363,18 @@ export const FaderThumb = (props: FaderThumbProps) => {
         });
         context.commit(context.resetValue());
       }}
-      onKeyDown={(event) => {
+      onKeyDown={(event: KeyboardEvent) => {
         props.onKeyDown?.(event);
 
         if (!event.defaultPrevented) {
           context.handleKeyDown(event);
         }
       }}
-      onPointerDown={(event) => {
+      onPointerDown={(event: PointerEvent) => {
         props.onPointerDown?.(event);
         context.pointer("drag", event);
       }}
-      onPointerMove={(event) => {
+      onPointerMove={(event: PointerEvent) => {
         props.onPointerMove?.(event);
         context.pointer("drag", event);
       }}
@@ -571,7 +575,6 @@ const RESET_OWN = [
   "class",
   "className",
   "onClick",
-  "type",
 ] as const;
 
 export const FaderReset = (props: FaderResetProps) => {
@@ -625,13 +628,23 @@ export const faderVariants = cva(
   }
 );
 
+type SliderRootProps = Parameters<typeof SliderPrimitive.Root>[0];
+
 type FaderDOMProps = Omit<
-  DivDOMProps,
+  SliderRootProps,
   | "children"
   | "class"
   | "className"
+  | "defaultValue"
+  | "getValueLabel"
+  | "maxValue"
+  | "minValue"
   | "onChange"
+  | "onChangeEnd"
+  | "orientation"
   | "ref"
+  | "step"
+  | "value"
 >;
 
 export interface FaderProps
@@ -706,11 +719,15 @@ export const Fader = (props: FaderProps) => {
   const step = () => props.step ?? 0.5;
   const largeStep = () => props.largeStep ?? 6;
   const fineStep = () => props.fineStep ?? 0.1;
-  const detents = () => props.detents ?? DEFAULT_DETENTS;
+  const detents = (): readonly number[] =>
+    props.detents ?? DEFAULT_DETENTS;
+
   const silenceAtMin = () => props.silenceAtMin ?? false;
   const disabled = () => props.disabled ?? config.disabled ?? false;
+
   const orientation = () =>
     props.orientation ?? config.orientation ?? "horizontal";
+
   const size = () => props.size ?? config.size ?? "default";
   const variant = () => props.variant ?? "default";
   const format = () => props.format ?? defaultFormat;
@@ -811,32 +828,48 @@ export const Fader = (props: FaderProps) => {
       largeStep()
     );
 
-    const targets: Record<string, () => number> = {
-      ArrowDown: () => nudge(-1, increment),
-      ArrowLeft: () => nudge(-1, increment),
-      ArrowRight: () => nudge(1, increment),
-      ArrowUp: () => nudge(1, increment),
-      End: () => max(),
-      Home: () => (silenceAtMin() ? SILENCE_DB : min()),
-      PageDown: () => nudge(-1, largeStep()),
-      PageUp: () => nudge(1, largeStep()),
-    };
+    let next: number | undefined;
 
-    const target = targets[event.key];
-
-    if (!target) {
-      return;
+    switch (event.key) {
+      case "ArrowDown":
+      case "ArrowLeft": {
+        next = nudge(-1, increment);
+        break;
+      }
+      case "ArrowRight":
+      case "ArrowUp": {
+        next = nudge(1, increment);
+        break;
+      }
+      case "End": {
+        next = max();
+        break;
+      }
+      case "Home": {
+        next = silenceAtMin() ? SILENCE_DB : min();
+        break;
+      }
+      case "PageDown": {
+        next = nudge(-1, largeStep());
+        break;
+      }
+      case "PageUp": {
+        next = nudge(1, largeStep());
+        break;
+      }
+      default: {
+        return;
+      }
     }
 
     event.preventDefault();
-
-    const next = target();
 
     change(next, { event, reason: "keyboard" });
     commit(next);
   };
 
   const position = () => toPosition(value());
+
   const originPosition = () =>
     toPosition(clamp(props.origin ?? min(), min(), max()));
 
@@ -877,8 +910,14 @@ export const Fader = (props: FaderProps) => {
   );
 
   const context: FaderContextValue = {
-    ariaLabel: () => props["aria-label"],
-    ariaLabelledBy: () => props["aria-labelledby"],
+    ariaLabel: () =>
+      typeof props["aria-label"] === "string"
+        ? props["aria-label"]
+        : undefined,
+    ariaLabelledBy: () =>
+      typeof props["aria-labelledby"] === "string"
+        ? props["aria-labelledby"]
+        : undefined,
     change,
     commit,
     disabled,
