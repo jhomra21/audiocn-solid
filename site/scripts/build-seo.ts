@@ -51,8 +51,12 @@ const pages = await Promise.all(
       html.match(/<title[^>]*>([\s\S]*?)<\/title>/iu)?.[1] ??
       siteConfig.name;
 
+    const metaDescription = html.match(
+      /<meta\b[^>]*\bname="description"[^>]*>/iu
+    )?.[0];
+
     const description =
-      html.match(/<meta name="description" content="([^"]*)"/iu)?.[1] ?? "";
+      metaDescription?.match(/\bcontent="([^"]*)"/iu)?.[1] ?? "";
 
     return {
       description,

@@ -34,7 +34,10 @@ export default function UnportedDocsPage() {
             description={page().description}
             title={page().title}
           >
-            <div class="grid gap-4">
+            <div
+              class="grid gap-4"
+              data-docs-route-not-yet-ported={currentPath()}
+            >
               <p>
                 This page has not yet been ported to the Solid documentation.
               </p>

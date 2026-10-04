@@ -1,4 +1,4 @@
-import { For, createSignal, onSettled } from "solid-js";
+import { For } from "solid-js";
 
 import { isTheme, THEMES } from "@/site/lib/docs/site-themes";
 import { siteConfig } from "@/site/lib/site";
@@ -10,28 +10,6 @@ import {
 export const SidebarControls = () => {
   const [appearance, setAppearance] = useAppearance();
   const [theme, setTheme] = useColorTheme();
-  const [stars, setStars] = createSignal<number | undefined>();
-
-  onSettled(() => {
-    let active = true;
-
-    void fetch(`https://api.github.com/repos/${siteConfig.githubRepo}`, {
-      headers: { Accept: "application/vnd.github+json" },
-    })
-      .then((response) => (response.ok ? response.json() : undefined))
-      .then((data: { stargazers_count?: unknown } | undefined) => {
-        const count = Number(String(data?.stargazers_count));
-
-        if (active && Number.isFinite(count)) {
-          setStars(count);
-        }
-      })
-      .catch(() => undefined);
-
-    return () => {
-      active = false;
-    };
-  });
 
   return (
     <div class="grid gap-3 border-t pt-4">
@@ -42,7 +20,7 @@ export const SidebarControls = () => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          GitHub ★ {stars() ?? ""}
+          GitHub ★
         </a>
         <select
           aria-label="Color theme"

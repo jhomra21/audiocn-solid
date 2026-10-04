@@ -39,12 +39,10 @@ test("prerendered routes have content and a recorded status", async ({
     const body = html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? "";
     const routeMarker = html.includes("data-docs-route-not-yet-ported");
     const exampleMarker = html.includes("data-not-yet-ported");
-    const marked = routeMarker || exampleMarker;
-
     expect(body.trim(), `${route} has an empty prerendered body`).not.toBe("");
     routes.push({
       route,
-      status: marked ? "not-yet-ported" : "ported",
+      status: routeMarker ? "not-yet-ported" : "ported",
     });
 
     if (route.startsWith("/docs/")) {
