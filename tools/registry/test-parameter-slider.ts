@@ -71,8 +71,8 @@ const frequencyMarks = [
 
 const formatHz = (hz: number) =>
   hz >= 1000
-    ? \`${(hz / 1000).toFixed(hz >= 10_000 ? 0 : 1)} kHz\`
-    : \`${Math.round(hz)} Hz\`;
+    ? \`\${(hz / 1000).toFixed(hz >= 10_000 ? 0 : 1)} kHz\`
+    : \`\${Math.round(hz)} Hz\`;
 
 export default function App() {
   const [value, setValue] = createSignal(0);
