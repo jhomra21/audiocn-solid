@@ -519,6 +519,26 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "channel-toggle",
+      "type": "registry:ui",
+      "title": "Channel Toggle",
+      "description": "Audio channel toggle buttons with neutral, mute, solo, and monitor tones plus inherited disabled state.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/channel-toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
