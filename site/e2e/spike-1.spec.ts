@@ -7,6 +7,7 @@ const captureConsoleFailures = (page: Page) => {
   page.on("console", (message) => {
     const type = message.type();
     const text = message.text();
+
     const isWebGlDriverNoise =
       type === "warning" &&
       text.includes("GL Driver Message") &&
