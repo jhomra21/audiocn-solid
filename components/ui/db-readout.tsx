@@ -1,7 +1,7 @@
 import { For, createMemo } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
-import type { SpanDOMProps } from "@compat/jsx-types";
+import type { SpanDOMProps } from "@/lib/solid/jsx-types";
 import { formatDb, SILENCE_DB } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame, MeterZone } from "@/lib/audio/types";
 import { omitProps } from "@/lib/solid/props";
