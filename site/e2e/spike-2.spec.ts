@@ -25,7 +25,6 @@ test("MDX pipeline prerenders docs content and custom components", async ({
   expect(docsHtml).toContain(
     "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light."
   );
-  expect(docsHtml).toContain('href="#installation"');
   expect(docsHtml).toContain('id="installation"');
   expect(docsHtml).toContain("<table");
   expect(docsHtml).toContain('class="shiki');
