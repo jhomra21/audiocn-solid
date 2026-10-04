@@ -72,6 +72,9 @@ jobs:
             site/artifacts/spike-1.json
             site/artifacts/spike-2.json
             artifacts/registry-install.json
+            artifacts/fader-e2e.json
+            artifacts/fader-solid1.png
+            artifacts/fader-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
             site/dist/client
