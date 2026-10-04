@@ -12,6 +12,7 @@ import { LevelMeterValues } from "@/components/examples/level-meter-values";
 import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
 import levelMeterSource from "@/components/ui/level-meter.tsx?raw";
+import { NotYetPorted } from "@/site/components/home/not-yet-ported";
 
 
 export const MdxA = (props: ComponentProps<"a">) => <a {...props} />;
@@ -134,9 +135,9 @@ interface ComponentPreviewProps {
 export const ComponentPreview = (props: ComponentPreviewProps) => {
   if (!isExampleName(props.name)) {
     return (
-      <div data-docs-component="component-preview" data-missing={props.name}>
-        Missing example: {props.name}
-      </div>
+      <section data-docs-component="component-preview" data-missing={props.name}>
+        <NotYetPorted item={`Example ${props.name}`} />
+      </section>
     );
   }
 

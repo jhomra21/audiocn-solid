@@ -1,0 +1,20 @@
+import { Meta, Title } from "@solidjs/meta";
+
+import DbScaleDoc, { frontmatter } from "@/site/content/docs/components/db-scale.mdx";
+import { DocsShell } from "@/site/components/docs/docs-shell";
+
+export default function DbScalePage() {
+  return (
+    <>
+      <Title>`${frontmatter.title} for Solid - audiocn Solid`</Title>
+      <Meta content={frontmatter.description} name="description" />
+      <DocsShell
+        currentPath="/docs/components/db-scale"
+        description={frontmatter.description}
+        title={frontmatter.title}
+      >
+        <DbScaleDoc />
+      </DocsShell>
+    </>
+  );
+}
