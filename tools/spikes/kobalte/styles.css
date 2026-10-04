@@ -59,3 +59,20 @@ button,
   border: 1px dashed #777;
   padding: 20px;
 }
+
+[data-testid="switch-control"] {
+  align-items: center;
+  border: 1px solid #777;
+  border-radius: 999px;
+  display: inline-flex;
+  height: 24px;
+  padding: 2px;
+  width: 44px;
+}
+
+[data-testid="switch-control"] > * {
+  background: #555;
+  border-radius: 50%;
+  height: 18px;
+  width: 18px;
+}
