@@ -16,7 +16,7 @@
     "site:spike:1": "cd site && bun run spike:1",
     "registry:build": "bun run tools/registry/build.ts",
     "registry:test-install": "bun run tools/registry/test-install.ts",
-    "registry:spike:3": "bun run registry:build && bun run registry:test-install && bun run registry:test-fader && bun run registry:test-parameter-slider && bun run registry:test-knob && bun run registry:test-pan-control && bun run registry:test-channel-toggle && bun run registry:test-volume-control",
+    "registry:spike:3": "bun run registry:build && bun run registry:test-install && bun run registry:test-fader && bun run registry:test-parameter-slider && bun run registry:test-knob && bun run registry:test-pan-control && bun run registry:test-channel-toggle && bun run registry:test-volume-control && bun run registry:test-channel-strip",
     "kobalte:spike:4": "bun run tools/spikes/kobalte/run.ts",
     "site:spike:5": "cd site && bun run spike:5",
     "registry:test-fader": "bun run tools/registry/test-fader.ts",
@@ -24,7 +24,8 @@
     "registry:test-knob": "bun run tools/registry/test-knob.ts",
     "registry:test-pan-control": "bun run tools/registry/test-pan-control.ts",
     "registry:test-channel-toggle": "bun run tools/registry/test-channel-toggle.ts",
-    "registry:test-volume-control": "bun run tools/registry/test-volume-control.ts"
+    "registry:test-volume-control": "bun run tools/registry/test-volume-control.ts",
+    "registry:test-channel-strip": "bun run tools/registry/test-channel-strip.ts"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",

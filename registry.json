@@ -559,6 +559,46 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A compact status badge with default, secondary, destructive, outline, ghost, and link variants.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core"
+      ],
+      "files": [
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "channel-strip",
+      "type": "registry:ui",
+      "title": "Channel Strip",
+      "description": "A composable horizontal or console-style channel strip with shared audio config, status parts, responsive layout, and clipping reflection.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/badge"
+      ],
+      "files": [
+        {
+          "path": "components/ui/channel-strip.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
