@@ -14,7 +14,7 @@ export default function LevelMeterPage() {
       <DocsShell
         currentPath="/docs/components/level-meter"
         description={frontmatter.description}
-        title={`${frontmatter.title} for Solid`}
+        title={frontmatter.title}
       >
         <LevelMeterDoc />
       </DocsShell>

@@ -1,4 +1,4 @@
-import { Errored, For } from "solid-js";
+import { Errored, For, createSignal } from "solid-js";
 import type { ComponentProps, JSX } from "@solidjs/web";
 
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
@@ -184,24 +184,54 @@ interface InstallCommandProps {
 }
 
 const packageCommands = (command: string) => [
-  ["npm", command],
   ["pnpm", command.replace(/^npx /, "pnpm dlx ")],
   ["yarn", command.replace(/^npx /, "yarn dlx ")],
+  ["npm", command],
   ["bun", command.replace(/^npx /, "bunx ")],
 ] as const;
 
 export const InstallCommand = (props: InstallCommandProps) => (
-  <div class="my-4 grid gap-2" data-docs-component="install-command">
-    <For each={packageCommands(props.command)}>
-      {([manager, command]) => (
-        <div class="grid grid-cols-[4rem_1fr] gap-2 rounded-lg border p-2">
-          <span class="text-muted-foreground font-mono text-xs">{manager}</span>
-          <code>{command}</code>
-        </div>
-      )}
-    </For>
-  </div>
+  <InstallTabs command={props.command} />
 );
+
+const InstallTabs = (props: InstallCommandProps) => {
+  const commands = packageCommands(props.command);
+  const [selected, setSelected] = createSignal("pnpm");
+  const current = () => commands.find(([manager]) => manager === selected())!;
+
+  return (
+    <section
+      class="my-4 overflow-hidden rounded-lg border"
+      data-docs-component="install-command"
+    >
+      <div class="flex items-center gap-1 border-b px-2 py-2">
+        <For each={commands}>
+          {([manager]) => (
+            <button
+              aria-pressed={selected() === manager ? "true" : "false"}
+              class="aria-[pressed=true]:bg-muted rounded-md px-3 py-1.5 text-xs"
+              onClick={() => setSelected(manager)}
+              type="button"
+            >
+              {manager}
+            </button>
+          )}
+        </For>
+        <button
+          aria-label="Copy install command"
+          class="text-muted-foreground ml-auto rounded-md px-2 py-1 text-xs"
+          onClick={() => void navigator.clipboard.writeText(current()[1])}
+          type="button"
+        >
+          Copy
+        </button>
+      </div>
+      <pre class="overflow-x-auto p-4">
+        <code>$ {current()[1]}</code>
+      </pre>
+    </section>
+  );
+};
 
 type PropRow = [
   name: string,
