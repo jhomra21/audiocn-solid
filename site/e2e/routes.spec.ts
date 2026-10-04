@@ -1,80 +1,56 @@
 import { expect, test } from "@playwright/test";
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 
-const clientDirectory = join(import.meta.dirname, "../dist/client");
+import { readPrerenderedRoutes } from "../scripts/prerendered-routes";
 
 const artifactPath = join(import.meta.dirname, "../artifacts/routes.json");
-
-const htmlFiles = async (directory: string): Promise<string[]> => {
-  const files: string[] = [];
-
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-
-    if (entry.isDirectory()) {
-      files.push(...(await htmlFiles(path)));
-    } else if (entry.name.endsWith(".html")) {
-      files.push(path);
-    }
-  }
-
-  return files;
-};
 
 test("prerendered routes have content and a recorded status", async ({
   page,
 }) => {
-  const files = await htmlFiles(clientDirectory);
-  const routes = [];
+  const routes = await readPrerenderedRoutes();
 
-  for (const file of files) {
-    const html = await readFile(file, "utf8");
-
-    const routePath = relative(clientDirectory, file)
-      .replace(/\/index\.html$/, "")
-      .replace(/\.html$/, "");
-
-    const route = routePath === "index" ? "/" : `/${routePath}`;
+  for (const { html, items, page: pageMarker, route } of routes) {
     const body = html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? "";
-
-    const routeMarker =
-      html.includes("data-docs-route-not-yet-ported") ||
-      html.includes("data-route-not-yet-ported");
-
-    const exampleMarker = html.includes("data-not-yet-ported");
     expect(body.trim(), `${route} has an empty prerendered body`).not.toBe("");
-    routes.push({
-      route,
-      status: routeMarker ? "not-yet-ported" : "ported",
-    });
 
     if (route.startsWith("/docs/")) {
       await page.goto(route);
       await expect(page.locator("body")).not.toBeEmpty();
 
-      if (routeMarker) {
-        const marker = page.locator(
-          "[data-docs-route-not-yet-ported], [data-route-not-yet-ported]"
+      if (pageMarker) {
+        await expect(
+          page.locator(
+            "[data-docs-route-not-yet-ported], [data-route-not-yet-ported]"
+          )
+        ).toBeVisible();
+        await expect(
+          page.getByRole("link", { name: "Read the upstream documentation" })
+        ).toBeVisible();
+      } else {
+        await expect(page.locator("[data-not-yet-ported]")).toHaveCount(
+          items.length
         );
-
-        await expect(marker).toBeVisible();
-
-        if (route.startsWith("/docs/")) {
-          await expect(
-            page.getByRole("link", {
-              name: "Read the upstream documentation",
-            })
-          ).toBeVisible();
-        }
-      }
-
-      if (exampleMarker) {
-        await expect(page.locator("[data-not-yet-ported]").first()).toBeVisible();
       }
     }
   }
 
   await mkdir(join(import.meta.dirname, "../artifacts"), { recursive: true });
-  await writeFile(artifactPath, `${JSON.stringify(routes, null, 2)}\n`);
+  await writeFile(
+    artifactPath,
+    `${JSON.stringify(
+      routes.map(({ items, page: pageMarker, route }) => ({
+        notPorted: items,
+        route,
+        status: pageMarker
+          ? "not-yet-ported"
+          : items.length > 0
+            ? "partially-ported"
+            : "ported",
+      })),
+      null,
+      2
+    )}\n`
+  );
 });
