@@ -10,14 +10,17 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "spike:1": "bun run scripts/spike-1.ts",
-    "spike:2": "bun run scripts/spike-2.ts"
+    "spike:2": "bun run scripts/spike-2.ts",
+    "search:index": "bun run scripts/build-search-index.ts",
+    "spike:5": "bun run scripts/spike-5.ts"
   },
   "dependencies": {
     "@solidjs/meta": "1.0.0-next.2",
     "@solidjs/router": "2.0.0-next.35",
     "@solidjs/web": "2.0.0-rc.13",
     "filesystem-routing": "0.4.0",
-    "solid-js": "2.0.0-rc.13"
+    "solid-js": "2.0.0-rc.13",
+    "@orama/orama": "3.1.18"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

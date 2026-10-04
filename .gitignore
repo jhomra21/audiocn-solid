@@ -6,3 +6,4 @@ test-results
 site/artifacts
 site/public/r/solid1
 site/public/r/solid2
+site/public/search-index.json

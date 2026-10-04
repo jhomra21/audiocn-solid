@@ -63,6 +63,7 @@ jobs:
       - run: cd site && bun run spike:2
       - run: bun run registry:spike:3
       - run: bun run kobalte:spike:4
+      - run: bun run site:spike:5
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -72,6 +73,7 @@ jobs:
             site/artifacts/spike-2.json
             artifacts/registry-install.json
             artifacts/spike-4.json
+            site/artifacts/spike-5.json
             site/dist/client
             site/dist/server
             site/test-results
