@@ -632,6 +632,8 @@ type SliderRootProps = Parameters<typeof SliderPrimitive.Root>[0];
 
 type FaderDOMProps = Omit<
   SliderRootProps,
+  | "aria-label"
+  | "aria-labelledby"
   | "children"
   | "class"
   | "className"
@@ -650,6 +652,8 @@ type FaderDOMProps = Omit<
 export interface FaderProps
   extends FaderDOMProps,
     Omit<VariantProps<typeof faderVariants>, "orientation"> {
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
   allowWheel?: boolean;
   defaultValue?: number;
   detents?: number[];
@@ -719,6 +723,7 @@ export const Fader = (props: FaderProps) => {
   const step = () => props.step ?? 0.5;
   const largeStep = () => props.largeStep ?? 6;
   const fineStep = () => props.fineStep ?? 0.1;
+
   const detents = (): readonly number[] =>
     props.detents ?? DEFAULT_DETENTS;
 
@@ -834,27 +839,33 @@ export const Fader = (props: FaderProps) => {
       case "ArrowDown":
       case "ArrowLeft": {
         next = nudge(-1, increment);
+
         break;
       }
       case "ArrowRight":
       case "ArrowUp": {
         next = nudge(1, increment);
+
         break;
       }
       case "End": {
         next = max();
+
         break;
       }
       case "Home": {
         next = silenceAtMin() ? SILENCE_DB : min();
+
         break;
       }
       case "PageDown": {
         next = nudge(-1, largeStep());
+
         break;
       }
       case "PageUp": {
         next = nudge(1, largeStep());
+
         break;
       }
       default: {
@@ -910,14 +921,8 @@ export const Fader = (props: FaderProps) => {
   );
 
   const context: FaderContextValue = {
-    ariaLabel: () =>
-      typeof props["aria-label"] === "string"
-        ? props["aria-label"]
-        : undefined,
-    ariaLabelledBy: () =>
-      typeof props["aria-labelledby"] === "string"
-        ? props["aria-labelledby"]
-        : undefined,
+    ariaLabel: () => props["aria-label"],
+    ariaLabelledBy: () => props["aria-labelledby"],
     change,
     commit,
     disabled,
