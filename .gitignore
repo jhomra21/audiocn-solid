@@ -2,6 +2,7 @@ node_modules
 dist
 playwright-report
 test-results
+artifacts/
 .DS_Store
 site/artifacts
 site/public/r/solid1

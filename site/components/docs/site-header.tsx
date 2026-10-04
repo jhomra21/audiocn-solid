@@ -25,10 +25,14 @@ export const SiteHeader = () => {
       }
     };
 
+    const onSearchRequest = () => setSearchOpen(true);
+
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("audiocn-open-search", onSearchRequest);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("audiocn-open-search", onSearchRequest);
     };
   });
 

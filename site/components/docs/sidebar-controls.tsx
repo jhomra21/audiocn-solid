@@ -1,6 +1,7 @@
-import { For } from "solid-js";
+import { For, createSignal, onSettled } from "solid-js";
 
 import { isTheme, THEMES } from "@/site/lib/docs/site-themes";
+import { siteConfig } from "@/site/lib/site";
 import {
   useAppearance,
   useColorTheme,
@@ -9,14 +10,43 @@ import {
 export const SidebarControls = () => {
   const [appearance, setAppearance] = useAppearance();
   const [theme, setTheme] = useColorTheme();
+  const [stars, setStars] = createSignal<number | undefined>();
+
+  onSettled(() => {
+    let active = true;
+
+    void fetch(`https://api.github.com/repos/${siteConfig.githubRepo}`, {
+      headers: { Accept: "application/vnd.github+json" },
+    })
+      .then((response) => (response.ok ? response.json() : undefined))
+      .then((data: { stargazers_count?: unknown } | undefined) => {
+        const count = Number(String(data?.stargazers_count));
+
+        if (active && Number.isFinite(count)) {
+          setStars(count);
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  });
 
   return (
-    <div class="grid gap-2 border-t pt-4">
-      <label class="grid gap-1 text-xs">
-        <span class="text-muted-foreground">Color theme</span>
+    <div class="grid gap-3 border-t pt-4">
+      <div class="flex items-center gap-2">
+        <a
+          class="text-muted-foreground hover:text-foreground flex h-8 items-center gap-2 rounded-md px-2 text-xs"
+          href={`https://github.com/${siteConfig.githubRepo}`}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          GitHub ★ {stars() ?? ""}
+        </a>
         <select
           aria-label="Color theme"
-          class="bg-background h-8 rounded-md border px-2 text-sm"
+          class="bg-background ml-auto h-8 min-w-24 rounded-md border px-2 text-xs"
           onChange={(event) => {
             const next = event.currentTarget.value;
 
@@ -30,18 +60,26 @@ export const SidebarControls = () => {
             {(option) => <option value={option.value}>{option.label}</option>}
           </For>
         </select>
-      </label>
+      </div>
 
-      <button
-        class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 items-center justify-between rounded-md px-2 text-sm"
-        onClick={() =>
-          setAppearance(appearance() === "dark" ? "light" : "dark")
-        }
-        type="button"
-      >
-        Appearance
-        <span>{appearance() === "dark" ? "Dark" : "Light"}</span>
-      </button>
+      <div class="grid grid-cols-2 gap-1">
+        <button
+          aria-pressed={appearance() === "light" ? "true" : "false"}
+          class="aria-[pressed=true]:bg-muted text-muted-foreground hover:text-foreground flex h-8 items-center justify-center rounded-md text-xs"
+          onClick={() => setAppearance("light")}
+          type="button"
+        >
+          Light
+        </button>
+        <button
+          aria-pressed={appearance() === "dark" ? "true" : "false"}
+          class="aria-[pressed=true]:bg-muted text-muted-foreground hover:text-foreground flex h-8 items-center justify-center rounded-md text-xs"
+          onClick={() => setAppearance("dark")}
+          type="button"
+        >
+          Dark
+        </button>
+      </div>
     </div>
   );
 };
