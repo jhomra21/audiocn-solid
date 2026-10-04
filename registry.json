@@ -498,6 +498,27 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "pan-control",
+      "type": "registry:ui",
+      "title": "Pan Control",
+      "description": "A left/right pan slider with a center fill, center detent, keyboard controls, accessible pan text, and double-click reset.",
+      "dependencies": [
+        "solid-js@^1.9.15",
+        "@kobalte/core@0.13.14",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config"
+      ],
+      "files": [
+        {
+          "path": "components/ui/pan-control.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
