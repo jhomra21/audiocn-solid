@@ -1,9 +1,23 @@
 import { For } from "solid-js";
 
-import { LevelMeterDemo } from "@/components/examples/level-meter-demo";
 import { ShowcaseCard } from "@/site/components/home/showcase-card";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
+import ChannelTile from "@/site/components/home/tiles/channel-tile";
+import EqTile from "@/site/components/home/tiles/eq-tile";
+import FadersTile from "@/site/components/home/tiles/faders-tile";
+import KnobsTile from "@/site/components/home/tiles/knobs-tile";
+import MetersTile from "@/site/components/home/tiles/meters-tile";
+import MixerTile from "@/site/components/home/tiles/mixer-tile";
 import { cn } from "@/lib/utils";
+
+const TILES = new Map([
+  ["channel", ChannelTile],
+  ["eq", EqTile],
+  ["faders", FadersTile],
+  ["knobs", KnobsTile],
+  ["meters", MetersTile],
+  ["mixer", MixerTile],
+]);
 
 interface ShowcaseItem {
   href: string;
@@ -62,14 +76,15 @@ const RIGHT: ShowcaseItem[] = [
   },
 ];
 
-const ShowcaseTile = (props: ShowcaseItem) =>
-  props.tile === "meters" ? (
-    <div class="w-full max-w-xs">
-      <LevelMeterDemo />
+const ShowcaseTile = (props: ShowcaseItem) => {
+  const Tile = TILES.get(props.tile);
+
+  return (
+    <div class="@container flex w-full min-w-0 justify-center">
+      {Tile ? <Tile /> : <NotYetPorted item={props.label} />}
     </div>
-  ) : (
-    <NotYetPorted item={props.label} />
   );
+};
 
 const Column = (props: { class?: string; items: ShowcaseItem[] }) => (
   <div class={cn("flex min-w-0 flex-col gap-4", props.class)}>
