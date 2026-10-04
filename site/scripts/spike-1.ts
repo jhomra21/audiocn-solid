@@ -62,11 +62,11 @@ const walk = async (directory: string): Promise<string[]> => {
 };
 
 const findRouteHtml = async (route: string): Promise<string> => {
-  const suffix =
-    route === "/"
-      ? "index.html"
-      : `${route.replace(/^\//, "")}/index.html`;
+  if (route === "/") {
+    return join(clientDir, "index.html");
+  }
 
+  const suffix = `${route.replace(/^\//, "")}/index.html`;
   const files = await walk(clientDir);
   const match = files.find((file) => file.endsWith(suffix));
 
