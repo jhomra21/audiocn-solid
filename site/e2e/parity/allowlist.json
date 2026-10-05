@@ -1,22 +1,23 @@
 [
   {
-    "field": "slots",
-    "route": "*",
-    "reason": "Fumadocs injects React layout, tab, anchor, and code-block slot names; the Solid shell and preview wrappers intentionally use their own slots."
-  },
-  {
-    "field": "headings",
     "route": "/docs/installation",
-    "reason": "The upstream React installation page includes a Radix-specific section; the Solid page documents the supported Solid 1 and Solid 2 runtimes instead."
+    "upstream": "Set up shadcn/ui",
+    "local": "Set up shadcn",
+    "level": 3,
+    "reason": "Both installation MDX files use this step for their respective framework's shadcn setup."
   },
   {
-    "field": "headings",
+    "route": "/docs/installation",
+    "upstream": "Radix projects",
+    "local": "Solid 1 and Solid 2",
+    "level": 2,
+    "reason": "React Radix/Base UI migration guidance is replaced by the supported Solid runtime/Kobalte installation guidance; verified in both installation MDX sources."
+  },
+  {
     "route": "/docs/concepts/feeding-data",
-    "reason": "The upstream includes a subsection demonstrating React state; the Solid port's examples use Solid lifecycle and reactive ownership instead."
-  },
-  {
-    "field": "headings",
-    "route": "/docs/components/mixer",
-    "reason": "The upstream mixer page opens with a React-specific example section; the Solid port moves that guidance under usage and maintains matching section content."
+    "upstream": "In React state",
+    "local": null,
+    "level": 2,
+    "reason": "This exact upstream-only section demonstrates React useState. The Solid page documents source/values/handle ownership instead. No other heading is exempt."
   }
 ]
