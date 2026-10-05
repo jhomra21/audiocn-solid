@@ -110,6 +110,19 @@ const files = (await readDocs(docsRoot)).sort();
 
 const documents = await Promise.all(files.map(parseDocument));
 
+await writeFile(
+  join(siteRoot, "lib/docs/page-metadata.json"),
+  `${JSON.stringify(
+    documents.map(({ title, description, url }) => ({
+      title,
+      description,
+      url,
+    })),
+    null,
+    2
+  )}\n`
+);
+
 const database = create({ schema: searchSchema });
 
 await insertMultiple(database, documents);

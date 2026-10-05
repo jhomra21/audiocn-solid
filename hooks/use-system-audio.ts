@@ -2,6 +2,7 @@ import { createSignal, onCleanup } from "solid-js";
 
 import { readMaybeAccessor } from "@/lib/solid/accessor";
 import type { MaybeAccessor } from "@/lib/solid/accessor";
+import { createCompatEffect } from "@/lib/solid/effect";
 
 export type SystemAudioStatus =
   | "idle"
@@ -44,6 +45,13 @@ const stopStream = (stream: MediaStream | null) => {
 export const useSystemAudio = (
   options: MaybeAccessor<UseSystemAudioOptions> = {}
 ): UseSystemAudioResult => {
+  // Start with the server value; publish browser capability after hydration.
+  const [isSupported, setIsSupported] = createSignal(false);
+
+  createCompatEffect(supported, (value) => {
+    setIsSupported(value);
+  });
+
   const [stream, setStream] = createSignal<MediaStream | null>(null);
   const [status, setStatus] = createSignal<SystemAudioStatus>("idle");
   const [error, setError] = createSignal<Error | null>(null);
@@ -143,13 +151,13 @@ export const useSystemAudio = (
 
   return {
     get isSupported() {
-      return supported();
+      return isSupported();
     },
     get stream() {
       return stream();
     },
     get status() {
-      return supported() ? status() : "unsupported";
+      return isSupported() ? status() : "unsupported";
     },
     get error() {
       return error();

@@ -9,7 +9,7 @@ export const runAudioDeviceSelectSuite = (runtime: string) => {
     const failures: string[] = [];
     page.on("pageerror", (error) => failures.push(error.message));
     await page.goto("/audio-devices");
-    const trigger = page.getByRole("button", { name: /Microphone device/ });
+    const trigger = page.getByRole("combobox", { name: /Microphone device/ });
     await trigger.click();
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(

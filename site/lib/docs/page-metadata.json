@@ -1,0 +1,277 @@
+[
+  {
+    "title": "Blocks",
+    "description": "Complete, working assemblies you install once and then make your own.",
+    "url": "/docs/blocks"
+  },
+  {
+    "title": "Microphone Setup",
+    "description": "Choose and check a microphone, with a live preview, a meter, gain, mute and a level check.",
+    "url": "/docs/blocks/mic-setup"
+  },
+  {
+    "title": "Music Player",
+    "description": "A playlist player with a waveform seek bar, shuffle, repeat and ducking under the microphone.",
+    "url": "/docs/blocks/music-player"
+  },
+  {
+    "title": "Quick Audio Popover",
+    "description": "Microphone and system audio controls behind one toolbar button that shows a live level.",
+    "url": "/docs/blocks/quick-audio-popover"
+  },
+  {
+    "title": "Soundboard",
+    "description": "Sound pads with hotkeys, modes, volume, stop all and drag-and-drop.",
+    "url": "/docs/blocks/soundboard"
+  },
+  {
+    "title": "System Audio Mixer",
+    "description": "The complete mixer, with microphone, system audio, music, sound pads and a master, running on Web Audio.",
+    "url": "/docs/blocks/system-audio-mixer"
+  },
+  {
+    "title": "System Audio Settings",
+    "description": "Turn system audio capture on, set its level and see what the browser captures.",
+    "url": "/docs/blocks/system-audio-settings"
+  },
+  {
+    "title": "Audio Device Select",
+    "description": "A microphone, speaker or source picker with permission, loading and disconnected states.",
+    "url": "/docs/components/audio-device-select"
+  },
+  {
+    "title": "Audio Player",
+    "description": "A composable audio player with transport, seeking, time, volume, rate, loop and keyboard shortcuts.",
+    "url": "/docs/components/audio-player"
+  },
+  {
+    "title": "Bar Visualizer",
+    "description": "A row of bars driven by frequency bands, with idle, loading and mirrored modes.",
+    "url": "/docs/components/bar-visualizer"
+  },
+  {
+    "title": "Channel Strip",
+    "description": "One channel of a mixer, as a row or a console strip, composed from the parts you need.",
+    "url": "/docs/components/channel-strip"
+  },
+  {
+    "title": "Channel Toggle",
+    "description": "Mute, solo and monitor toggle buttons with their own pressed colours.",
+    "url": "/docs/components/channel-toggle"
+  },
+  {
+    "title": "Clip Indicator",
+    "description": "A clip light that holds after the signal clips, with an optional count and click to reset.",
+    "url": "/docs/components/clip-indicator"
+  },
+  {
+    "title": "dB Readout",
+    "description": "A numeric level label that updates at a readable rate and never shifts the layout.",
+    "url": "/docs/components/db-readout"
+  },
+  {
+    "title": "dB Scale",
+    "description": "Tick marks and labels for a decibel range, shared by meters and faders.",
+    "url": "/docs/components/db-scale"
+  },
+  {
+    "title": "Electric Bar Visualizer",
+    "description": "Frequency-band bars drawn as crackling filaments, with arcs between loud neighbours and sparks on sudden rises.",
+    "url": "/docs/components/electric-bar-visualizer"
+  },
+  {
+    "title": "Electric Waveform",
+    "description": "One electric line across the width, with a crackling white-hot core, a tall glow, forks off the peaks and sparks.",
+    "url": "/docs/components/electric-waveform"
+  },
+  {
+    "title": "Fader",
+    "description": "A volume fader in decibels, with tapers, detents, a scale, reset and an editable value.",
+    "url": "/docs/components/fader"
+  },
+  {
+    "title": "Components",
+    "description": "Every audiocn component, grouped by what it does.",
+    "url": "/docs/components"
+  },
+  {
+    "title": "Knob",
+    "description": "A rotary control for dense layouts, drawn in SVG.",
+    "url": "/docs/components/knob"
+  },
+  {
+    "title": "Level Meter",
+    "description": "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
+    "url": "/docs/components/level-meter"
+  },
+  {
+    "title": "Live Waveform",
+    "description": "A canvas waveform of a live signal, as scrolling history or the current frame.",
+    "url": "/docs/components/live-waveform"
+  },
+  {
+    "title": "Mixer",
+    "description": "The container for channel strips, with shared meter settings and keyboard navigation.",
+    "url": "/docs/components/mixer"
+  },
+  {
+    "title": "Pan Control",
+    "description": "Left and right balance with a fill from the centre and a centre detent.",
+    "url": "/docs/components/pan-control"
+  },
+  {
+    "title": "Parameter Slider",
+    "description": "A labelled slider with a numeric input, unit, marks and reset, for everything that is not a volume.",
+    "url": "/docs/components/parameter-slider"
+  },
+  {
+    "title": "Smooth Waveform",
+    "description": "One clean line across the width that follows the sound, as a flowing wave or an oscilloscope trace.",
+    "url": "/docs/components/smooth-waveform"
+  },
+  {
+    "title": "Sound Pad",
+    "description": "A trigger pad with modes, a hotkey, playback progress and an accent colour.",
+    "url": "/docs/components/sound-pad"
+  },
+  {
+    "title": "Spectrum",
+    "description": "A frequency spectrum analyser with axes, a grid and peak hold.",
+    "url": "/docs/components/spectrum"
+  },
+  {
+    "title": "Track List",
+    "description": "A list of tracks with active and playing states and arrow-key navigation.",
+    "url": "/docs/components/track-list"
+  },
+  {
+    "title": "Volume Control",
+    "description": "A simple volume slider with a mute button, for players.",
+    "url": "/docs/components/volume-control"
+  },
+  {
+    "title": "Waveform",
+    "description": "A static waveform of a clip with a smooth playhead, seeking, hover time, regions and markers.",
+    "url": "/docs/components/waveform"
+  },
+  {
+    "title": "Accessibility",
+    "description": "How audiocn components work with keyboards, screen readers and reduced motion.",
+    "url": "/docs/concepts/accessibility"
+  },
+  {
+    "title": "Using your own audio engine",
+    "description": "Drive audiocn from a native backend, a WebSocket, a worker or anything else.",
+    "url": "/docs/concepts/custom-engine"
+  },
+  {
+    "title": "Decibels and levels",
+    "description": "The units audiocn uses, and the helpers in the audio core that convert between them.",
+    "url": "/docs/concepts/decibels"
+  },
+  {
+    "title": "Feeding data",
+    "description": "Every meter and visualizer accepts levels three ways, so it fits any audio source.",
+    "url": "/docs/concepts/feeding-data"
+  },
+  {
+    "title": "Theming",
+    "description": "audiocn uses your shadcn theme, plus six audio tokens you can change like any other.",
+    "url": "/docs/concepts/theming"
+  },
+  {
+    "title": "useAudioAnalyser",
+    "description": "Meter and visual frame sources from a MediaStream, media element or AudioNode.",
+    "url": "/docs/hooks/use-audio-analyser"
+  },
+  {
+    "title": "useAudioContext",
+    "description": "One shared AudioContext that resumes on the first user gesture, plus a provider to supply your own.",
+    "url": "/docs/hooks/use-audio-context"
+  },
+  {
+    "title": "useAudioDevices",
+    "description": "The list of audio input or output devices, with permission state and live updates.",
+    "url": "/docs/hooks/use-audio-devices"
+  },
+  {
+    "title": "useAudioPlayer",
+    "description": "Playback state for an audio element the hook owns.",
+    "url": "/docs/hooks/use-audio-player"
+  },
+  {
+    "title": "useClipHold",
+    "description": "Clip detection with a hold time, a clip count and a reset.",
+    "url": "/docs/hooks/use-clip-hold"
+  },
+  {
+    "title": "useDemoSignal",
+    "description": "A synthetic speech, music, tone or noise signal as frame sources, for previews, prototypes and tests.",
+    "url": "/docs/hooks/use-demo-signal"
+  },
+  {
+    "title": "useFrameSource",
+    "description": "Subscribe a callback to a frame source, with a stable callback and automatic cleanup.",
+    "url": "/docs/hooks/use-frame-source"
+  },
+  {
+    "title": "useGainNode",
+    "description": "A gain node on the shared AudioContext, wired from an input to a destination, with click-free level changes.",
+    "url": "/docs/hooks/use-gain-node"
+  },
+  {
+    "title": "useLevel",
+    "description": "Read a meter source into Solid state at a low rate, for labels and conditional UI.",
+    "url": "/docs/hooks/use-level"
+  },
+  {
+    "title": "useMicrophone",
+    "description": "Open a microphone as a MediaStream, with browser processing off by default.",
+    "url": "/docs/hooks/use-microphone"
+  },
+  {
+    "title": "useMixer",
+    "description": "Mixer state with no audio attached: gain, mute, solo, pan and monitor per channel, plus a master.",
+    "url": "/docs/hooks/use-mixer"
+  },
+  {
+    "title": "useReducedMotion",
+    "description": "True when the user asked the system to reduce motion.",
+    "url": "/docs/hooks/use-reduced-motion"
+  },
+  {
+    "title": "useSound",
+    "description": "Low-latency playback of short sounds decoded into memory.",
+    "url": "/docs/hooks/use-sound"
+  },
+  {
+    "title": "useSystemAudio",
+    "description": "Capture system or tab audio through the browser's screen-share picker.",
+    "url": "/docs/hooks/use-system-audio"
+  },
+  {
+    "title": "useVisibility",
+    "description": "Whether an element is on screen, in a ref, so animation loops can skip frames nobody sees.",
+    "url": "/docs/hooks/use-visibility"
+  },
+  {
+    "title": "useWaveformData",
+    "description": "Decode an audio file and reduce it to cached waveform peaks.",
+    "url": "/docs/hooks/use-waveform-data"
+  },
+  {
+    "title": "useWebAudioMixer",
+    "description": "Binds mixer state to a Web Audio graph, with ducking, monitor sends, a limited master and meters.",
+    "url": "/docs/hooks/use-web-audio-mixer"
+  },
+  {
+    "title": "Introduction",
+    "description": "Audio components for Solid, built the shadcn way.",
+    "url": "/docs"
+  },
+  {
+    "title": "Installation",
+    "description": "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI.",
+    "url": "/docs/installation"
+  }
+]

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import allowlist from "./allowlist.json" with { type: "json" };
+import { adaptContent } from "./content-adapters";
 import { inspectPage } from "./metrics";
 
 test.afterEach(async ({ page }, info) => {
@@ -13,6 +14,36 @@ test.afterEach(async ({ page }, info) => {
     body: await page.screenshot(),
     contentType: "image/png",
   });
+});
+
+test("framework prose adapters are exact, route-scoped, and reject stale upstream text", () => {
+  const upstream = [
+    {
+      tag: "p",
+      text: "Outside React, createDemoSignal(options) returns the same object.",
+    },
+  ];
+
+  const local = [
+    {
+      tag: "p",
+      text: "Outside Solid, createDemoSignal(options) returns the same object.",
+    },
+  ];
+
+  expect(adaptContent("/docs/hooks/use-demo-signal", upstream)).toEqual(local);
+  expect(adaptContent("/docs/components/level-meter", upstream)).toEqual(
+    upstream
+  );
+  expect(() =>
+    adaptContent("/docs/hooks/use-demo-signal", [
+      {
+        tag: "p",
+        text: "Outside React, createDemoSignal(options) returns a different object.",
+      },
+    ])
+  ).toThrow("Stale prose adapter");
+  expect(adaptContent("/docs/hooks/use-demo-signal", upstream)).not.toEqual([]);
 });
 
 test("parity exemptions are exact and do not hide mixer or slot differences", () => {
@@ -63,10 +94,45 @@ test("removing actual controls changes the example even with slots preserved", a
     .first()
     .evaluate((preview) =>
       preview
-        .querySelectorAll("input, button")
+        .querySelectorAll("input, button, [role='slider']")
         .forEach((control) => control.remove())
     );
   expect((await inspectPage(page)).examples).not.toEqual(before.examples);
+});
+
+test("native ranges and ARIA sliders compare by their accessible contract without duplicate hidden inputs", async ({
+  page,
+}) => {
+  await page.goto("/docs/components/fader");
+  const before = await inspectPage(page);
+  await page
+    .locator('[data-slot="component-preview"]')
+    .first()
+    .evaluate((preview) => {
+      const thumb = preview.querySelector('[role="slider"]')!;
+      const input = document.createElement("input");
+      input.type = "range";
+
+      for (const attribute of thumb.attributes) {
+        if (
+          attribute.name.startsWith("aria-") ||
+          attribute.name === "data-slot"
+        )
+          input.setAttribute(attribute.name, attribute.value);
+      }
+
+      thumb.replaceWith(input);
+    });
+  expect((await inspectPage(page)).examples[0].controls).toEqual(
+    before.examples[0].controls
+  );
+  await page
+    .locator('[data-slot="component-preview"] input[type="range"]')
+    .first()
+    .evaluate((input) => input.remove());
+  expect((await inspectPage(page)).examples[0].controls).not.toEqual(
+    before.examples[0].controls
+  );
 });
 
 test("missing prose is detected even when headings and wrappers survive", async ({
@@ -81,6 +147,34 @@ test("missing prose is detected even when headings and wrappers survive", async 
     );
   expect((await inspectPage(page)).content).not.toEqual(before.content);
 });
+
+for (const mutation of ["label", "role", "number"] as const) {
+  test(`changing a control's ${mutation} remains an observable difference`, async ({
+    page,
+  }) => {
+    await page.goto("/docs/components/parameter-slider");
+    const before = await inspectPage(page);
+    await page
+      .locator('[data-slot="component-preview"]')
+      .first()
+      .evaluate((preview, change) => {
+        if (change === "number")
+          preview
+            .querySelector('[data-slot="parameter-slider-input"]')
+            ?.setAttribute("type", "checkbox");
+        else
+          preview
+            .querySelector('[role="slider"]')
+            ?.setAttribute(
+              change === "label" ? "aria-label" : "role",
+              change === "label" ? "Wrong gain" : "img"
+            );
+      }, mutation);
+    expect((await inspectPage(page)).examples[0].controls).not.toEqual(
+      before.examples[0].controls
+    );
+  });
+}
 
 test("presentation slot changes and horizontal overflow remain observable", async ({
   page,
@@ -97,18 +191,50 @@ test("presentation slot changes and horizontal overflow remain observable", asyn
   expect(after.layout).not.toEqual(before.layout);
 });
 
-test("real unavailable examples and placeholder routes are explicit gaps", async ({
+test("unavailable examples and placeholder routes remain explicit gaps after ports are complete", async ({
   page,
 }) => {
   await page.goto("/docs/components/volume-control");
+  await page
+    .locator('[data-slot="component-preview"]')
+    .first()
+    .evaluate((preview) => {
+      const marker = document.createElement("div");
+      marker.dataset.notYetPorted = "Example volume-control-popover";
+      preview.replaceChildren(marker);
+    });
   expect((await inspectPage(page)).gaps).toContain(
     "Example volume-control-popover"
   );
   await page.goto("/docs/hooks/use-demo-signal");
+  await page
+    .locator('[data-slot="component-preview"]')
+    .first()
+    .evaluate((preview) => {
+      const marker = document.createElement("div");
+      marker.dataset.notYetPorted = "Example frame-source-demo";
+      preview.replaceChildren(marker);
+    });
   expect((await inspectPage(page)).gaps).toContain("Example frame-source-demo");
   await page.goto("/docs/components/bar-visualizer");
+  await page.locator("main").evaluate((main) => {
+    const marker = document.createElement("div");
+    marker.setAttribute(
+      "data-docs-route-not-yet-ported",
+      "/docs/components/bar-visualizer"
+    );
+    main.append(marker);
+  });
   expect((await inspectPage(page)).gaps).toContain("Unported page");
   await page.goto("/docs/hooks/use-level");
+  await page.locator("main").evaluate((main) => {
+    const marker = document.createElement("div");
+    marker.setAttribute(
+      "data-docs-route-not-yet-ported",
+      "/docs/hooks/use-level"
+    );
+    main.append(marker);
+  });
   expect((await inspectPage(page)).gaps).toContain("Unported page");
 });
 

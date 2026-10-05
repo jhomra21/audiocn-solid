@@ -22,7 +22,11 @@ interface PageMetrics {
 
 export const inspectPage = async (page: Page): Promise<PageMetrics> =>
   page.locator("body").evaluate((body) => {
-    const main = body.querySelector("main") ?? body;
+    // Upstream's home shell has an outer main containing header/footer.
+    // Inspect the content main on both sites, as docs already do.
+    const main =
+      body.querySelector("main main") ?? body.querySelector("main") ?? body;
+
     const title = main.querySelector("h1");
 
     const headings = [...main.querySelectorAll("h1, h2, h3")].flatMap(
@@ -59,7 +63,7 @@ export const inspectPage = async (page: Page): Promise<PageMetrics> =>
     return {
       content: [...main.querySelectorAll("p, li, th, td")].flatMap((element) =>
         element.closest(
-          '[data-slot="component-preview"], [role="tabpanel"], aside, nav'
+          '[data-slot="component-preview"], [role="tabpanel"], [data-slot="showcase-card"], aside, nav'
         )
           ? []
           : [
@@ -76,17 +80,75 @@ export const inspectPage = async (page: Page): Promise<PageMetrics> =>
           ...preview.querySelectorAll(
             'button, input, select, [role="slider"], [role="switch"]'
           ),
-        ].map((control) => ({
-          label:
+        ].flatMap((control) => {
+          // Kobalte keeps a form input inside its interactive ARIA thumb.
+          // Base UI uses a native range. Count either as one real slider.
+          if (
+            control.closest('[aria-hidden="true"]') ||
+            (control.matches('input[type="range"]') &&
+              control.parentElement?.closest('[role="slider"]'))
+          )
+            return [];
+
+          const type = control.getAttribute("type") ?? "";
+
+          const role =
+            control.getAttribute("role") ?? (type === "range" ? "slider" : "");
+
+          const labelledBy = control
+            .getAttribute("aria-labelledby")
+            ?.split(/\s+/)
+            .map((id) => document.getElementById(id)?.textContent ?? "")
+            .join(" ")
+            .trim();
+
+          const nativeLabel =
+            control instanceof HTMLButtonElement ||
+            control instanceof HTMLInputElement ||
+            control instanceof HTMLSelectElement
+              ? [...(control.labels ?? [])]
+                  .map((label) => label.textContent?.trim() ?? "")
+                  .join(" ")
+              : "";
+
+          // SAFETY: cloning an Element preserves its element node type.
+          const visibleContent = control.cloneNode(true) as Element;
+          visibleContent
+            .querySelectorAll('[aria-hidden="true"]')
+            .forEach((node) => node.remove());
+
+          const label =
             control.getAttribute("aria-label") ??
             control.getAttribute("title") ??
+            labelledBy ??
+            (nativeLabel || undefined) ??
             (control.tagName === "BUTTON"
-              ? (control.textContent?.trim() ?? "")
-              : ""),
-          role: control.getAttribute("role") ?? "",
-          tag: control.tagName.toLowerCase(),
-          type: control.getAttribute("type") ?? "",
-        })),
+              ? (visibleContent.textContent?.trim() ?? "")
+              : "");
+
+          if (role === "slider" || role === "switch")
+            return [
+              {
+                label,
+                role,
+                tag: "input",
+                type: role === "slider" ? "range" : "checkbox",
+              },
+            ];
+
+          if (
+            control.getAttribute("data-slot") === "parameter-slider-input" &&
+            control.tagName === "INPUT" &&
+            (type === "number" ||
+              (type === "text" &&
+                control.getAttribute("inputmode") === "numeric"))
+          )
+            return [
+              { label, role: "spinbutton", tag: "input", type: "number" },
+            ];
+
+          return [{ label, role, tag: control.tagName.toLowerCase(), type }];
+        }),
         media: {
           canvas: preview.querySelectorAll("canvas").length,
           images: preview.querySelectorAll("img").length,

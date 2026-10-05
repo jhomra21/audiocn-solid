@@ -3,6 +3,12 @@
   "compilerOptions": {
     "jsxImportSource": "@solidjs/web",
     "paths": {
+      "@kobalte/core/primitives/create-dom-collection": [
+        "./node_modules/@kobalte/core-solid2/dist/primitives/create-dom-collection/index.d.ts"
+      ],
+      "@kobalte/core/context-menu": [
+        "./node_modules/@kobalte/core-solid2/dist/context-menu/index.d.ts"
+      ],
       "@kobalte/core/select": [
         "./node_modules/@kobalte/core-solid2/dist/select/index.d.ts"
       ],

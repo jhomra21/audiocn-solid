@@ -6,6 +6,7 @@ import type { Page } from "@playwright/test";
 
 import { readPrerenderedRoutes } from "../../scripts/prerendered-routes";
 import allowlist from "./allowlist.json" with { type: "json" };
+import { adaptContent } from "./content-adapters";
 import { inspectPage } from "./metrics";
 
 // Explicit comparison scope. Remaining prerendered routes are inventoried as gaps below.
@@ -60,6 +61,12 @@ const routes = [
   "/docs/hooks/use-microphone",
   "/docs/hooks/use-mixer",
   "/docs/blocks",
+  "/docs/blocks/system-audio-mixer",
+  "/docs/blocks/mic-setup",
+  "/docs/blocks/system-audio-settings",
+  "/docs/blocks/quick-audio-popover",
+  "/docs/blocks/music-player",
+  "/docs/blocks/soundboard",
 ] as const;
 
 const artifactDirectory = join(import.meta.dirname, "../../artifacts/parity");
@@ -74,7 +81,7 @@ const expectedExamples = async (root: string, route: string) => {
   const source = await readFile(path, "utf8");
 
   return Array.from(
-    source.matchAll(/<ComponentPreview\s+name="([^"]+)"/g),
+    source.matchAll(/<ComponentPreview\b[^>]*\bname="([^"]+)"/g),
     ([, name]) => name
   );
 };
@@ -83,6 +90,40 @@ const capturePage = async (page: Page, url: string, path: string) => {
   try {
     const response = await page.goto(url, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
+
+    if (new URL(url).pathname === "/docs/components/waveform") {
+      const demo = page.locator('[data-slot="component-preview"]').first();
+      await expect(
+        demo.getByRole("slider", { name: "Night Drive" })
+      ).toHaveAttribute("aria-valuemax", "19");
+      await expect(demo.locator('[data-slot="waveform-skeleton"]')).toHaveCount(
+        0
+      );
+    }
+
+    if (new URL(url).pathname === "/docs/blocks/music-player") {
+      const previews = page.locator('[data-slot="component-preview"]');
+      await expect(
+        previews.locator('[data-slot="waveform"][role="slider"]')
+      ).toHaveCount(2);
+      await expect(
+        previews.locator('[data-slot="waveform-skeleton"]')
+      ).toHaveCount(0);
+    }
+
+    // Upstream mounts showcase tiles near the viewport. Measure loaded UI,
+    // not its ten offscreen skeletons, on both sites.
+    if (new URL(url).pathname === "/") {
+      for (const card of await page
+        .locator('[data-slot="showcase-card"]')
+        .all()) {
+        await card.scrollIntoViewIfNeeded();
+        await expect(card.locator('[data-slot="skeleton"]')).toHaveCount(0);
+      }
+
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+
     const metrics = await inspectPage(page);
     await page.screenshot({ fullPage: true, path });
 
@@ -242,7 +283,10 @@ test("compare upstream and local page structure", async ({ page }) => {
         });
       }
 
-      if (JSON.stringify(upstream.content) !== JSON.stringify(local.content)) {
+      if (
+        JSON.stringify(adaptContent(route, upstream.content)) !==
+        JSON.stringify(local.content)
+      ) {
         differences.push({
           field: "content",
           upstream: upstream.content,

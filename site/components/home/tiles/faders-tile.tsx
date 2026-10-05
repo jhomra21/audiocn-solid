@@ -26,6 +26,9 @@ const ConsoleFader = (props: ConsoleFaderProps) => {
 
   const signal = useDemoSignal({
     channels: 2,
+    get gainDb() {
+      return gainDb();
+    },
     kind: props.kind,
     seed: props.seed,
   });

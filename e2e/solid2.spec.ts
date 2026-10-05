@@ -1,6 +1,7 @@
 import { runAudioDeviceSelectSuite } from "./audio-device-select-suite";
 import { runAudioHooksSuite } from "./audio-hooks-suite";
 import { runAudioPlayerSuite } from "./audio-player-suite";
+import { runBlocksSuite } from "./blocks-suite";
 import { runParitySuite } from "./parity-suite";
 import { runPlaybackSuite } from "./playback-suite";
 import { runPopoverSuite } from "./popover-suite";
@@ -10,6 +11,8 @@ import { runWaveformSuite } from "./waveform-suite";
 import { runWebAudioMixerSuite } from "./web-audio-mixer-suite";
 
 runAudioPlayerSuite("solid-2");
+
+runBlocksSuite("solid-2");
 
 runAudioDeviceSelectSuite("solid-2");
 

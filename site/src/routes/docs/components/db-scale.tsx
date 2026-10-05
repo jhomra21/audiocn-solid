@@ -8,7 +8,7 @@ import DbScaleDoc, {
 export default function DbScalePage() {
   return (
     <>
-      <Title>`${frontmatter.title} for Solid - audiocn Solid`</Title>
+      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
       <Meta content={frontmatter.description} name="description" />
       <DocsShell
         currentPath="/docs/components/db-scale"

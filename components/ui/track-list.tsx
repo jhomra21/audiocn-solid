@@ -221,7 +221,9 @@ export const TrackListItem = (props: TrackListItemProps) => {
       return <>{rendered()}</>;
     }
 
-    return <li {...renderProps} />;
+    const domProps = omitProps(renderProps, ["children"]);
+
+    return <li {...domProps}>{props.children}</li>;
   });
 };
 

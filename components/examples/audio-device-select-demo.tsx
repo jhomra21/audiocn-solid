@@ -41,7 +41,7 @@ const AudioDeviceSelectDemo = () => {
         }
         value={deviceId()}
       >
-        <AudioDeviceSelectTrigger aria-label="Microphone">
+        <AudioDeviceSelectTrigger>
           <AudioDeviceSelectValue placeholder="Select a microphone" />
         </AudioDeviceSelectTrigger>
         <AudioDeviceSelectContent />

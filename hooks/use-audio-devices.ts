@@ -37,6 +37,7 @@ const supported = () =>
 export const useAudioDevices = (
   options: MaybeAccessor<UseAudioDevicesOptions> = {}
 ): UseAudioDevicesResult => {
+  const [isSupported, setIsSupported] = createSignal(false);
   const [devices, setDevices] = createSignal<AudioDeviceInfo[]>([]);
   const [permission, setPermission] = createSignal<AudioPermission>("prompt");
   const [loaded, setLoaded] = createSignal(false);
@@ -115,7 +116,10 @@ export const useAudioDevices = (
   createCompatEffect(
     () => readMaybeAccessor(options).kind ?? "audioinput",
     () => {
-      if (!supported()) return;
+      const available = supported();
+      setIsSupported(available);
+
+      if (!available) return;
       let cancelled = false;
       const listeners = new AbortController();
       setLoaded(false);
@@ -162,10 +166,10 @@ export const useAudioDevices = (
       return devices();
     },
     get permission() {
-      return supported() ? permission() : "unsupported";
+      return isSupported() ? permission() : "unsupported";
     },
     get isLoading() {
-      return supported() && !loaded();
+      return isSupported() && !loaded();
     },
     get error() {
       return error();

@@ -989,6 +989,358 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/alert.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/empty.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/label.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/separator.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/switch.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/label",
+        "@audiocn-solid/separator"
+      ],
+      "files": [
+        {
+          "path": "components/ui/field.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "kobalte-dom-collection",
+      "type": "registry:lib",
+      "title": "Kobalte Dom Collection",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "lib/solid/kobalte-dom-collection.tsx",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context Menu",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/kobalte-dom-collection"
+      ],
+      "files": [
+        {
+          "path": "components/ui/context-menu.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "music-player",
+      "type": "registry:block",
+      "title": "Music Player",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/audio-player",
+        "@audiocn-solid/waveform",
+        "@audiocn-solid/track-list",
+        "@audiocn-solid/card",
+        "@audiocn-solid/empty",
+        "@audiocn-solid/label",
+        "@audiocn-solid/parameter-slider",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/toggle",
+        "@audiocn-solid/volume-control",
+        "@audiocn-solid/use-audio-analyser",
+        "@audiocn-solid/use-audio-context",
+        "@audiocn-solid/use-audio-player",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-waveform-data"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/music-player/music-player.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "soundboard",
+      "type": "registry:block",
+      "title": "Soundboard",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/alert",
+        "@audiocn-solid/button",
+        "@audiocn-solid/context-menu",
+        "@audiocn-solid/empty",
+        "@audiocn-solid/label",
+        "@audiocn-solid/sound-pad",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/volume-control",
+        "@audiocn-solid/use-gain-node",
+        "@audiocn-solid/use-sound"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/soundboard/soundboard.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "mic-setup",
+      "type": "registry:block",
+      "title": "Mic Setup",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/alert",
+        "@audiocn-solid/audio-device-select",
+        "@audiocn-solid/button",
+        "@audiocn-solid/card",
+        "@audiocn-solid/db-readout",
+        "@audiocn-solid/field",
+        "@audiocn-solid/level-meter",
+        "@audiocn-solid/live-waveform",
+        "@audiocn-solid/parameter-slider",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/use-audio-analyser",
+        "@audiocn-solid/use-audio-devices",
+        "@audiocn-solid/use-gain-node",
+        "@audiocn-solid/use-microphone"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/mic-setup/mic-setup.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "system-audio-settings",
+      "type": "registry:block",
+      "title": "System Audio Settings",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/alert",
+        "@audiocn-solid/badge",
+        "@audiocn-solid/card",
+        "@audiocn-solid/field",
+        "@audiocn-solid/level-meter",
+        "@audiocn-solid/parameter-slider",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/use-audio-analyser",
+        "@audiocn-solid/use-audio-context",
+        "@audiocn-solid/use-gain-node",
+        "@audiocn-solid/use-system-audio"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/system-audio-settings/system-audio-settings.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "quick-audio-popover",
+      "type": "registry:block",
+      "title": "Quick Audio Popover",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/audio-device-select",
+        "@audiocn-solid/bar-visualizer",
+        "@audiocn-solid/button",
+        "@audiocn-solid/field",
+        "@audiocn-solid/popover",
+        "@audiocn-solid/separator",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/use-audio-analyser",
+        "@audiocn-solid/use-audio-devices",
+        "@audiocn-solid/use-microphone",
+        "@audiocn-solid/use-system-audio"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/quick-audio-popover/quick-audio-popover.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "system-audio-mixer",
+      "type": "registry:block",
+      "title": "System Audio Mixer",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/audio-device-select",
+        "@audiocn-solid/button",
+        "@audiocn-solid/channel-strip",
+        "@audiocn-solid/channel-toggle",
+        "@audiocn-solid/fader",
+        "@audiocn-solid/level-meter",
+        "@audiocn-solid/mixer",
+        "@audiocn-solid/popover",
+        "@audiocn-solid/sound-pad",
+        "@audiocn-solid/switch",
+        "@audiocn-solid/tabs",
+        "@audiocn-solid/use-audio-devices",
+        "@audiocn-solid/use-audio-player",
+        "@audiocn-solid/use-gain-node",
+        "@audiocn-solid/use-microphone",
+        "@audiocn-solid/use-mixer",
+        "@audiocn-solid/use-sound",
+        "@audiocn-solid/use-system-audio",
+        "@audiocn-solid/use-web-audio-mixer"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/system-audio-mixer/system-audio-mixer.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/blocks/system-audio-mixer/mixer-source-strip.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/blocks/system-audio-mixer/mixer-master-strip.tsx",
+          "type": "registry:block"
+        },
+        {
+          "path": "components/icons/phosphor.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,648 @@
+[
+  {
+    "route": "/docs/installation",
+    "reason": "Installation describes the separate Solid registry namespace.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn registry to a shadcn/ui project and install components with the shadcn CLI."
+      },
+      {
+        "tag": "p",
+        "text": "audiocn is a shadcn registry. You add components with the same shadcn CLI you already use, and the code lands in your project."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI."
+      },
+      {
+        "tag": "p",
+        "text": "audiocn Solid is a shadcn registry. You add components with the same shadcn CLI, and the code lands in your project."
+      }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "Solid runtime and Kobalte requirements replace React useEffectEvent and Base UI requirements.",
+    "upstream": [
+      {
+        "tag": "li",
+        "text": "React 19.2 or later, and Tailwind CSS v4. The hooks use useEffectEvent, which arrived in React 19.2."
+      },
+      {
+        "tag": "li",
+        "text": "A project set up with shadcn/ui. audiocn components use the standard shadcn tokens (background, muted, primary, ring…) and the cn helper from @/lib/utils."
+      },
+      {
+        "tag": "li",
+        "text": "Components are built on Base UI. The CLI installs @base-ui/react for you, so they also work in projects whose other shadcn components use Radix."
+      }
+    ],
+    "local": [
+      { "tag": "li", "text": "Solid 1.9.15 or later, or Solid 2." },
+      { "tag": "li", "text": "Tailwind CSS v4." },
+      {
+        "tag": "li",
+        "text": "A project set up with shadcn and a components.json. audiocn Solid components use the standard shadcn tokens (background, muted, primary, ring...) and the cn helper from @/lib/utils."
+      },
+      {
+        "tag": "li",
+        "text": "Interactive primitives use Kobalte. The runtime-specific registry installs the matching Kobalte line for you."
+      }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "Separate versioned registry URLs are built for Solid 1 and Solid 2; a public production domain has not been selected.",
+    "upstream": [
+      { "tag": "p", "text": "Add the @audiocn namespace to components.json:" }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Use the registry URL for the Solid version in your app. The production domain is selected at release."
+      },
+      { "tag": "p", "text": "Solid 1:" },
+      { "tag": "p", "text": "Solid 2:" }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "Fresh-install contracts verify the additional lib/solid compatibility files.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The CLI copies the component and everything it depends on: the audio core (lib/audio), the audio theme tokens, and any hooks it uses."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The CLI copies the component and everything it depends on: the audio core (lib/audio), Solid compatibility helpers, audio theme tokens, and any hooks it uses."
+      }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "Distribution includes lib/solid helpers and does not prescribe a Next.js global CSS path.",
+    "upstream": [
+      {
+        "tag": "td",
+        "text": "The audio core: decibels, ballistics, tapers, types"
+      },
+      { "tag": "td", "text": "app/globals.css" }
+    ],
+    "local": [
+      {
+        "tag": "td",
+        "text": "The framework-neutral audio core: decibels, ballistics, tapers, types"
+      },
+      { "tag": "td", "text": "lib/solid/*.ts" },
+      {
+        "tag": "td",
+        "text": "Small Solid compatibility helpers used by registry files"
+      },
+      { "tag": "td", "text": "global CSS" }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "React Radix/Base UI migration advice is inapplicable; the port documents runtime-selected Solid/Kobalte compatibility.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The components are built on Base UI, and the CLI installs @base-ui/react next to Radix. Your own components keep Radix; only the audiocn files import Base UI. A few things to know:"
+      },
+      {
+        "tag": "li",
+        "text": "channel-strip uses the shadcn badge. If you have customised yours, answer No when the CLI asks to overwrite badge.tsx. The current shadcn badge also adds the cn package; remove it from package.json if you keep your own badge."
+      },
+      {
+        "tag": "li",
+        "text": "audio-device-select and the blocks compose shadcn components through Base UI APIs (render, the Select items prop), so they need a Base UI project. Every other item works in both."
+      },
+      {
+        "tag": "li",
+        "text": "The six audio tokens land in your global CSS. If your theme already has status colours, point the tokens at them instead (see Theming)."
+      },
+      { "tag": "li", "text": "The code compiles against an ES2022 lib." }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The two registry URLs expose the same public audiocn API. The Solid 1 registry targets Solid 1.9.15+ and the Solid 1 Kobalte line. The Solid 2 registry targets Solid 2 and the Solid 2 Kobalte line. Runtime-specific compatibility files are selected when the registry is built; application code should not branch on the Solid version."
+      },
+      {
+        "tag": "li",
+        "text": "The six audio tokens land in your global CSS. If your theme already has status colours, point the tokens at them instead (see Theming)."
+      },
+      { "tag": "li", "text": "The code compiles against an ES2022 lib." }
+    ]
+  },
+  {
+    "route": "/docs/installation",
+    "reason": "Adjacent-page metadata names the supported framework.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Audio components for React, built the shadcn way."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Audio components for Solid, built the shadcn way."
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "reason": "The hero names the supported framework.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Meters, faders, knobs, visualizers and a complete mixer for React. Built the shadcn way, so you own every line."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Meters, faders, knobs, visualizers and a complete mixer for Solid. Built the shadcn way, so you own every line."
+      }
+    ]
+  },
+  {
+    "route": "/docs",
+    "reason": "The introduction names the supported framework.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Audio components for React, built the shadcn way."
+      },
+      {
+        "tag": "p",
+        "text": "audiocn is a set of audio components for React: level meters, visualizers, faders, channel strips, a complete mixer, players and sound pads."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Audio components for Solid, built the shadcn way."
+      },
+      {
+        "tag": "p",
+        "text": "audiocn is a set of audio components for Solid: level meters, visualizers, faders, channel strips, a complete mixer, players and sound pads."
+      }
+    ]
+  },
+  {
+    "route": "/docs",
+    "reason": "Kobalte is the Solid interaction dependency; native audio frame paints avoid reactive component updates.",
+    "upstream": [
+      {
+        "tag": "li",
+        "text": "Built on Base UI, styled with Tailwind CSS, and themed with the same CSS variables as shadcn/ui. Any shadcn theme restyles audiocn."
+      },
+      {
+        "tag": "li",
+        "text": "Fast by default. Meters and visualizers paint on the animation frame without re-rendering React, so a mixer with many channels stays smooth."
+      }
+    ],
+    "local": [
+      {
+        "tag": "li",
+        "text": "Built on Kobalte, styled with Tailwind CSS, and themed with the same CSS variables as shadcn/ui. Any shadcn theme restyles audiocn."
+      },
+      {
+        "tag": "li",
+        "text": "Fast by default. Meters and visualizers paint on the animation frame without driving Solid component updates for every audio frame, so a mixer with many channels stays smooth."
+      }
+    ]
+  },
+  {
+    "route": "/docs",
+    "reason": "Adjacent-page metadata describes the Solid registry installation.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn registry to a shadcn/ui project and install components with the shadcn CLI."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI."
+      }
+    ]
+  },
+  {
+    "route": "/docs/concepts/decibels",
+    "reason": "The namespace is audiocn-solid/core, but installation ownership remains lib/audio.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "@audiocn/core (installed as lib/audio) has the maths every component uses:"
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The audio core, installed as lib/audio, has the maths every component uses:"
+      }
+    ]
+  },
+  {
+    "route": "/docs/concepts/decibels",
+    "reason": "Adjacent-page metadata describes the Solid registry installation.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn registry to a shadcn/ui project and install components with the shadcn CLI."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI."
+      }
+    ]
+  },
+  {
+    "route": "/docs/concepts/feeding-data",
+    "reason": "Direct DOM paints do not invalidate Solid state on every audio frame.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Pass one as source and the component subscribes and paints itself on every animation frame, without re-rendering React. This is the fastest way, and the one to use for live audio. A meter that has settled, has gone quiet or is off screen stops requesting frames, and the next frame or value wakes it, so an idle mixer costs nothing."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Pass one as source and the component subscribes and paints itself on every animation frame, without invalidating Solid reactive state for every audio frame. This is the fastest way, and the one to use for live audio. A meter that has settled, has gone quiet or is off screen stops requesting frames, and the next frame or value wakes it, so an idle mixer costs nothing."
+      }
+    ]
+  },
+  {
+    "route": "/docs/concepts/feeding-data",
+    "reason": "The low-rate state recipe targets Solid.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "When you need a level in React, for a label or a warning, use useLevel. It samples a source a few times a second."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "When you need a level in Solid, for a label or a warning, use useLevel. It samples a source a few times a second."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/db-readout",
+    "reason": "The readout paints outside Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "With a source, the readout updates its own text four times a second without re-rendering React. Its width is reserved for the longest value, so the text never pushes neighbouring elements around."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "With a source, the readout updates its own text four times a second without re-rendering Solid. Its width is reserved for the longest value, so the text never pushes neighbouring elements around."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/bar-visualizer",
+    "reason": "Animation-frame paints bypass Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Bars take their color from the text color, so set it with a class such as text-primary. Bars paint on the animation frame without re-rendering React."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Bars take their color from the text color, so set it with a class such as text-primary. Bars paint on the animation frame without updating Solid state."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/electric-bar-visualizer",
+    "reason": "Animation-frame paints bypass Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The visualizer fills its container, so size it with classes. It paints on the animation frame without re-rendering React, redraws on resize and picks up theme changes on its own."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The visualizer fills its container, so size it with classes. It paints on the animation frame without re-rendering Solid, redraws on resize and picks up theme changes on its own."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/electric-waveform",
+    "reason": "Animation-frame paints bypass Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The waveform fills its container, so size it with classes. It paints on the animation frame without re-rendering React, redraws on resize and picks up theme changes on its own."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The waveform fills its container, so size it with classes. It paints on the animation frame without re-rendering Solid, redraws on resize and picks up theme changes on its own."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/smooth-waveform",
+    "reason": "Animation-frame paints bypass Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The waveform fills its container, so size it with classes. It paints on the animation frame without re-rendering React, redraws on resize and picks up theme changes on its own."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The waveform fills its container, so size it with classes. It paints on the animation frame without re-rendering Solid, redraws on resize and picks up theme changes on its own."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/waveform",
+    "reason": "The playhead frame source bypasses Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Pass time (a frame source) for a playhead that moves every frame without re-rendering React, or currentTime for plain controlled use."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Pass time (a frame source) for a playhead that moves every frame without re-rendering Solid, or currentTime for plain controlled use."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/knob",
+    "reason": "Solid JSX uses class, not React className.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Style the SVG parts with stroke-* and fill-* classes. Restyle the lit ticks from the scale, for example <KnobScale className=\"**:data-active:stroke-primary\" />."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Style the SVG parts with stroke-* and fill-* classes. Restyle the lit ticks from the scale, for example <KnobScale class=\"**:data-active:stroke-primary\" />."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/mixer",
+    "reason": "Meters paint outside Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Sixteen strips in a console. Meters paint outside React, so a full console keeps the frame rate with no re-renders while it meters."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Sixteen strips in a console. Meters paint outside Solid, so a full console keeps the frame rate with no re-renders while it meters."
+      }
+    ]
+  },
+  {
+    "route": "/docs/components/audio-device-select",
+    "reason": "Kobalte's public Listbox item renderer owns option collections and keyboard navigation.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "AudioDeviceSelectContent renders one item per device. Pass children to render items yourself with AudioDeviceSelectItem."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "AudioDeviceSelectContent renders one item per device. Pass a Select.Listbox item renderer to render AudioDeviceSelectItem yourself."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-demo-signal",
+    "reason": "The framework-neutral factory is usable outside Solid.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Outside React, createDemoSignal(options) returns the same object."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Outside Solid, createDemoSignal(options) returns the same object."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-frame-source",
+    "reason": "Frame callbacks paint outside Solid component updates.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The callback runs outside React rendering, so it can update the DOM on every frame without re-rendering."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The callback runs outside Solid rendering, so it can update the DOM on every frame without re-rendering."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-frame-source",
+    "reason": "Adjacent-page metadata names Solid state.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into React state at a low rate, for labels and conditional UI."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into Solid state at a low rate, for labels and conditional UI."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-level",
+    "reason": "The hook publishes low-rate Solid state while frame sources paint directly.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into React state at a low rate, for labels and conditional UI."
+      },
+      {
+        "tag": "p",
+        "text": "Meters paint every frame without React. When you need the level in React, for a label or to show a warning, useLevel samples the source a few times a second."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into Solid state at a low rate, for labels and conditional UI."
+      },
+      {
+        "tag": "p",
+        "text": "Meters paint every frame without component updates. When you need the level in Solid, for a label or to show a warning, useLevel samples the source a few times a second."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-clip-hold",
+    "reason": "Adjacent-page metadata names Solid state.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into React state at a low rate, for labels and conditional UI."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Read a meter source into Solid state at a low rate, for labels and conditional UI."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-gain-node",
+    "reason": "Solid owner disposal and reactive edge changes replace React StrictMode/Activity lifecycle guidance.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Each connection lives in an effect and is undone on cleanup. That makes the node safe under StrictMode and <Activity>: hiding disconnects it, and showing reconnects it at the same level."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Each connection lives in an effect and is undone on cleanup. Reactive option changes disconnect the previous edge; disposing the Solid owner releases every connection the hook owns."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-audio-player",
+    "reason": "Solid controllers use live getters; the additional recipe prevents destructuring away reactivity.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The hook creates and owns an <audio> element. Pass player.element to useAudioAnalyser or useWebAudioMixer, and player to AudioPlayer."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The hook creates and owns an <audio> element. Pass player.element to useAudioAnalyser or useWebAudioMixer, and player to AudioPlayer."
+      },
+      {
+        "tag": "p",
+        "text": "Options accept getters or an accessor. Keep the controller intact so its reactive fields stay live:"
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-sound",
+    "reason": "Solid controllers use live getters; source changes require accessors.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "The sound is fetched and decoded once per page, then plays instantly on every trigger. src can also be an AudioBuffer you made yourself."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "The sound is fetched and decoded once per page, then plays instantly on every trigger. src can also be an AudioBuffer you made yourself."
+      },
+      {
+        "tag": "p",
+        "text": "Pass an accessor for a changing source or options. Read ding.isPlaying in JSX rather than destructuring the controller."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-waveform-data",
+    "reason": "Upstream MDX accidentally parses '1.' as an ordered-list item; the port keeps the intended normalization sentence and adds Solid accessor guidance.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Peaks are the loudest sample in each slice, normalised so the loudest slice is"
+      },
+      {
+        "tag": "li",
+        "text": "Results are cached per file and sample count. src can also be an AudioBuffer."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Peaks are the loudest sample in each slice, normalised so the loudest slice is 1. Results are cached per file and sample count. src can also be an AudioBuffer."
+      },
+      {
+        "tag": "p",
+        "text": "Pass an accessor for a changing source or sample count. Read the returned fields in JSX so changes stay reactive."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-waveform-data",
+    "reason": "The framework-neutral peak helper is usable outside Solid.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "computePeaks(buffer, samples) is exported for use outside React."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "computePeaks(buffer, samples) is exported for use outside Solid."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-mixer",
+    "reason": "The framework-neutral mixer helpers are usable outside Solid.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "mixerReducer and isChannelAudible are exported for use outside React."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "mixerReducer and isChannelAudible are exported for use outside Solid."
+      }
+    ]
+  }
+]

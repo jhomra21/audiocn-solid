@@ -1,6 +1,7 @@
 import type { JSX } from "@solidjs/web";
-import { For, Show, createSignal, onCleanup, onSettled } from "solid-js";
+import { For, Show, createSignal, onSettled } from "solid-js";
 
+import { BrandAssetsMenu } from "@/site/components/docs/brand-assets-menu";
 import {
   ChevronDownIcon,
   PanelLeftIcon,
@@ -11,12 +12,14 @@ import { SiteSearch, openSearch } from "@/site/components/docs/search-dialog";
 import { SidebarControls } from "@/site/components/docs/sidebar-controls";
 import { SiteFooter } from "@/site/components/docs/site-footer";
 import { DOCS_NAVIGATION } from "@/site/lib/docs/navigation";
+import metadata from "@/site/lib/docs/page-metadata.json";
 
 interface DocsShellProps {
   children: JSX.Element;
   currentPath: string;
   description: string;
   title: string;
+  full?: boolean;
 }
 
 interface TocHeading {
@@ -58,10 +61,7 @@ const revealCurrentLink = (viewport: HTMLDivElement) => {
 };
 
 const Brand = () => (
-  <a
-    class="me-auto inline-flex items-center gap-2.5 text-[0.9375rem] font-medium select-none"
-    href="/"
-  >
+  <BrandAssetsMenu class="me-auto inline-flex items-center gap-2.5 text-[0.9375rem] font-medium select-none">
     <span class="font-heading inline-flex items-center gap-1 font-semibold tracking-tight">
       <img
         alt=""
@@ -74,7 +74,7 @@ const Brand = () => (
       audiocn
       <span class="text-muted-foreground ms-1 text-xs font-normal">Solid</span>
     </span>
-  </a>
+  </BrandAssetsMenu>
 );
 
 const DocsNavigation = (props: { currentPath: string }) => (
@@ -172,6 +172,18 @@ const TableOfContents = (props: {
 );
 
 export const DocsShell = (props: DocsShellProps) => {
+  const pages = DOCS_NAVIGATION.flatMap((area) =>
+    area.groups.flatMap((group) => group.items)
+  );
+
+  const currentIndex = () =>
+    pages.findIndex((page) => page.href === props.currentPath);
+
+  const adjacent = () => [pages[currentIndex() - 1], pages[currentIndex() + 1]];
+
+  const pageMetadata: { title: string; description: string; url: string }[] =
+    metadata;
+
   const [collapsed, setCollapsed] = createSignal(false);
   const [mobileOpen, setMobileOpen] = createSignal(false);
   const [tocOpen, setTocOpen] = createSignal(false);
@@ -221,13 +233,14 @@ export const DocsShell = (props: DocsShellProps) => {
     setHeadings(values);
     setActiveHeading(values[0]?.id ?? "");
     nodes.forEach((node) => observer.observe(node));
-    onCleanup(() => observer.disconnect());
+
+    return () => observer.disconnect();
   });
 
   return (
     <div class="flex min-h-0 flex-1 flex-col">
       <div
-        class={`grid [--fd-sidebar-width:0px] [--fd-toc-width:0px] xl:[--fd-toc-width:268px] ${collapsed() ? "" : "md:[--fd-sidebar-width:268px]"}`}
+        class={`grid [--fd-sidebar-width:0px] [--fd-toc-width:0px] ${props.full ? "" : "xl:[--fd-toc-width:268px]"} ${collapsed() ? "" : "md:[--fd-sidebar-width:268px]"}`}
         data-sidebar-collapsed={collapsed() ? "true" : "false"}
         id="nd-docs-layout"
         style={{
@@ -326,10 +339,10 @@ export const DocsShell = (props: DocsShellProps) => {
             class="sticky top-14 z-10 [grid-area:toc-popover] md:top-0 xl:hidden"
             data-docs-toc-popover
           >
-            <div class="bg-background/80 border-b backdrop-blur-sm">
+            <div class="bg-background/80 backdrop-blur-sm">
               <button
                 aria-expanded={tocOpen() ? "true" : "false"}
-                class="text-muted-foreground flex h-10 w-full items-center gap-2.5 px-4 py-2.5 text-start text-sm md:px-6 [&_svg]:size-4"
+                class="text-muted-foreground flex h-10 w-full items-center gap-2.5 border-b px-4 py-2.5 text-start text-sm md:px-6 [&_svg]:size-4"
                 onClick={() => setTocOpen((open) => !open)}
                 type="button"
               >
@@ -377,16 +390,49 @@ export const DocsShell = (props: DocsShellProps) => {
         </Show>
 
         <main class="grid justify-items-center [grid-area:main]">
-          <article class="flex w-full max-w-[900px] min-w-0 flex-col gap-4 px-4 py-6 md:px-6 md:pt-8 md:in-data-[sidebar-collapsed=true]:pt-16 xl:px-8 xl:pt-14 xl:in-data-[sidebar-collapsed=true]:pt-14">
+          <article
+            data-full={props.full ? "true" : undefined}
+            class={`flex w-full ${props.full ? "" : "max-w-[900px]"} min-w-0 flex-col gap-4 px-4 py-6 md:px-6 md:pt-8 md:in-data-[sidebar-collapsed=true]:pt-16 xl:px-8 xl:pt-14 xl:in-data-[sidebar-collapsed=true]:pt-14`}
+          >
             <h1 class="text-[1.75em] font-semibold">{props.title}</h1>
             <p class="text-muted-foreground mb-8 text-lg">
               {props.description}
             </p>
             <div class="docs-article prose flex-1">{props.children}</div>
+            <div
+              role="navigation"
+              aria-label="Adjacent pages"
+              class="grid grid-cols-2 gap-4 pb-6"
+            >
+              <For each={adjacent()}>
+                {(page, index) => (
+                  <Show when={page} fallback={<div />}>
+                    {(item) => {
+                      const details = () =>
+                        pageMetadata.find((entry) => entry.url === item().href);
+
+                      return (
+                        <a
+                          href={item().href}
+                          class={`hover:bg-accent/50 flex flex-col gap-2 rounded-lg border p-4 transition-colors ${index() === 1 ? "col-start-2 text-end" : ""}`}
+                        >
+                          <p class="font-medium">
+                            {details()?.title ?? item().label}
+                          </p>
+                          <p class="text-muted-foreground text-sm">
+                            {details()?.description}
+                          </p>
+                        </a>
+                      );
+                    }}
+                  </Show>
+                )}
+              </For>
+            </div>
           </article>
         </main>
 
-        <Show when={headings().length > 0}>
+        <Show when={!props.full && headings().length > 0}>
           <div class="sticky top-0 flex h-dvh w-(--fd-toc-width) flex-col pe-4 pt-12 pb-2 [grid-area:toc] max-xl:hidden">
             <nav aria-label="On this page" class="flex min-h-0 flex-col">
               <h2 class="text-muted-foreground inline-flex items-center gap-1.5 text-sm">

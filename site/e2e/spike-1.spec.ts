@@ -108,7 +108,15 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
         page.getByRole("heading", { name: "Audio UI, mixed and mastered." })
       ).toBeVisible();
       await expect(page.locator('[data-slot="showcase-card"]')).toHaveCount(14);
-      await expect(page.locator("[data-not-yet-ported]")).toHaveCount(1);
+      await expect(page.locator("[data-not-yet-ported]")).toHaveCount(0);
+
+      for (const card of await page
+        .locator('[data-slot="showcase-card"]')
+        .all()) {
+        await card.scrollIntoViewIfNeeded();
+        await expect(card.locator('[data-slot="skeleton"]')).toHaveCount(0);
+      }
+
       await expect(
         page.locator('[data-slot="bar-visualizer"]').first()
       ).toBeVisible();

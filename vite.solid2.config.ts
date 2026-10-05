@@ -9,6 +9,18 @@ export default defineConfig({
   plugins: [solid(), tailwindcss()],
   resolve: {
     alias: {
+      "@kobalte/core/primitives/create-dom-collection": fileURLToPath(
+        new URL(
+          "./node_modules/@kobalte/core-solid2/dist/primitives/create-dom-collection/index.jsx",
+          import.meta.url
+        )
+      ),
+      "@kobalte/core/context-menu": fileURLToPath(
+        new URL(
+          "./node_modules/@kobalte/core-solid2/dist/context-menu/index.jsx",
+          import.meta.url
+        )
+      ),
       "@kobalte/core/select": fileURLToPath(
         new URL(
           "./node_modules/@kobalte/core-solid2/dist/select/index.jsx",

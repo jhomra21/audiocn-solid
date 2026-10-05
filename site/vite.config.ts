@@ -42,12 +42,24 @@ export default defineConfig({
       ssr: true,
       start: true,
     }),
-    fileRoutes({ codeSplitting: false }),
+    fileRoutes({ codeSplitting: true }),
     tailwindcss(),
     prerender({ mode: "static" }),
   ],
   resolve: {
     alias: {
+      "@kobalte/core/primitives/create-dom-collection": fileURLToPath(
+        new URL(
+          "../node_modules/@kobalte/core-solid2/dist/primitives/create-dom-collection/index.jsx",
+          import.meta.url
+        )
+      ),
+      "@kobalte/core/context-menu": fileURLToPath(
+        new URL(
+          "../node_modules/@kobalte/core-solid2/dist/context-menu/index.jsx",
+          import.meta.url
+        )
+      ),
       "@kobalte/core/select": fileURLToPath(
         new URL(
           "../node_modules/@kobalte/core-solid2/dist/select/index.jsx",
@@ -71,6 +83,10 @@ export default defineConfig({
     dedupe: ["solid-js", "@solidjs/web"],
   },
   build: {
+    // Match upstream's color lowering so low-chroma neutral tokens do not
+    // contribute a hue to OKLCH pad accent mixes.
+    cssMinify: "lightningcss",
+    cssTarget: "safari15",
     sourcemap: true,
   },
 });

@@ -127,7 +127,9 @@ const AudioPlayerRoot = (
 
   createCompatEffect(
     () => player().currentTime,
-    (time) => props.onTimeUpdate?.(time)
+    (time) => {
+      props.onTimeUpdate?.(time);
+    }
   );
 
   const keyDown = (event: KeyboardEvent) => {

@@ -39,7 +39,7 @@ interface GridContextValue {
   register: (hotkey: string, handlers: PadHandlers) => () => void;
 }
 
-const GridContext = createContext<GridContextValue>();
+const GridContext = createContext<GridContextValue | null>(null);
 
 const PadContext = createContext<{ hotkey?: string; playing: boolean }>({
   playing: false,

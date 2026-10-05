@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 import {
   DesktopIcon,
@@ -26,11 +26,12 @@ import {
   MixerMaster,
   MixerSeparator,
 } from "@/components/ui/mixer";
-import { useDemoSignal } from "@/hooks/use-demo-signal";
 import type { DemoSignalKind } from "@/hooks/use-demo-signal";
 import { useMixer } from "@/hooks/use-mixer";
 import type { Mixer as MixerController } from "@/hooks/use-mixer";
 import { formatDb } from "@/lib/audio/decibels";
+import type { FrameSource, MeterFrame } from "@/lib/audio/types";
+import { useDemoMixer } from "@/lib/docs/use-demo-mixer";
 
 interface Channel {
   id: string;
@@ -87,13 +88,11 @@ const CHANNELS: Channel[] = [
 
 const INITIAL_CHANNELS = CHANNELS.map(({ id, gainDb }) => ({ gainDb, id }));
 
-const Strip = (props: { channel: Channel; mixer: MixerController }) => {
-  const signal = useDemoSignal({
-    channels: props.channel.channels,
-    kind: props.channel.kind,
-    seed: props.channel.seed,
-  });
-
+const Strip = (props: {
+  channel: Channel;
+  mixer: MixerController;
+  source: FrameSource<MeterFrame>;
+}) => {
   const state = () => props.mixer.channel(props.channel.id);
 
   return (
@@ -113,9 +112,12 @@ const Strip = (props: { channel: Channel; mixer: MixerController }) => {
           <ChannelStripMeter>
             <LevelMeter
               aria-label={`${props.channel.name} level`}
+              ballistics={
+                props.mixer.isAudible(props.channel.id) ? undefined : "instant"
+              }
               channelCount={props.channel.channels}
               size="sm"
-              source={signal.meter}
+              source={props.source}
             />
           </ChannelStripMeter>
           <ChannelStripFader>
@@ -159,7 +161,8 @@ const Strip = (props: { channel: Channel; mixer: MixerController }) => {
 
 const MixerTile = () => {
   const mixer = useMixer({ channels: INITIAL_CHANNELS });
-  const program = useDemoSignal({ channels: 2, kind: "music", seed: 9 });
+  const demo = useDemoMixer(CHANNELS, () => mixer.state);
+  const audible = () => CHANNELS.some(({ id }) => mixer.isAudible(id));
 
   return (
     // The card label titles the tile, so the mixer is named here instead of
@@ -171,9 +174,15 @@ const MixerTile = () => {
       orientation="vertical"
     >
       <MixerChannels>
-        {CHANNELS.map((channel) => (
-          <Strip channel={channel} mixer={mixer} />
-        ))}
+        <For each={CHANNELS}>
+          {(channel) => (
+            <Strip
+              channel={channel}
+              mixer={mixer}
+              source={demo.sources[channel.id]!}
+            />
+          )}
+        </For>
       </MixerChannels>
       <MixerSeparator />
       <MixerMaster>
@@ -187,9 +196,10 @@ const MixerTile = () => {
           <ChannelStripMeter>
             <LevelMeter
               aria-label="Master level"
+              ballistics={audible() ? undefined : "instant"}
               channelCount={2}
               size="sm"
-              source={program.meter}
+              source={demo.master}
             />
           </ChannelStripMeter>
           <ChannelStripFader>

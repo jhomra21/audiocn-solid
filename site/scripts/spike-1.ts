@@ -105,7 +105,17 @@ const assertHtml = async (
   const path = await findRouteHtml(route);
   const html = await readFile(path, "utf8");
 
-  if (!html.includes('data-slot="level-meter"')) {
+  if (route === "/") {
+    // Lazy tiles deliberately prerender dimensioned placeholders; browser
+    // acceptance below loads every tile and verifies the real audio controls.
+    if (
+      html.match(/data-slot="showcase-card"/g)?.length !== 14 ||
+      html.match(/data-slot="skeleton"/g)?.length !== 14
+    )
+      throw new Error(
+        "Prerendered home is missing its lazy showcase inventory."
+      );
+  } else if (!html.includes('data-slot="level-meter"')) {
     throw new Error(`Prerendered ${route} is missing LevelMeter markup.`);
   }
 
@@ -201,7 +211,7 @@ try {
     evidence: {
       html,
       runtimeRoots,
-      upstreamSha: "199b0b83e9ea175006bb2d86b529a3287e1fc4f6",
+      upstreamSha: "9598cf2abbcf0dc844e61d77d18af46a6d17e8a9",
     },
   });
 } catch (error) {

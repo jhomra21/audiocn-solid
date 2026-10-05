@@ -1,5 +1,3 @@
-import { createSignal } from "solid-js";
-
 import {
   DesktopIcon,
   MicrophoneIcon,
@@ -19,23 +17,41 @@ import { MuteToggle, SoloToggle } from "@/components/ui/channel-toggle";
 import { Fader } from "@/components/ui/fader";
 import { LevelMeter } from "@/components/ui/level-meter";
 import { useDemoSignal } from "@/hooks/use-demo-signal";
+import type { DemoSignalKind } from "@/hooks/use-demo-signal";
+import { useMixer } from "@/hooks/use-mixer";
+import type { Mixer } from "@/hooks/use-mixer";
 import { formatDb } from "@/lib/audio/decibels";
-import type { FrameSource, MeterFrame } from "@/lib/audio/types";
 import type { JSXElement } from "@/lib/solid/jsx-types";
 
 const Strip = (props: {
   title: string;
+  id: string;
+  mixer: Mixer;
   icon: JSXElement;
   accent: string;
-  source: FrameSource<MeterFrame>;
+  kind: DemoSignalKind;
+  seed?: number;
 }) => {
-  const [gainDb, setGainDb] = createSignal(0);
-  const [muted, setMuted] = createSignal(false);
+  const channel = () => props.mixer.channel(props.id)!;
+
+  const signal = useDemoSignal({
+    channels: 2,
+    kind: props.kind,
+    seed: props.seed,
+    get gainDb() {
+      return channel().gainDb;
+    },
+    get playing() {
+      return props.mixer.isAudible(props.id);
+    },
+  });
 
   return (
     <ChannelStrip
       accent={props.accent}
-      muted={muted()}
+      muted={channel().muted}
+      solo={channel().solo}
+      dimmed={props.mixer.isDimmed(props.id)}
       orientation="vertical"
       variant="card"
     >
@@ -46,55 +62,75 @@ const Strip = (props: {
       <ChannelStripMeter>
         <LevelMeter
           aria-label={`${props.title} level`}
+          ballistics={props.mixer.isAudible(props.id) ? undefined : "instant"}
           channelCount={2}
           class="h-full"
           size="sm"
-          source={props.source}
+          source={signal.meter}
         />
       </ChannelStripMeter>
       <ChannelStripFader>
         <Fader
           aria-label={`${props.title} volume`}
-          onValueChange={setGainDb}
+          onValueChange={(gainDb) => props.mixer.setGain(props.id, gainDb)}
           size="sm"
           taper="audio"
-          value={gainDb()}
+          value={channel().gainDb}
         />
       </ChannelStripFader>
-      <ChannelStripValue>{formatDb(gainDb())}</ChannelStripValue>
+      <ChannelStripValue>{formatDb(channel().gainDb)}</ChannelStripValue>
       <ChannelStripControls>
-        <MuteToggle onPressedChange={setMuted} pressed={muted()} size="sm">
+        <MuteToggle
+          aria-label={`Mute ${props.title}`}
+          onPressedChange={(muted) => props.mixer.setMuted(props.id, muted)}
+          pressed={channel().muted}
+          size="sm"
+        >
           M
         </MuteToggle>
-        <SoloToggle size="sm">S</SoloToggle>
+        <SoloToggle
+          aria-label={`Solo ${props.title}`}
+          onPressedChange={(solo) => props.mixer.setSolo(props.id, solo)}
+          pressed={channel().solo}
+          size="sm"
+        >
+          S
+        </SoloToggle>
       </ChannelStripControls>
     </ChannelStrip>
   );
 };
 
 const ChannelStripConsole = () => {
-  const voice = useDemoSignal({ channels: 2, kind: "speech" });
-  const music = useDemoSignal({ channels: 2, kind: "music" });
-  const game = useDemoSignal({ channels: 2, kind: "noise", seed: 3 });
+  const mixer = useMixer({
+    channels: [{ id: "mic" }, { id: "music" }, { id: "game" }],
+  });
 
   return (
     <div class="flex h-96 max-w-full gap-3 overflow-x-auto">
       <Strip
         accent="var(--chart-2)"
         icon={<MicrophoneIcon />}
-        source={voice.meter}
+        id="mic"
+        mixer={mixer}
+        kind="speech"
         title="Mic"
       />
       <Strip
         accent="var(--chart-1)"
         icon={<MusicNotesIcon />}
-        source={music.meter}
+        id="music"
+        mixer={mixer}
+        kind="music"
         title="Music"
       />
       <Strip
         accent="var(--chart-4)"
         icon={<DesktopIcon />}
-        source={game.meter}
+        id="game"
+        mixer={mixer}
+        kind="noise"
+        seed={3}
         title="Game"
       />
     </div>

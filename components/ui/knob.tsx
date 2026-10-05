@@ -854,7 +854,13 @@ export const KnobDial = (props: KnobDialProps) => {
       aria-valuenow={context.value()}
       aria-valuetext={context.format()(context.value())}
       class={cn(
-        "relative size-(--knob-size) cursor-grab touch-none rounded-full outline-none aria-disabled:cursor-default data-dragging:cursor-grabbing",
+        "relative size-(--knob-size) cursor-grab touch-none rounded-full outline-none aria-disabled:cursor-default",
+        {
+          "data-dragging:cursor-ew-resize":
+            dial.dragDirection() === "horizontal",
+          "data-dragging:cursor-grabbing": dial.dragDirection() === "circular",
+          "data-dragging:cursor-ns-resize": dial.dragDirection() === "vertical",
+        },
         props.class,
         props.className
       )}

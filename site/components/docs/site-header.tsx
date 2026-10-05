@@ -1,3 +1,7 @@
+import { For, Show } from "solid-js";
+
+import { BrandAssetsMenu } from "@/site/components/docs/brand-assets-menu";
+import { MoonIcon, SunIcon } from "@/site/components/docs/icons";
 import { SiteSearch, openSearch } from "@/site/components/docs/search-dialog";
 import { useAppearance } from "@/site/components/docs/theme-controls";
 import { siteConfig } from "@/site/lib/site";
@@ -15,12 +19,10 @@ export const SiteHeader = () => {
     <>
       <header class="bg-background/90 sticky top-0 z-50 border-b backdrop-blur">
         <div class="mx-auto flex h-14 w-full max-w-7xl items-center gap-5 px-4 sm:px-6">
-          <a
-            class="focus-visible:ring-ring/50 flex items-center gap-2 rounded-md outline-none focus-visible:ring-3"
-            href="/"
-          >
+          <BrandAssetsMenu class="focus-visible:ring-ring/50 flex items-center gap-2 rounded-md outline-none focus-visible:ring-3">
             <img
               alt=""
+              data-slot="brand-logo"
               aria-hidden="true"
               class="size-7 dark:invert"
               height="28"
@@ -31,20 +33,22 @@ export const SiteHeader = () => {
               audiocn
             </span>
             <span class="text-muted-foreground text-xs">Solid</span>
-          </a>
+          </BrandAssetsMenu>
 
           <nav
             aria-label="Primary"
             class="hidden items-center gap-1 text-sm sm:flex"
           >
-            {navItems.map((item) => (
-              <a
-                class="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md px-2.5 py-1.5 transition-colors"
-                href={item.href}
-              >
-                {item.label}
-              </a>
-            ))}
+            <For each={navItems}>
+              {(item) => (
+                <a
+                  class="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md px-2.5 py-1.5 transition-colors"
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              )}
+            </For>
           </nav>
 
           <div class="ml-auto flex items-center gap-1">
@@ -84,9 +88,12 @@ export const SiteHeader = () => {
               }
               type="button"
             >
-              <span aria-hidden="true">
-                {appearance() === "dark" ? "☀" : "☾"}
-              </span>
+              <Show
+                when={appearance() === "dark"}
+                fallback={<MoonIcon class="size-4" />}
+              >
+                <SunIcon class="size-4" />
+              </Show>
             </button>
           </div>
         </div>

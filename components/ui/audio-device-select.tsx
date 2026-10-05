@@ -9,12 +9,7 @@ import {
 } from "solid-js";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectTrigger } from "@/components/ui/select";
 import type {
   SelectContentProps,
   SelectTriggerProps,
@@ -53,6 +48,7 @@ interface DeviceItem {
 }
 
 interface DeviceContextValue {
+  readonly selected: DeviceItem | null;
   readonly items: DeviceItem[];
   readonly loading: boolean;
   readonly permission: "granted" | "prompt" | "denied";
@@ -98,21 +94,24 @@ export interface AudioDeviceSelectValueProps extends Omit<
 
 export const AudioDeviceSelectValue = (props: AudioDeviceSelectValueProps) => {
   const settings = useDeviceSelect("AudioDeviceSelectValue");
-  const rest = omitProps(props, ["class", "className", "placeholder"]);
+  const select = SelectPrimitive.useSelectContext();
+  const id = () => props.id ?? select.generateId("value");
+  createCompatEffect(id, select.registerValueId);
+  const rest = omitProps(props, ["class", "className", "placeholder", "id"]);
 
   return (
-    <SelectValue<DeviceItem>
+    <span
+      id={id()}
+      data-placeholder-shown={settings.selected ? undefined : ""}
       class={cn("truncate", props.class, props.className)}
       data-slot="audio-device-select-value"
       {...rest}
     >
-      {(state) =>
-        state.selectedOption()?.label ??
+      {settings.selected?.label ??
         (settings.loading
           ? "Finding devices…"
-          : (props.placeholder ?? "Select a device"))
-      }
-    </SelectValue>
+          : (props.placeholder ?? "Select a device"))}
+    </span>
   );
 };
 
@@ -337,6 +336,9 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
     ) ?? null;
 
   const settings: DeviceContextValue = {
+    get selected() {
+      return selected();
+    },
     get items() {
       return items();
     },

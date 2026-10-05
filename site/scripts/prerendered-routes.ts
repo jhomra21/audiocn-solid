@@ -5,7 +5,7 @@ export const clientDirectory = join(import.meta.dirname, "../dist/client");
 
 const PAGE_MARKER = /\sdata-(?:docs-)?route-not-yet-ported="/;
 
-const ITEM_MARKER = /\sdata-not-yet-ported="([^"]*)"/g;
+const ITEM_MARKER = /\sdata-(?:not-yet-ported|docs-ssr-error)="([^"]*)"/g;
 
 export interface PrerenderedRoute {
   route: string;

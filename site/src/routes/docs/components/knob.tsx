@@ -6,7 +6,7 @@ import KnobDoc, { frontmatter } from "@/site/content/docs/components/knob.mdx";
 export default function KnobPage() {
   return (
     <>
-      <Title>`${frontmatter.title} for Solid - audiocn Solid`</Title>
+      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
       <Meta content={frontmatter.description} name="description" />
       <DocsShell
         currentPath="/docs/components/knob"

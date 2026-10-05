@@ -8,7 +8,7 @@ import UseMicrophoneDoc, {
 export default function UseMicrophonePage() {
   return (
     <>
-      <Title>`${frontmatter.title} - audiocn Solid`</Title>
+      <Title>{`${frontmatter.title} - audiocn Solid`}</Title>
       <Meta content={frontmatter.description} name="description" />
       <DocsShell
         currentPath="/docs/hooks/use-microphone"

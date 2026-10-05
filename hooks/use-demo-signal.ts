@@ -13,6 +13,8 @@ export interface DemoSignalOptions {
   channels?: number;
   /** Changes the pattern while keeping it repeatable. Default 1. */
   seed?: number;
+  /** Gain applied after the synthetic signal, in dB. Default 0. */
+  gainDb?: number;
   /** Frequency bands per visual frame. Default 32. */
   bands?: number;
   /** Entries in the level history ring. Default 60. */
@@ -209,6 +211,7 @@ export const createDemoSignal = (
   let kind: DemoSignalKind = "speech";
   let channels = 1;
   let seed = 1;
+  let gainDb = 0;
   let playing = true;
   let historyIntervalMs = 50;
   let bands = new Float32Array(32);
@@ -234,6 +237,7 @@ export const createDemoSignal = (
     kind = options.kind ?? kind;
     channels = clamp(Math.round(options.channels ?? channels), 1, 8);
     seed = options.seed ?? seed;
+    gainDb = options.gainDb ?? gainDb;
     playing = options.playing ?? playing;
     historyIntervalMs = options.historyIntervalMs ?? historyIntervalMs;
 
@@ -258,7 +262,9 @@ export const createDemoSignal = (
     startMs ??= nowMs;
     const seconds = (nowMs - startMs) / MS_PER_SECOND;
     const activeKind: DemoSignalKind = playing ? kind : "silence";
-    const amplitude = Math.min(1, amplitudeFor(activeKind, seed, seconds));
+    const inputAmplitude = Math.min(1, amplitudeFor(activeKind, seed, seconds));
+    const gain = dbToGain(gainDb);
+    const amplitude = inputAmplitude * gain;
     const crestGain = dbToGain(-CREST_DB[activeKind]);
 
     meterFrame.channels.length = channels;
@@ -270,7 +276,7 @@ export const createDemoSignal = (
           ? 1
           : 1 + 0.3 * (smoothNoise(seed + 17 * channel, seconds * 3) - 0.5);
 
-      const channelAmplitude = Math.min(1, amplitude * wobble);
+      const channelAmplitude = Math.min(1, inputAmplitude * wobble) * gain;
       loudest = Math.max(loudest, channelAmplitude);
       meterFrame.channels[channel] = {
         peakDb: gainToDb(channelAmplitude),
@@ -347,6 +353,7 @@ export const useDemoSignal = (options: DemoSignalOptions = {}): DemoSignal => {
     () => ({
       bands: options.bands,
       channels: options.channels,
+      gainDb: options.gainDb,
       historyIntervalMs: options.historyIntervalMs,
       historySize: options.historySize,
       kind: options.kind,

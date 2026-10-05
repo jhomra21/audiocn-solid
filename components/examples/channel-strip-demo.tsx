@@ -21,10 +21,19 @@ import { LevelMeter } from "@/components/ui/level-meter";
 import { useDemoSignal } from "@/hooks/use-demo-signal";
 
 const ChannelStripDemo = () => {
-  const signal = useDemoSignal({ kind: "speech" });
   const [gainDb, setGainDb] = createSignal(0);
   const [muted, setMuted] = createSignal(false);
   const [solo, setSolo] = createSignal(false);
+
+  const signal = useDemoSignal({
+    kind: "speech",
+    get gainDb() {
+      return gainDb();
+    },
+    get playing() {
+      return !muted();
+    },
+  });
 
   return (
     <ChannelStrip class="max-w-2xl" muted={muted()} solo={solo()}>
@@ -43,6 +52,7 @@ const ChannelStripDemo = () => {
       <ChannelStripMeter>
         <LevelMeter
           aria-label="Microphone level"
+          ballistics={muted() ? "instant" : undefined}
           size="sm"
           source={signal.meter}
         />

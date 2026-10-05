@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 import {
   DesktopIcon,
@@ -28,17 +28,29 @@ import {
   MixerSeparator,
   MixerTitle,
 } from "@/components/ui/mixer";
-import { useDemoSignal } from "@/hooks/use-demo-signal";
 import { useMixer } from "@/hooks/use-mixer";
 import type { Mixer as MixerController } from "@/hooks/use-mixer";
 import { formatDb } from "@/lib/audio/decibels";
 import type { FrameSource, MeterFrame } from "@/lib/audio/types";
+import { useDemoMixer } from "@/lib/docs/use-demo-mixer";
 import type { JSXElement } from "@/lib/solid/jsx-types";
 
 const channels = [
-  { Icon: MicrophoneIcon, id: "mic", title: "Microphone" },
-  { Icon: DesktopIcon, id: "system", title: "System audio" },
-  { Icon: MusicNotesIcon, id: "music", title: "Music" },
+  { Icon: MicrophoneIcon, id: "mic", kind: "speech", title: "Microphone" },
+  {
+    Icon: DesktopIcon,
+    id: "system",
+    kind: "noise",
+    channels: 2,
+    title: "System audio",
+  },
+  {
+    Icon: MusicNotesIcon,
+    id: "music",
+    kind: "music",
+    channels: 2,
+    title: "Music",
+  },
 ] as const;
 
 const Strip = (props: {
@@ -67,6 +79,9 @@ const Strip = (props: {
           <ChannelStripMeter>
             <LevelMeter
               aria-label={`${props.title} level`}
+              ballistics={
+                props.mixer.isAudible(props.id) ? undefined : "instant"
+              }
               size="sm"
               source={props.source}
             />
@@ -104,15 +119,8 @@ const Strip = (props: {
 
 const MixerDemo = () => {
   const mixer = useMixer({ channels: channels.map(({ id }) => ({ id })) });
-  const speech = useDemoSignal({ kind: "speech" });
-  const noise = useDemoSignal({ channels: 2, kind: "noise" });
-  const music = useDemoSignal({ channels: 2, kind: "music" });
-
-  const sources = {
-    mic: speech.meter,
-    music: music.meter,
-    system: noise.meter,
-  };
+  const demo = useDemoMixer(channels, () => mixer.state);
+  const audible = () => channels.some(({ id }) => mixer.isAudible(id));
 
   return (
     <Mixer class="w-full max-w-2xl">
@@ -120,15 +128,17 @@ const MixerDemo = () => {
         <MixerTitle>Audio mixer</MixerTitle>
       </MixerHeader>
       <MixerChannels>
-        {channels.map((channel) => (
-          <Strip
-            icon={<channel.Icon />}
-            id={channel.id}
-            mixer={mixer}
-            source={sources[channel.id]}
-            title={channel.title}
-          />
-        ))}
+        <For each={channels}>
+          {(channel) => (
+            <Strip
+              icon={<channel.Icon />}
+              id={channel.id}
+              mixer={mixer}
+              source={demo.sources[channel.id]!}
+              title={channel.title}
+            />
+          )}
+        </For>
       </MixerChannels>
       <MixerSeparator />
       <MixerMaster>
@@ -142,9 +152,10 @@ const MixerDemo = () => {
           <ChannelStripMeter>
             <LevelMeter
               aria-label="Master level"
+              ballistics={audible() ? undefined : "instant"}
               channelCount={2}
               size="sm"
-              source={music.meter}
+              source={demo.master}
             />
           </ChannelStripMeter>
           <ChannelStripFader>

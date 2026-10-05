@@ -8,6 +8,7 @@ import {
   createUniqueId,
   omit,
   onCleanup,
+  onSettled,
 } from "solid-js";
 
 import AudioDeviceSelectDemo from "@/components/examples/audio-device-select-demo";
@@ -67,28 +68,43 @@ import LiveWaveformDemo from "@/components/examples/live-waveform-demo";
 import LiveWaveformIdle from "@/components/examples/live-waveform-idle";
 import LiveWaveformMicrophone from "@/components/examples/live-waveform-microphone";
 import LiveWaveformVariants from "@/components/examples/live-waveform-variants";
+import MicSetupDemo from "@/components/examples/mic-setup-demo";
 import MixerConsole from "@/components/examples/mixer-console";
 import MixerDemo from "@/components/examples/mixer-demo";
 import MixerEmptyDemo from "@/components/examples/mixer-empty";
+import MusicPlayerDemo from "@/components/examples/music-player-demo";
+import MusicPlayerDucking from "@/components/examples/music-player-ducking";
 import PanControlDemo from "@/components/examples/pan-control-demo";
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import ParameterSliderDemo from "@/components/examples/parameter-slider-demo";
 import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
+import QuickAudioPopoverDemo from "@/components/examples/quick-audio-popover-demo";
 import SmoothWaveformDemo from "@/components/examples/smooth-waveform-demo";
 import SmoothWaveformMicrophone from "@/components/examples/smooth-waveform-microphone";
 import SmoothWaveformModes from "@/components/examples/smooth-waveform-modes";
 import SmoothWaveformStates from "@/components/examples/smooth-waveform-states";
 import SoundPadDemo from "@/components/examples/sound-pad-demo";
 import SoundPadGridDemo from "@/components/examples/sound-pad-grid";
+import SoundboardDemo from "@/components/examples/soundboard-demo";
 import SpectrumDemo from "@/components/examples/spectrum-demo";
 import SpectrumMicrophone from "@/components/examples/spectrum-microphone";
 import SpectrumVariants from "@/components/examples/spectrum-variants";
+import SystemAudioMixerConsole from "@/components/examples/system-audio-mixer-console";
+import SystemAudioMixerDemo from "@/components/examples/system-audio-mixer-demo";
+import SystemAudioSettingsDemo from "@/components/examples/system-audio-settings-demo";
 import TrackListDemo from "@/components/examples/track-list-demo";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import VolumeControlPopover from "@/components/examples/volume-control-popover";
 import WaveformDemo from "@/components/examples/waveform-demo";
 import WaveformRegions from "@/components/examples/waveform-regions";
 import WaveformVariants from "@/components/examples/waveform-variants";
+import {
+  Tabs as CommandTabs,
+  TabsList as CommandTabsList,
+  TabsTrigger as CommandTab,
+  TabsContent as CommandContent,
+} from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -361,6 +377,14 @@ export const Tab = (props: TabProps) => (
 type ExampleName = keyof typeof examples;
 
 const examples = {
+  "mic-setup-demo": MicSetupDemo,
+  "music-player-demo": MusicPlayerDemo,
+  "music-player-ducking": MusicPlayerDucking,
+  "quick-audio-popover-demo": QuickAudioPopoverDemo,
+  "soundboard-demo": SoundboardDemo,
+  "system-audio-mixer-demo": SystemAudioMixerDemo,
+  "system-audio-mixer-console": SystemAudioMixerConsole,
+  "system-audio-settings-demo": SystemAudioSettingsDemo,
   "audio-player-demo": AudioPlayerDemo,
   "audio-player-compact": AudioPlayerCompact,
   "audio-device-select-demo": AudioDeviceSelectDemo,
@@ -522,45 +546,57 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
           )}
         </For>
       </div>
-      <div
-        aria-labelledby={`${id}-preview-tab`}
-        class="flex-1 text-sm outline-none"
-        data-slot="tabs-content"
-        hidden={selected() !== "preview"}
-        id={`${id}-preview-panel`}
-        role="tabpanel"
-        tabindex="0"
-      >
+      <Show when={selected() === "preview"}>
         <div
-          class={`bg-background flex min-h-72 w-full justify-center rounded-xl border p-4 sm:p-10 ${props.align === "start" ? "items-start" : props.align === "end" ? "items-end" : "items-center"} ${props.className ?? ""}`}
-          data-slot="component-preview"
+          aria-labelledby={`${id}-preview-tab`}
+          class="flex-1 text-sm outline-none"
+          data-slot="tabs-content"
+          id={`${id}-preview-panel`}
+          role="tabpanel"
+          tabindex="0"
         >
-          <Errored
-            fallback={(error) => {
-              const current = error();
-
-              return (
-                <div data-docs-ssr-error={props.name}>
-                  {current instanceof Error ? current.message : String(current)}
-                </div>
-              );
-            }}
+          <div
+            class={cn(
+              "bg-background flex min-h-72 w-full justify-center rounded-xl border p-4 sm:p-10",
+              props.align === "start"
+                ? "items-start"
+                : props.align === "end"
+                  ? "items-end"
+                  : "items-center",
+              props.className
+            )}
+            data-slot="component-preview"
           >
-            <Example />
-          </Errored>
+            <Errored
+              fallback={(error) => {
+                const current = error();
+
+                return (
+                  <div data-docs-ssr-error={props.name}>
+                    {current instanceof Error
+                      ? current.message
+                      : String(current)}
+                  </div>
+                );
+              }}
+            >
+              <Example />
+            </Errored>
+          </div>
         </div>
-      </div>
-      <div
-        aria-labelledby={`${id}-code-tab`}
-        class="flex-1 text-sm outline-none [&_.fd-scroll-container]:max-h-[32rem] [&_figure]:my-0"
-        data-slot="tabs-content"
-        hidden={selected() !== "code"}
-        id={`${id}-code-panel`}
-        role="tabpanel"
-        tabindex="0"
-      >
-        {props.children}
-      </div>
+      </Show>
+      <Show when={selected() === "code"}>
+        <div
+          aria-labelledby={`${id}-code-tab`}
+          class="flex-1 text-sm outline-none [&_.fd-scroll-container]:max-h-[32rem] [&_figure]:my-0"
+          data-slot="tabs-content"
+          id={`${id}-code-panel`}
+          role="tabpanel"
+          tabindex="0"
+        >
+          {props.children}
+        </div>
+      </Show>
     </section>
   );
 };
@@ -595,55 +631,106 @@ const InstallTabs = (props: InstallCommandProps) => {
   const [selected, setSelected] = createSignal("pnpm");
   const current = () => commands.find(([manager]) => manager === selected())!;
   const [copied, copy] = createCopy(() => current()[1]);
+  onSettled(() => {
+    try {
+      const saved = localStorage.getItem("packageManager");
+
+      if (commands.some(([manager]) => manager === saved)) setSelected(saved!);
+    } catch {
+      // Storage may be blocked; selection stays local to this command.
+    }
+  });
+
+  const selectManager = (value: string) => {
+    setSelected(value);
+
+    try {
+      localStorage.setItem("packageManager", value);
+    } catch {
+      /* Selection still works without storage. */
+    }
+  };
 
   return (
     <section
       class="not-prose bg-code relative my-4 overflow-hidden rounded-xl"
       data-docs-component="install-command"
     >
-      <div class="text-muted-foreground flex h-10 items-center border-b ps-4 pe-2">
-        <svg
-          aria-hidden="true"
-          class="me-2 size-4 shrink-0"
-          viewBox="0 0 24 24"
+      <CommandTabs
+        value={selected()}
+        onValueChange={selectManager}
+        class="gap-0"
+      >
+        <CommandTabsList
+          aria-label="Package manager"
+          class="text-muted-foreground flex h-10 w-full justify-start rounded-none border-b bg-transparent p-0 ps-4 pe-10 group-data-[orientation=horizontal]/tabs:h-10"
         >
-          <path
-            d="M0 0v7.5h7.5V0zm8.25 0v7.5h7.498V0zm8.25 0v7.5H24V0zM8.25 8.25v7.5h7.498v-7.5zm8.25 0v7.5H24v-7.5zM0 16.5V24h7.5v-7.5zm8.25 0V24h7.498v-7.5zm8.25 0V24H24v-7.5z"
-            fill="currentColor"
-          />
-        </svg>
+          <svg
+            aria-hidden="true"
+            class="me-2 size-4 shrink-0"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M0 0v7.5h7.5V0zm8.25 0v7.5h7.498V0zm8.25 0v7.5H24V0zM8.25 8.25v7.5h7.498v-7.5zm8.25 0v7.5H24v-7.5zM0 16.5V24h7.5v-7.5zm8.25 0V24h7.498v-7.5zm8.25 0V24H24v-7.5z"
+              fill="currentColor"
+            />
+          </svg>
+          <For each={commands}>
+            {([manager]) => (
+              <CommandTab
+                value={manager}
+                class="relative h-7 flex-none rounded-lg bg-transparent px-2 font-mono text-sm font-medium shadow-none data-active:bg-transparent"
+              >
+                {manager}
+                <Show when={selected() === manager}>
+                  <span
+                    data-slot="tabs-indicator"
+                    aria-hidden="true"
+                    class="bg-foreground pointer-events-none absolute inset-x-0 -bottom-1.5 h-0.5"
+                  />
+                </Show>
+              </CommandTab>
+            )}
+          </For>
+        </CommandTabsList>
         <For each={commands}>
-          {([manager]) => (
-            <button
-              aria-pressed={selected() === manager ? "true" : "false"}
-              class="aria-pressed:text-foreground aria-pressed:after:bg-foreground relative h-10 px-2 font-mono text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5"
-              onClick={() => setSelected(manager)}
-              type="button"
-            >
-              {manager}
-            </button>
+          {([manager, command]) => (
+            <CommandContent value={manager}>
+              <pre class="overflow-x-auto overscroll-x-contain p-4 leading-6">
+                <code
+                  data-slot="code-block"
+                  data-language="bash"
+                  class="text-muted-foreground font-mono text-sm/none"
+                >
+                  <span class="select-none">$ </span>
+                  {command}
+                </code>
+              </pre>
+            </CommandContent>
           )}
         </For>
-        <button
-          aria-label={
-            copied() ? "Copied install command" : "Copy install command"
+      </CommandTabs>
+      <button
+        data-slot="button"
+        aria-label={
+          copied() ? "Copied install command" : "Copy install command"
+        }
+        aria-live="polite"
+        class={`${COPY_BUTTON_CLASS} absolute top-2 right-2 size-6`}
+        onClick={() => void copy()}
+        type="button"
+      >
+        <Show
+          fallback={
+            <span data-slot="idle-icon">
+              <CopyIcon />
+            </span>
           }
-          aria-live="polite"
-          class={`${COPY_BUTTON_CLASS} ms-auto`}
-          onClick={() => void copy()}
-          type="button"
+          when={copied()}
         >
-          <Show fallback={<CopyIcon />} when={copied()}>
-            <CheckIcon />
-          </Show>
-        </button>
-      </div>
-      <pre class="overflow-x-auto overscroll-x-contain p-4 leading-6">
-        <code class="text-muted-foreground font-mono text-sm/none">
-          <span class="select-none">$ </span>
-          {current()[1]}
-        </code>
-      </pre>
+          <CheckIcon />
+        </Show>
+      </button>
     </section>
   );
 };

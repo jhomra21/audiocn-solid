@@ -98,6 +98,9 @@ The paths follow the aliases in your `components.json`, so they adapt to project
 
 The two registry URLs expose the same public audiocn API. The Solid 1 registry targets Solid 1.9.15+ and the Solid 1 Kobalte line. The Solid 2 registry targets Solid 2 and the Solid 2 Kobalte line. Runtime-specific compatibility files are selected when the registry is built; application code should not branch on the Solid version.
 
+- The six audio tokens land in your global CSS. If your theme already has status colours, point the tokens at them instead (see [Theming](/docs/concepts/theming)).
+- The code compiles against an ES2022 `lib`.
+
 ## Install everything
 
 Every block pulls in the components it uses. The full mixer installs most of the library in one step:

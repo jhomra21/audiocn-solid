@@ -441,10 +441,12 @@ export const ParameterSliderInput = (props: ParameterSliderInputProps) => {
     }
   };
 
-  const finish = (event?: Event) => {
+  const finish = (event: Event & { currentTarget: HTMLInputElement }) => {
     applyDraft("input", event);
     context.commitLatest();
     setDraft(null);
+    // Ignored incomplete text never reaches the draft, so restore it here.
+    event.currentTarget.value = numericText();
   };
 
   const unit = () => context.unit();
@@ -542,6 +544,11 @@ export const ParameterSliderInput = (props: ParameterSliderInputProps) => {
           setDraft(numericText());
         }}
         onInput={(event) => {
+          // Number inputs report incomplete text such as "-" as "".
+          if (event.currentTarget.value === "") {
+            return;
+          }
+
           setDraft(event.currentTarget.value);
           applyDraft("input", event);
         }}

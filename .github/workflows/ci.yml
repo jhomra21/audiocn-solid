@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-      - run: bun install
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run format:check
       - run: bun run check
@@ -36,6 +36,7 @@ jobs:
             test-results/sound-pad
             test-results/audio-player
             test-results/audio-devices
+            test-results/blocks
             playwright-report
           if-no-files-found: ignore
 
@@ -45,8 +46,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-      - run: bun install
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
       - run: bun add --no-save solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
       - run: bunx tsc -p tsconfig.solid2.json --noEmit
       - run: bunx playwright install --with-deps chromium
@@ -66,6 +67,7 @@ jobs:
             test-results/sound-pad
             test-results/audio-player
             test-results/audio-devices
+            test-results/blocks
             playwright-report
           if-no-files-found: ignore
 
@@ -75,14 +77,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-      - run: bun install
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
       - run: cd site && bunx playwright install --with-deps chromium
       - run: bun run site:spike:1
       - run: cd site && bun run spike:2
       - run: bun run registry:spike:3
       - run: bun run kobalte:spike:4
       - run: bun run site:spike:5
+      - run: cd site && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -118,8 +121,13 @@ jobs:
             artifacts/use-mixer-e2e.json
             artifacts/use-mixer-solid1.png
             artifacts/use-mixer-solid2.png
+            artifacts/blocks-e2e.json
+            artifacts/blocks-solid1.png
+            artifacts/blocks-solid2.png
             artifacts/spike-4.json
             site/artifacts/spike-5.json
+            site/artifacts/
+            site/test-results/
             site/dist/client
             site/dist/server
             site/test-results

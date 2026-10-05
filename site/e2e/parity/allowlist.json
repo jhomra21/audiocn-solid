@@ -16,8 +16,8 @@
   {
     "route": "/docs/concepts/feeding-data",
     "upstream": "In React state",
-    "local": null,
+    "local": "In Solid state",
     "level": 2,
-    "reason": "This exact upstream-only section demonstrates React useState. The Solid page documents source/values/handle ownership instead. No other heading is exempt."
+    "reason": "The same low-rate useLevel recipe is documented with Solid state rather than React state."
   }
 ]

@@ -3,6 +3,7 @@ import { render } from "@solidjs/web";
 import { AudioDevicesApp } from "@/app/audio-devices";
 import { AudioHooksApp } from "@/app/audio-hooks";
 import { AudioPlayerApp } from "@/app/audio-player";
+import { BlocksApp } from "@/app/blocks";
 import { ContractApp } from "@/app/contracts";
 import { App } from "@/app/gallery";
 import { PlaybackApp } from "@/app/playback";
@@ -22,7 +23,9 @@ if (!root) {
 
 const dispose = render(
   () =>
-    location.pathname === "/audio-devices" ? (
+    location.pathname === "/blocks" ? (
+      <BlocksApp />
+    ) : location.pathname === "/audio-devices" ? (
       <AudioDevicesApp />
     ) : location.pathname === "/audio-player" ? (
       <AudioPlayerApp />

@@ -18,17 +18,13 @@ import { AudioDeviceSelect } from "@/components/ui/audio-device-select";
 ```
 
 ```tsx
-const audioDevices = useAudioDevices();
+const audio = useAudioDevices();
 
 <AudioDeviceSelect
-  devices={audioDevices.devices}
-  onRequestPermission={() => void audioDevices.requestPermission()}
+  devices={audio.devices}
+  onRequestPermission={audio.requestPermission}
   onValueChange={setDeviceId}
-  permission={
-    audioDevices.permission === "unsupported"
-      ? "denied"
-      : audioDevices.permission
-  }
+  permission={audio.permission === "unsupported" ? "denied" : audio.permission}
   value={deviceId()}
 />;
 ```
@@ -49,7 +45,7 @@ Devices come in as a prop, so the select works with [`useAudioDevices`](/docs/ho
 </AudioDeviceSelect>
 ```
 
-`AudioDeviceSelectContent` renders one item per device. For custom content, include Kobalte’s `Select.Listbox` to retain its option collection and keyboard navigation. Its item renderer receives a collection node for `AudioDeviceSelectItem`.
+`AudioDeviceSelectContent` renders one item per device. Pass a Select.Listbox item renderer to render `AudioDeviceSelectItem` yourself.
 
 ## Examples
 

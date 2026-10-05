@@ -1,4 +1,10 @@
 import {
+  SpeakerHighIcon,
+  SpeakerLowIcon,
+  SpeakerNoneIcon,
+  SpeakerXIcon,
+} from "@/components/icons/phosphor";
+import {
   VolumeControl,
   VolumeControlMute,
   VolumeControlSlider,
@@ -8,7 +14,10 @@ import {
 const VolumeControlDemo = () => (
   <VolumeControl class="w-full max-w-xs" defaultValue={0.6}>
     <VolumeControlMute class="group/mute">
-      <span aria-hidden="true">♫</span>
+      <SpeakerXIcon class="hidden group-data-[level=muted]/mute:block" />
+      <SpeakerNoneIcon class="hidden group-data-[level=low]/mute:block" />
+      <SpeakerLowIcon class="hidden group-data-[level=medium]/mute:block" />
+      <SpeakerHighIcon class="hidden group-data-[level=high]/mute:block" />
     </VolumeControlMute>
     <VolumeControlSlider />
     <VolumeControlValue />

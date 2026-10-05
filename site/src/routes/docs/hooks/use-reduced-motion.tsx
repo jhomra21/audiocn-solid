@@ -8,7 +8,7 @@ import UseReducedMotionDoc, {
 export default function UseReducedMotionPage() {
   return (
     <>
-      <Title>`${frontmatter.title} - audiocn Solid`</Title>
+      <Title>{`${frontmatter.title} - audiocn Solid`}</Title>
       <Meta content={frontmatter.description} name="description" />
       <DocsShell
         currentPath="/docs/hooks/use-reduced-motion"

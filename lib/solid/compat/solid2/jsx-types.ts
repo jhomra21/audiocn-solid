@@ -14,6 +14,12 @@ export type ListItemDOMProps = JSX.IntrinsicElements["li"];
 
 export type KbdDOMProps = JSX.IntrinsicElements["kbd"];
 
+export type LabelDOMProps = JSX.IntrinsicElements["label"];
+
+export type FieldSetDOMProps = JSX.IntrinsicElements["fieldset"];
+
+export type LegendDOMProps = JSX.IntrinsicElements["legend"];
+
 export type GroupDOMProps = JSX.IntrinsicElements["g"];
 
 export type HeadingDOMProps = JSX.HTMLAttributes<HTMLHeadingElement>;

@@ -85,3 +85,7 @@ For smooth `LiveWaveform` scrolling, set `historyUpdatedAt` and a positive `hist
 The built-in demo and analyser sources set these fields for you. After a pause or throttled frames, they append only the new sample and restart the history clock. They do not fill missed intervals with stale levels. Custom sources that omit the timing fields still work, but their history moves one step per update.
 
 If your source uses the shared `subscribeFrame` loop from `@/lib/audio/frame-loop`, pass `"update"` as its second argument. The loop runs source updates before canvas drawing, even when you connect a source after mounting a component.
+
+## In Solid state
+
+When you need a level in Solid, for a label or a warning, use [`useLevel`](/docs/hooks/use-level). It samples a source a few times a second.

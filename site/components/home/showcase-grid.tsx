@@ -1,42 +1,14 @@
 import { For } from "solid-js";
 
 import { cn } from "@/lib/utils";
-import { NotYetPorted } from "@/site/components/home/not-yet-ported";
 import { ShowcaseCard } from "@/site/components/home/showcase-card";
-import ChannelTile from "@/site/components/home/tiles/channel-tile";
-import CompactPlayerTile from "@/site/components/home/tiles/compact-player-tile";
-import EqTile from "@/site/components/home/tiles/eq-tile";
-import FadersTile from "@/site/components/home/tiles/faders-tile";
-import KnobsTile from "@/site/components/home/tiles/knobs-tile";
-import LiveWaveformTile from "@/site/components/home/tiles/live-waveform-tile";
-import MetersTile from "@/site/components/home/tiles/meters-tile";
-import MixerTile from "@/site/components/home/tiles/mixer-tile";
-import OutputTile from "@/site/components/home/tiles/output-tile";
-import SoundPadsTile from "@/site/components/home/tiles/sound-pads-tile";
-import SpectrumTile from "@/site/components/home/tiles/spectrum-tile";
-import VoiceTile from "@/site/components/home/tiles/voice-tile";
-import WaveformTile from "@/site/components/home/tiles/waveform-tile";
-
-const TILES = new Map([
-  ["channel", ChannelTile],
-  ["eq", EqTile],
-  ["faders", FadersTile],
-  ["knobs", KnobsTile],
-  ["meters", MetersTile],
-  ["mixer", MixerTile],
-  ["live-waveform", LiveWaveformTile],
-  ["voice", VoiceTile],
-  ["spectrum", SpectrumTile],
-  ["waveform", WaveformTile],
-  ["sound-pads", SoundPadsTile],
-  ["output", OutputTile],
-  ["compact-player", CompactPlayerTile],
-]);
+import { ShowcaseTile } from "@/site/components/home/showcase-tile";
+import type { ShowcaseTileName } from "@/site/components/home/showcase-tile";
 
 interface ShowcaseItem {
   href: string;
   label: string;
-  tile: string;
+  tile: ShowcaseTileName;
 }
 
 const WIDE: ShowcaseItem[] = [
@@ -94,22 +66,12 @@ const RIGHT: ShowcaseItem[] = [
   },
 ];
 
-const ShowcaseTile = (props: ShowcaseItem) => {
-  const Tile = TILES.get(props.tile);
-
-  return (
-    <div class="@container flex w-full min-w-0 justify-center">
-      {Tile ? <Tile /> : <NotYetPorted item={props.label} />}
-    </div>
-  );
-};
-
 const Column = (props: { class?: string; items: ShowcaseItem[] }) => (
   <div class={cn("flex min-w-0 flex-col gap-4", props.class)}>
     <For each={props.items}>
       {(item) => (
         <ShowcaseCard href={item.href} label={item.label}>
-          <ShowcaseTile {...item} />
+          <ShowcaseTile name={item.tile} />
         </ShowcaseCard>
       )}
     </For>
