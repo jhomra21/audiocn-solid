@@ -4,14 +4,18 @@ import { cn } from "@/lib/utils";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
 import { ShowcaseCard } from "@/site/components/home/showcase-card";
 import ChannelTile from "@/site/components/home/tiles/channel-tile";
+import CompactPlayerTile from "@/site/components/home/tiles/compact-player-tile";
 import EqTile from "@/site/components/home/tiles/eq-tile";
 import FadersTile from "@/site/components/home/tiles/faders-tile";
 import KnobsTile from "@/site/components/home/tiles/knobs-tile";
 import LiveWaveformTile from "@/site/components/home/tiles/live-waveform-tile";
 import MetersTile from "@/site/components/home/tiles/meters-tile";
 import MixerTile from "@/site/components/home/tiles/mixer-tile";
+import OutputTile from "@/site/components/home/tiles/output-tile";
+import SoundPadsTile from "@/site/components/home/tiles/sound-pads-tile";
 import SpectrumTile from "@/site/components/home/tiles/spectrum-tile";
 import VoiceTile from "@/site/components/home/tiles/voice-tile";
+import WaveformTile from "@/site/components/home/tiles/waveform-tile";
 
 const TILES = new Map([
   ["channel", ChannelTile],
@@ -23,6 +27,10 @@ const TILES = new Map([
   ["live-waveform", LiveWaveformTile],
   ["voice", VoiceTile],
   ["spectrum", SpectrumTile],
+  ["waveform", WaveformTile],
+  ["sound-pads", SoundPadsTile],
+  ["output", OutputTile],
+  ["compact-player", CompactPlayerTile],
 ]);
 
 interface ShowcaseItem {

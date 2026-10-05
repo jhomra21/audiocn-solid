@@ -32,6 +32,10 @@ jobs:
             test-results/popover
             test-results/playback
             test-results/web-audio-mixer
+            test-results/waveform
+            test-results/sound-pad
+            test-results/audio-player
+            test-results/audio-devices
             playwright-report
           if-no-files-found: ignore
 
@@ -58,6 +62,10 @@ jobs:
             test-results/popover
             test-results/playback
             test-results/web-audio-mixer
+            test-results/waveform
+            test-results/sound-pad
+            test-results/audio-player
+            test-results/audio-devices
             playwright-report
           if-no-files-found: ignore
 

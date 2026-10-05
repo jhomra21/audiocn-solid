@@ -6,6 +6,14 @@ export type DivDOMProps = JSX.HTMLAttributes<HTMLDivElement>;
 
 export type CanvasDOMProps = JSX.IntrinsicElements["canvas"];
 
+export type ImageDOMProps = JSX.IntrinsicElements["img"];
+
+export type ListDOMProps = JSX.IntrinsicElements["ul"];
+
+export type ListItemDOMProps = JSX.IntrinsicElements["li"];
+
+export type KbdDOMProps = JSX.IntrinsicElements["kbd"];
+
 export type GroupDOMProps = JSX.IntrinsicElements["g"];
 
 export type HeadingDOMProps = JSX.HTMLAttributes<HTMLHeadingElement>;

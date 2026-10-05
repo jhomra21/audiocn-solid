@@ -48,6 +48,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "@kobalte/core/select": fileURLToPath(
+        new URL(
+          "../node_modules/@kobalte/core-solid2/dist/select/index.jsx",
+          import.meta.url
+        )
+      ),
       "@kobalte/core/popover": fileURLToPath(
         new URL(
           "../node_modules/@kobalte/core-solid2/dist/popover/index.jsx",

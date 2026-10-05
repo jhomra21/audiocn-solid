@@ -10,6 +10,10 @@ import {
   onCleanup,
 } from "solid-js";
 
+import AudioDeviceSelectDemo from "@/components/examples/audio-device-select-demo";
+import AudioDeviceSelectStates from "@/components/examples/audio-device-select-states";
+import AudioPlayerCompact from "@/components/examples/audio-player-compact";
+import AudioPlayerDemo from "@/components/examples/audio-player-demo";
 import BarVisualizerAlign from "@/components/examples/bar-visualizer-align";
 import BarVisualizerDemo from "@/components/examples/bar-visualizer-demo";
 import BarVisualizerMini from "@/components/examples/bar-visualizer-mini";
@@ -74,11 +78,17 @@ import SmoothWaveformDemo from "@/components/examples/smooth-waveform-demo";
 import SmoothWaveformMicrophone from "@/components/examples/smooth-waveform-microphone";
 import SmoothWaveformModes from "@/components/examples/smooth-waveform-modes";
 import SmoothWaveformStates from "@/components/examples/smooth-waveform-states";
+import SoundPadDemo from "@/components/examples/sound-pad-demo";
+import SoundPadGridDemo from "@/components/examples/sound-pad-grid";
 import SpectrumDemo from "@/components/examples/spectrum-demo";
 import SpectrumMicrophone from "@/components/examples/spectrum-microphone";
 import SpectrumVariants from "@/components/examples/spectrum-variants";
+import TrackListDemo from "@/components/examples/track-list-demo";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import VolumeControlPopover from "@/components/examples/volume-control-popover";
+import WaveformDemo from "@/components/examples/waveform-demo";
+import WaveformRegions from "@/components/examples/waveform-regions";
+import WaveformVariants from "@/components/examples/waveform-variants";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -351,6 +361,16 @@ export const Tab = (props: TabProps) => (
 type ExampleName = keyof typeof examples;
 
 const examples = {
+  "audio-player-demo": AudioPlayerDemo,
+  "audio-player-compact": AudioPlayerCompact,
+  "audio-device-select-demo": AudioDeviceSelectDemo,
+  "audio-device-select-states": AudioDeviceSelectStates,
+  "waveform-demo": WaveformDemo,
+  "waveform-regions": WaveformRegions,
+  "waveform-variants": WaveformVariants,
+  "track-list-demo": TrackListDemo,
+  "sound-pad-demo": SoundPadDemo,
+  "sound-pad-grid": SoundPadGridDemo,
   "electric-bar-visualizer-demo": ElectricBarVisualizerDemo,
   "electric-bar-visualizer-colors": ElectricBarVisualizerColors,
   "electric-bar-visualizer-intensity": ElectricBarVisualizerIntensity,

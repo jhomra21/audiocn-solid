@@ -593,7 +593,12 @@
       "description": "Accessible popover with focus restoration and outside dismissal.",
       "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
       "registryDependencies": ["@audiocn-solid/core", "@audiocn-solid/button"],
-      "files": [{ "path": "components/ui/popover.tsx", "type": "registry:ui" }]
+      "files": [
+        {
+          "path": "components/ui/popover.tsx",
+          "type": "registry:ui"
+        }
+      ]
     },
     {
       "name": "bar-visualizer",
@@ -609,7 +614,10 @@
         "@audiocn-solid/use-visibility"
       ],
       "files": [
-        { "path": "components/ui/bar-visualizer.tsx", "type": "registry:ui" }
+        {
+          "path": "components/ui/bar-visualizer.tsx",
+          "type": "registry:ui"
+        }
       ]
     },
     {
@@ -625,7 +633,10 @@
         "@audiocn-solid/use-visibility"
       ],
       "files": [
-        { "path": "components/ui/smooth-waveform.tsx", "type": "registry:ui" }
+        {
+          "path": "components/ui/smooth-waveform.tsx",
+          "type": "registry:ui"
+        }
       ]
     },
     {
@@ -641,7 +652,10 @@
         "@audiocn-solid/use-visibility"
       ],
       "files": [
-        { "path": "components/ui/live-waveform.tsx", "type": "registry:ui" }
+        {
+          "path": "components/ui/live-waveform.tsx",
+          "type": "registry:ui"
+        }
       ]
     },
     {
@@ -650,7 +664,12 @@
       "title": "Electric drawing",
       "description": "Shared electric canvas colors, sparks and geometry.",
       "registryDependencies": ["@audiocn-solid/core"],
-      "files": [{ "path": "lib/electric.ts", "type": "registry:lib" }]
+      "files": [
+        {
+          "path": "lib/electric.ts",
+          "type": "registry:lib"
+        }
+      ]
     },
     {
       "name": "electric-bar-visualizer",
@@ -687,7 +706,10 @@
         "@audiocn-solid/use-visibility"
       ],
       "files": [
-        { "path": "components/ui/electric-waveform.tsx", "type": "registry:ui" }
+        {
+          "path": "components/ui/electric-waveform.tsx",
+          "type": "registry:ui"
+        }
       ]
     },
     {
@@ -702,7 +724,75 @@
         "@audiocn-solid/use-reduced-motion",
         "@audiocn-solid/use-visibility"
       ],
-      "files": [{ "path": "components/ui/spectrum.tsx", "type": "registry:ui" }]
+      "files": [
+        {
+          "path": "components/ui/spectrum.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "waveform",
+      "type": "registry:ui",
+      "title": "Waveform",
+      "description": "A clip waveform with seeking, hover, regions and markers.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        {
+          "path": "components/ui/waveform.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "track-list",
+      "type": "registry:ui",
+      "title": "Track List",
+      "description": "Track rows with active, playing and disabled states.",
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/track-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Keyboard shortcut",
+      "description": "Keyboard shortcut labels and groups.",
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/kbd.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sound-pad",
+      "type": "registry:ui",
+      "title": "Sound Pad",
+      "description": "Sound triggers with modes, hotkeys and progress.",
+      "dependencies": ["solid-js@^1.9.15", "class-variance-authority"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/kbd",
+        "@audiocn-solid/use-frame-source"
+      ],
+      "files": [
+        {
+          "path": "components/ui/sound-pad.tsx",
+          "type": "registry:ui"
+        }
+      ]
     },
     {
       "name": "use-audio-player",
@@ -712,7 +802,10 @@
       "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": ["@audiocn-solid/core"],
       "files": [
-        { "path": "hooks/use-audio-player.ts", "type": "registry:hook" }
+        {
+          "path": "hooks/use-audio-player.ts",
+          "type": "registry:hook"
+        }
       ]
     },
     {
@@ -726,7 +819,12 @@
         "@audiocn-solid/use-audio-context",
         "@audiocn-solid/use-gain-node"
       ],
-      "files": [{ "path": "hooks/use-sound.ts", "type": "registry:hook" }]
+      "files": [
+        {
+          "path": "hooks/use-sound.ts",
+          "type": "registry:hook"
+        }
+      ]
     },
     {
       "name": "use-waveform-data",
@@ -740,7 +838,10 @@
         "@audiocn-solid/use-sound"
       ],
       "files": [
-        { "path": "hooks/use-waveform-data.ts", "type": "registry:hook" }
+        {
+          "path": "hooks/use-waveform-data.ts",
+          "type": "registry:hook"
+        }
       ]
     },
     {
@@ -756,7 +857,10 @@
         "@audiocn-solid/use-mixer"
       ],
       "files": [
-        { "path": "hooks/use-web-audio-mixer.ts", "type": "registry:hook" }
+        {
+          "path": "hooks/use-web-audio-mixer.ts",
+          "type": "registry:hook"
+        }
       ]
     },
     {
@@ -769,7 +873,12 @@
         "@audiocn-solid/core",
         "@audiocn-solid/use-frame-source"
       ],
-      "files": [{ "path": "hooks/use-level.ts", "type": "registry:hook" }]
+      "files": [
+        {
+          "path": "hooks/use-level.ts",
+          "type": "registry:hook"
+        }
+      ]
     },
     {
       "name": "use-gain-node",
@@ -781,7 +890,12 @@
         "@audiocn-solid/core",
         "@audiocn-solid/use-audio-context"
       ],
-      "files": [{ "path": "hooks/use-gain-node.ts", "type": "registry:hook" }]
+      "files": [
+        {
+          "path": "hooks/use-gain-node.ts",
+          "type": "registry:hook"
+        }
+      ]
     },
     {
       "name": "use-audio-devices",
@@ -791,7 +905,10 @@
       "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": ["@audiocn-solid/core"],
       "files": [
-        { "path": "hooks/use-audio-devices.ts", "type": "registry:hook" }
+        {
+          "path": "hooks/use-audio-devices.ts",
+          "type": "registry:hook"
+        }
       ]
     },
     {
@@ -802,7 +919,10 @@
       "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": ["@audiocn-solid/core"],
       "files": [
-        { "path": "hooks/use-system-audio.ts", "type": "registry:hook" }
+        {
+          "path": "hooks/use-system-audio.ts",
+          "type": "registry:hook"
+        }
       ]
     },
     {
@@ -816,6 +936,57 @@
         {
           "path": "hooks/use-mixer.ts",
           "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Accessible selection with Kobalte keyboard navigation.",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        {
+          "path": "components/ui/select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "audio-device-select",
+      "type": "registry:ui",
+      "title": "Audio Device Select",
+      "description": "Audio device picker with permission, loading and disconnected states.",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/button",
+        "@audiocn-solid/select"
+      ],
+      "files": [
+        {
+          "path": "components/ui/audio-device-select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "audio-player",
+      "type": "registry:ui",
+      "title": "Audio Player",
+      "description": "Composable transport, seeking, time, volume, rate and loop controls.",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/volume-control",
+        "@audiocn-solid/use-audio-player",
+        "@audiocn-solid/use-frame-source"
+      ],
+      "files": [
+        {
+          "path": "components/ui/audio-player.tsx",
+          "type": "registry:ui"
         }
       ]
     }

@@ -248,3 +248,60 @@ test("docs sidebar, appearance and mobile navigation work without page overflow"
   );
   await page.screenshot({ path: "artifacts/docs-mobile-dark.png" });
 });
+
+test("playback and device docs hydrate working previews and real source", async ({
+  page,
+}) => {
+  const failures: string[] = [];
+  page.on("pageerror", (error) => failures.push(error.message));
+
+  for (const [name, count] of [
+    ["waveform", 3],
+    ["track-list", 1],
+    ["sound-pad", 2],
+    ["audio-player", 2],
+    ["audio-device-select", 2],
+  ] as const) {
+    await page.goto(`/docs/components/${name}`);
+    await expect(page.locator("[data-not-yet-ported]")).toHaveCount(0);
+    await expect(page.locator("[data-example]")).toHaveCount(count);
+    const demo = page.locator(`[data-example="${name}-demo"]`);
+
+    if (name === "audio-player") {
+      const play = demo.getByRole("button", { name: "Play", exact: true });
+      await expect(play).toBeEnabled();
+      await play.click();
+      await expect(demo.locator('[data-slot="audio-player"]')).toHaveAttribute(
+        "data-playing",
+        ""
+      );
+      await demo.getByRole("button", { name: "Pause", exact: true }).click();
+    }
+
+    if (name === "audio-device-select") {
+      const states = page.locator(
+        '[data-example="audio-device-select-states"]'
+      );
+
+      await states.getByRole("button", { name: /Shure MV7/ }).click();
+      await expect(
+        page.getByRole("option", { name: "Elgato Wave:3", exact: false })
+      ).toHaveAttribute("aria-disabled", "true");
+      await page
+        .getByRole("option", { name: /MacBook Pro Microphone/ })
+        .click();
+      await expect(
+        states.getByRole("button", { name: /MacBook Pro Microphone/ }).first()
+      ).toBeVisible();
+    }
+
+    await demo.getByRole("tab", { name: "Code", exact: true }).click();
+    await expect(demo.locator("pre")).toContainText("class=");
+    await page.screenshot({
+      path: `artifacts/docs-${name}.png`,
+      fullPage: true,
+    });
+  }
+
+  expect(failures).toEqual([]);
+});

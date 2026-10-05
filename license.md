@@ -9,3 +9,5 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 This project ports source from https://github.com/audiocn/ui. The original audiocn source is MIT licensed and its copyright notice is retained above.
+
+`site/public/sounds/peon-work-work.wav`, the "Work, work" home-page pad, is from Warcraft III. Warcraft is a trademark of Blizzard Entertainment, Inc., which owns the recording. It is not covered by the MIT licence, is not part of the registry, and is not installed by the shadcn CLI.
