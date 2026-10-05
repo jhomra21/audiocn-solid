@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 
+import { HeadphonesIcon } from "@/components/icons/phosphor";
 import {
   MonitorToggle,
   MuteToggle,
@@ -24,7 +25,7 @@ const ChannelToggleDemo = () => {
         pressed={monitor()}
         size="icon"
       >
-        ◖
+        <HeadphonesIcon />
       </MonitorToggle>
     </div>
   );

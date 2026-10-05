@@ -52,6 +52,7 @@ import ParameterSliderFrequency from "@/components/examples/parameter-slider-fre
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import {
   CheckIcon,
+  ChevronDownIcon,
   ClipboardIcon,
   CopyIcon,
   InfoIcon,
@@ -411,13 +412,17 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
 
   return (
     <section
-      class="not-prose my-6"
+      class="not-prose my-6 flex flex-col gap-2"
       data-docs-component="component-preview"
       data-example={props.name}
+      data-orientation="horizontal"
+      data-slot="tabs"
     >
       <div
         aria-label={`${props.name} example`}
-        class="mb-1 flex h-9 items-center gap-2"
+        class="text-muted-foreground inline-flex h-8 w-fit items-center justify-center gap-1 bg-transparent p-[3px]"
+        data-slot="tabs-list"
+        data-variant="line"
         role="tablist"
       >
         <For each={tabs}>
@@ -425,7 +430,8 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
             <button
               aria-controls={`${id}-${tab}-panel`}
               aria-selected={selected() === tab ? "true" : "false"}
-              class="text-muted-foreground aria-selected:text-foreground aria-selected:after:bg-foreground relative h-9 px-2 text-sm font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full"
+              class="text-foreground/60 hover:text-foreground focus-visible:ring-ring/50 aria-selected:text-foreground after:bg-foreground relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap outline-none after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:opacity-0 after:transition-opacity focus-visible:ring-3 aria-selected:after:opacity-100"
+              data-slot="tabs-trigger"
               id={`${id}-${tab}-tab`}
               onClick={() => setSelected(tab)}
               onKeyDown={onTabKeyDown}
@@ -440,6 +446,8 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
       </div>
       <div
         aria-labelledby={`${id}-preview-tab`}
+        class="flex-1 text-sm outline-none"
+        data-slot="tabs-content"
         hidden={selected() !== "preview"}
         id={`${id}-preview-panel`}
         role="tabpanel"
@@ -466,7 +474,8 @@ export const ComponentPreview = (props: ComponentPreviewProps) => {
       </div>
       <div
         aria-labelledby={`${id}-code-tab`}
-        class="[&_.fd-scroll-container]:max-h-[32rem] [&_figure]:my-0"
+        class="flex-1 text-sm outline-none [&_.fd-scroll-container]:max-h-[32rem] [&_figure]:my-0"
+        data-slot="tabs-content"
         hidden={selected() !== "code"}
         id={`${id}-code-panel`}
         role="tabpanel"
@@ -573,65 +582,92 @@ interface PropsTableProps {
 }
 
 export const PropsTable = (props: PropsTableProps) => (
-  <div class="my-4 overflow-x-auto" data-docs-component="props-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Prop</th>
-          <th>Type</th>
-          <th>Default</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <For each={props.rows}>
-          {(row) => (
-            <tr>
-              <td>
-                <code>{row[0]}</code>
-              </td>
-              <td>
-                <code>{row[1]}</code>
-              </td>
-              <td>{row[2] ?? "—"}</td>
-              <td>{row[3] ?? ""}</td>
-            </tr>
-          )}
-        </For>
-      </tbody>
-    </table>
-  </div>
+  <Show
+    when={props.rows.length > 0}
+    fallback={<p class="text-muted-foreground text-sm">No props.</p>}
+  >
+    <TypeTable
+      component="props-table"
+      type={Object.fromEntries(
+        props.rows.map(([name, type, defaultValue, description]) => [
+          name,
+          {
+            type,
+            default: defaultValue ?? undefined,
+            description: description ?? undefined,
+          },
+        ])
+      )}
+    />
+  </Show>
 );
 
 interface TypeEntry {
   default?: string;
   description?: string;
   type: string;
+  required?: boolean;
 }
 
 interface TypeTableProps {
+  component?: string;
   type: Record<string, TypeEntry>;
 }
 
 export const TypeTable = (props: TypeTableProps) => (
-  <div class="my-4 overflow-x-auto" data-docs-component="type-table">
-    <table>
-      <tbody>
-        <For each={Object.entries(props.type)}>
-          {([name, entry]) => (
-            <tr>
-              <td>
-                <code>{name}</code>
-              </td>
-              <td>
-                <code>{entry.type}</code>
-              </td>
-              <td>{entry.default ?? ""}</td>
-              <td>{entry.description ?? ""}</td>
-            </tr>
-          )}
-        </For>
-      </tbody>
-    </table>
+  <div
+    class="bg-card text-card-foreground @container my-6 flex flex-col overflow-hidden rounded-2xl border p-1 text-sm"
+    data-docs-component={props.component ?? "type-table"}
+  >
+    <div class="not-prose text-muted-foreground flex items-center px-3 py-1 font-medium">
+      <p class="w-1/4">Prop</p>
+      <p class="@max-xl:hidden">Type</p>
+    </div>
+    <For each={Object.entries(props.type)}>
+      {([name, entry]) => <TypeProperty name={name} entry={entry} />}
+    </For>
   </div>
 );
+
+const TypeProperty = (props: { name: string; entry: TypeEntry }) => {
+  const [open, setOpen] = createSignal(false);
+  const id = createUniqueId();
+
+  return (
+    <div
+      class={`scroll-m-20 overflow-hidden rounded-xl border transition-all ${open() ? "bg-background shadow-sm not-last:mb-2" : "border-transparent"}`}
+    >
+      <button
+        aria-controls={id}
+        aria-expanded={open() ? "true" : "false"}
+        aria-label={`${props.name}${props.entry.required ? "" : "?"}`}
+        class="not-prose hover:bg-accent relative flex w-full items-center px-3 py-2 text-start"
+        onClick={() => setOpen((value) => !value)}
+        type="button"
+      >
+        <code class="text-primary w-1/4 min-w-fit pe-2 font-mono font-medium">
+          {props.name}
+          {props.entry.required ? "" : "?"}
+        </code>
+        <span class="@max-xl:hidden">{props.entry.type}</span>
+        <ChevronDownIcon
+          class={`text-muted-foreground absolute end-2 size-4 transition-transform ${open() ? "rotate-180" : ""}`}
+        />
+      </button>
+      <Show when={open()}>
+        <div
+          class="fd-scroll-container grid grid-cols-[1fr_3fr] gap-y-4 overflow-auto border-t p-3 text-sm"
+          id={id}
+        >
+          <div class="prose prose-no-margin col-span-full empty:hidden">
+            {props.entry.description}
+          </div>
+          <Show when={props.entry.default}>
+            <p class="not-prose text-muted-foreground pe-2">Default</p>
+            <p class="not-prose my-auto">{props.entry.default}</p>
+          </Show>
+        </div>
+      </Show>
+    </div>
+  );
+};

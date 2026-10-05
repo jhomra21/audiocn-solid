@@ -20,7 +20,9 @@ export default function UnportedDocsPage() {
       fallback={
         <>
           <Title>Not found - audiocn Solid</Title>
-          <main class="p-8">This documentation page was not found.</main>
+          <main class="p-8" data-docs-route-unavailable={currentPath()}>
+            This documentation page was not found.
+          </main>
         </>
       }
       when={metadata()}

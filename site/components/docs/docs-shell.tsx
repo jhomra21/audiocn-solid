@@ -129,15 +129,41 @@ const DocsNavigation = (props: { currentPath: string }) => (
   </nav>
 );
 
-const TableOfContents = (props: { active: string; headings: TocHeading[] }) => (
+const TableOfContents = (props: {
+  active: string;
+  headings: TocHeading[];
+  onNavigate?: (id: string) => void;
+}) => (
   <div class="flex flex-col">
     <For each={props.headings}>
-      {(heading) => (
+      {(heading, index) => (
         <a
-          aria-current={props.active === heading.id ? "location" : undefined}
-          class={`text-muted-foreground hover:text-accent-foreground aria-[current=location]:text-primary aria-[current=location]:before:bg-primary before:bg-border relative py-1.5 text-sm wrap-anywhere transition-colors before:absolute before:inset-y-0 before:w-px ${heading.level === 3 ? "ps-8 before:start-4" : "ps-5 before:start-2"}`}
+          aria-current={props.active === heading.id ? "location" : "false"}
+          class={`text-muted-foreground hover:text-accent-foreground aria-[current=location]:text-primary relative py-1.5 text-sm wrap-anywhere transition-colors first:pt-0 last:pb-0 ${heading.level === 3 ? "ps-8" : "ps-5"}`}
           href={`#${heading.id}`}
+          onClick={() => props.onNavigate?.(heading.id)}
         >
+          <svg
+            aria-hidden="true"
+            class="pointer-events-none absolute start-0 top-0 h-full w-6 overflow-visible"
+            fill="none"
+          >
+            <path
+              class="stroke-foreground/10"
+              d={`M ${props.headings[index() - 1]?.level === 3 ? 16.5 : 8.5} 0 C ${props.headings[index() - 1]?.level === 3 ? 16.5 : 8.5} 8 ${heading.level === 3 ? 16.5 : 8.5} 4 ${heading.level === 3 ? 16.5 : 8.5} 12`}
+            />
+            <line
+              class={
+                props.active === heading.id
+                  ? "stroke-primary"
+                  : "stroke-foreground/10"
+              }
+              x1={heading.level === 3 ? 16.5 : 8.5}
+              x2={heading.level === 3 ? 16.5 : 8.5}
+              y1="12"
+              y2="100%"
+            />
+          </svg>
           {heading.title}
         </a>
       )}
@@ -296,7 +322,10 @@ export const DocsShell = (props: DocsShellProps) => {
         </Show>
 
         <Show when={headings().length > 0}>
-          <div class="sticky top-14 z-10 [grid-area:toc-popover] md:top-0 xl:hidden">
+          <div
+            class="sticky top-14 z-10 [grid-area:toc-popover] md:top-0 xl:hidden"
+            data-docs-toc-popover
+          >
             <div class="bg-background/80 border-b backdrop-blur-sm">
               <button
                 aria-expanded={tocOpen() ? "true" : "false"}
@@ -336,6 +365,10 @@ export const DocsShell = (props: DocsShellProps) => {
                   <TableOfContents
                     active={activeHeading()}
                     headings={headings()}
+                    onNavigate={(id) => {
+                      setActiveHeading(id);
+                      setTocOpen(false);
+                    }}
                   />
                 </div>
               </Show>

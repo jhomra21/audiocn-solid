@@ -67,6 +67,11 @@ export const DOCS_PAGE_METADATA = {
     description:
       "Subscribe a callback to a frame source, with a stable callback and automatic cleanup.",
   },
+  "/docs/hooks/use-level": {
+    title: "useLevel",
+    description:
+      "Read a meter source at a low rate, for labels and conditional UI.",
+  },
   "/docs/hooks/use-clip-hold": {
     title: "useClipHold",
     description: "Clip detection with a hold time, a clip count and a reset.",
