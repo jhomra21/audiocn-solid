@@ -27,6 +27,9 @@ jobs:
           name: solid-1-e2e
           path: |
             test-results/artifacts
+            test-results/audio-hooks
+            test-results/visualizers
+            test-results/popover
             playwright-report
           if-no-files-found: ignore
 
@@ -38,7 +41,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
-      - run: bun add --no-save solid-js@next @solidjs/web@next @solidjs/vite-plugin@next
+      - run: bun add --no-save solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
       - run: bunx tsc -p tsconfig.solid2.json --noEmit
       - run: bunx playwright install --with-deps chromium
       - run: bunx playwright test --config playwright.solid2.config.ts
@@ -48,6 +51,9 @@ jobs:
           name: solid-2-e2e
           path: |
             test-results/solid2-artifacts
+            test-results/audio-hooks
+            test-results/visualizers
+            test-results/popover
             playwright-report
           if-no-files-found: ignore
 

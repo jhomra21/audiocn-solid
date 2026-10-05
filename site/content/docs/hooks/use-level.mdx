@@ -1,0 +1,58 @@
+---
+title: useLevel
+description: Read a meter source into Solid state at a low rate, for labels and conditional UI.
+---
+
+Meters paint every frame without component updates. When you need the level in Solid, for a label or to show a warning, `useLevel` samples the source a few times a second.
+
+```npm
+npx shadcn@latest add @audiocn-solid/use-level
+```
+
+## Usage
+
+```tsx
+const level = useLevel(analyser.meter);
+
+return (
+  <Show when={level.zone === "clip"}>
+    <p>Turn your microphone down.</p>
+  </Show>
+);
+```
+
+## Options
+
+<PropsTable
+  rows={[
+    ["intervalMs", "number", "250", "How often Solid state updates."],
+    [
+      "channel",
+      'number | "max"',
+      '"max"',
+      "A channel index, or the loudest channel.",
+    ],
+    ["zones", "MeterZone[]", "DEFAULT_ZONES", "Zones used to compute zone."],
+    ["enabled", "boolean", "true", "Pause sampling."],
+  ]}
+/>
+
+## Returns
+
+<PropsTable
+  rows={[
+    [
+      "peakDb",
+      "number",
+      null,
+      "Peak level in dBFS. -Infinity until the first frame.",
+    ],
+    [
+      "rmsDb",
+      "number | undefined",
+      null,
+      "RMS level in dBFS, when the source measures it.",
+    ],
+    ["zone", '"ok" | "warn" | "clip"', null, "The zone of peakDb."],
+  ]}
+/>

@@ -3,6 +3,9 @@
   "compilerOptions": {
     "jsxImportSource": "@solidjs/web",
     "paths": {
+      "@kobalte/core/popover": [
+        "./node_modules/@kobalte/core-solid2/dist/popover/index.d.ts"
+      ],
       "@/lib/solid/jsx-types": ["./lib/solid/compat/solid2/jsx-types.ts"],
       "@/*": ["./*"],
       "@kobalte/core/slider": [

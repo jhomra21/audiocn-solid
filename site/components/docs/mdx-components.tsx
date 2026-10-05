@@ -10,6 +10,11 @@ import {
   onCleanup,
 } from "solid-js";
 
+import BarVisualizerAlign from "@/components/examples/bar-visualizer-align";
+import BarVisualizerDemo from "@/components/examples/bar-visualizer-demo";
+import BarVisualizerMini from "@/components/examples/bar-visualizer-mini";
+import BarVisualizerMirrored from "@/components/examples/bar-visualizer-mirrored";
+import BarVisualizerStates from "@/components/examples/bar-visualizer-states";
 import ChannelStripConsole from "@/components/examples/channel-strip-console";
 import ChannelStripDemo from "@/components/examples/channel-strip-demo";
 import ChannelStripNotices from "@/components/examples/channel-strip-notices";
@@ -27,6 +32,7 @@ import FaderSilence from "@/components/examples/fader-silence";
 import FaderSizes from "@/components/examples/fader-sizes";
 import FaderVertical from "@/components/examples/fader-vertical";
 import FaderWithMeter from "@/components/examples/fader-with-meter";
+import FrameSourceDemo from "@/components/examples/frame-source-demo";
 import KnobDemo from "@/components/examples/knob-demo";
 import KnobDragDirections from "@/components/examples/knob-drag-directions";
 import KnobMetal from "@/components/examples/knob-metal";
@@ -42,6 +48,10 @@ import { LevelMeterSimple } from "@/components/examples/level-meter-simple";
 import { LevelMeterValues } from "@/components/examples/level-meter-values";
 import { LevelMeterVariants } from "@/components/examples/level-meter-variants";
 import { LevelMeterVertical } from "@/components/examples/level-meter-vertical";
+import LiveWaveformDemo from "@/components/examples/live-waveform-demo";
+import LiveWaveformIdle from "@/components/examples/live-waveform-idle";
+import LiveWaveformMicrophone from "@/components/examples/live-waveform-microphone";
+import LiveWaveformVariants from "@/components/examples/live-waveform-variants";
 import MixerConsole from "@/components/examples/mixer-console";
 import MixerDemo from "@/components/examples/mixer-demo";
 import MixerEmptyDemo from "@/components/examples/mixer-empty";
@@ -49,7 +59,12 @@ import PanControlDemo from "@/components/examples/pan-control-demo";
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import ParameterSliderDemo from "@/components/examples/parameter-slider-demo";
 import ParameterSliderFrequency from "@/components/examples/parameter-slider-frequency";
+import SmoothWaveformDemo from "@/components/examples/smooth-waveform-demo";
+import SmoothWaveformMicrophone from "@/components/examples/smooth-waveform-microphone";
+import SmoothWaveformModes from "@/components/examples/smooth-waveform-modes";
+import SmoothWaveformStates from "@/components/examples/smooth-waveform-states";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
+import VolumeControlPopover from "@/components/examples/volume-control-popover";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -322,6 +337,20 @@ export const Tab = (props: TabProps) => (
 type ExampleName = keyof typeof examples;
 
 const examples = {
+  "bar-visualizer-align": BarVisualizerAlign,
+  "bar-visualizer-demo": BarVisualizerDemo,
+  "bar-visualizer-mini": BarVisualizerMini,
+  "bar-visualizer-mirrored": BarVisualizerMirrored,
+  "bar-visualizer-states": BarVisualizerStates,
+  "smooth-waveform-demo": SmoothWaveformDemo,
+  "smooth-waveform-modes": SmoothWaveformModes,
+  "smooth-waveform-states": SmoothWaveformStates,
+  "smooth-waveform-microphone": SmoothWaveformMicrophone,
+  "live-waveform-demo": LiveWaveformDemo,
+  "live-waveform-variants": LiveWaveformVariants,
+  "live-waveform-idle": LiveWaveformIdle,
+  "live-waveform-microphone": LiveWaveformMicrophone,
+  "frame-source-demo": FrameSourceDemo,
   "clip-indicator-demo": ClipIndicatorDemo,
   "clip-indicator-latching": ClipIndicatorLatching,
   "db-readout-demo": DbReadoutDemo,
@@ -352,6 +381,7 @@ const examples = {
   "channel-toggle-demo": ChannelToggleDemo,
   "channel-toggle-variants": ChannelToggleVariants,
   "volume-control-demo": VolumeControlDemo,
+  "volume-control-popover": VolumeControlPopover,
   "level-meter-ballistics": LevelMeterBallistics,
   "level-meter-css-level": LevelMeterCssLevel,
   "level-meter-custom-colors": LevelMeterCustomColors,

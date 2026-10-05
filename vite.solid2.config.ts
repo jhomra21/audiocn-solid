@@ -9,6 +9,12 @@ export default defineConfig({
   plugins: [solid(), tailwindcss()],
   resolve: {
     alias: {
+      "@kobalte/core/popover": fileURLToPath(
+        new URL(
+          "./node_modules/@kobalte/core-solid2/dist/popover/index.jsx",
+          import.meta.url
+        )
+      ),
       "@kobalte/core/slider": fileURLToPath(
         new URL(
           "./node_modules/@kobalte/core-solid2/dist/slider/index.jsx",

@@ -59,6 +59,10 @@
           "type": "registry:lib"
         },
         {
+          "path": "lib/audio/history-playback.ts",
+          "type": "registry:lib"
+        },
+        {
           "path": "lib/solid/accessor.ts",
           "type": "registry:lib"
         },
@@ -580,6 +584,110 @@
           "path": "components/ui/mixer.tsx",
           "type": "registry:ui"
         }
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Accessible popover with focus restoration and outside dismissal.",
+      "dependencies": ["solid-js@^1.9.15", "@kobalte/core@0.13.14"],
+      "registryDependencies": ["@audiocn-solid/core", "@audiocn-solid/button"],
+      "files": [{ "path": "components/ui/popover.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "bar-visualizer",
+      "type": "registry:ui",
+      "title": "Bar Visualizer",
+      "description": "Frequency-band bars with idle, loading and mirrored modes.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        { "path": "components/ui/bar-visualizer.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "smooth-waveform",
+      "type": "registry:ui",
+      "title": "Smooth Waveform",
+      "description": "A smooth frequency-band wave or oscilloscope trace.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        { "path": "components/ui/smooth-waveform.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "live-waveform",
+      "type": "registry:ui",
+      "title": "Live Waveform",
+      "description": "Live signal canvas with scrolling history, bars, mirrors and lines.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        { "path": "components/ui/live-waveform.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "use-level",
+      "type": "registry:hook",
+      "title": "useLevel",
+      "description": "Samples a meter source for reactive level labels.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source"
+      ],
+      "files": [{ "path": "hooks/use-level.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-gain-node",
+      "type": "registry:hook",
+      "title": "useGainNode",
+      "description": "Stable gain routing with click-free changes and connection cleanup.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-context"
+      ],
+      "files": [{ "path": "hooks/use-gain-node.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-audio-devices",
+      "type": "registry:hook",
+      "title": "useAudioDevices",
+      "description": "Audio devices and permission state with live updates.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        { "path": "hooks/use-audio-devices.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-system-audio",
+      "type": "registry:hook",
+      "title": "useSystemAudio",
+      "description": "Capture system or tab audio with cancellation and track cleanup.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        { "path": "hooks/use-system-audio.ts", "type": "registry:hook" }
       ]
     },
     {

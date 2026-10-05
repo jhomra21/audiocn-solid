@@ -43,7 +43,7 @@ export const buttonVariants = cva(
   }
 );
 
-type ButtonProps = Omit<
+export type ButtonProps = Omit<
   ButtonDOMProps,
   "children" | "class" | "className" | "onClick" | "ref" | "tabIndex" | "type"
 > &
