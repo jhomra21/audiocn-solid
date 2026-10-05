@@ -10,6 +10,7 @@ import KnobsTile from "@/site/components/home/tiles/knobs-tile";
 import LiveWaveformTile from "@/site/components/home/tiles/live-waveform-tile";
 import MetersTile from "@/site/components/home/tiles/meters-tile";
 import MixerTile from "@/site/components/home/tiles/mixer-tile";
+import SpectrumTile from "@/site/components/home/tiles/spectrum-tile";
 import VoiceTile from "@/site/components/home/tiles/voice-tile";
 
 const TILES = new Map([
@@ -21,6 +22,7 @@ const TILES = new Map([
   ["mixer", MixerTile],
   ["live-waveform", LiveWaveformTile],
   ["voice", VoiceTile],
+  ["spectrum", SpectrumTile],
 ]);
 
 interface ShowcaseItem {

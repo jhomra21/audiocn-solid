@@ -162,6 +162,47 @@ test("existing meter utility examples have no missing registration markers", asy
   }
 });
 
+test("electric and spectrum docs hydrate every example and expose real Solid source", async ({
+  page,
+}) => {
+  const failures: string[] = [];
+  page.on("pageerror", (error) => failures.push(error.message));
+
+  for (const [name, count] of [
+    ["electric-bar-visualizer", 6],
+    ["electric-waveform", 5],
+    ["spectrum", 3],
+  ] as const) {
+    await page.goto(`/docs/components/${name}`);
+    await expect(page.locator("[data-not-yet-ported]")).toHaveCount(0);
+    await expect(page.locator("[data-example]")).toHaveCount(count);
+    const preview = page.locator(`[data-example="${name}-demo"]`);
+    await expect(preview.locator("canvas").first()).toBeVisible();
+    await preview.getByRole("tab", { name: "Code", exact: true }).click();
+    await expect(preview.locator("pre")).toContainText("useDemoSignal");
+    await expect(preview.locator("pre")).toContainText("class=");
+    await page.screenshot({
+      path: `artifacts/docs-${name}.png`,
+      fullPage: true,
+    });
+  }
+
+  for (const name of [
+    "use-audio-player",
+    "use-sound",
+    "use-waveform-data",
+    "use-web-audio-mixer",
+  ]) {
+    await page.goto(`/docs/hooks/${name}`);
+    await expect(page.locator("[data-not-yet-ported]")).toHaveCount(0);
+    await expect(
+      page.locator("h2").filter({ hasText: "Returns" })
+    ).toBeVisible();
+  }
+
+  expect(failures).toEqual([]);
+});
+
 test("docs sidebar, appearance and mobile navigation work without page overflow", async ({
   page,
 }) => {

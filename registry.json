@@ -645,6 +645,121 @@
       ]
     },
     {
+      "name": "electric",
+      "type": "registry:lib",
+      "title": "Electric drawing",
+      "description": "Shared electric canvas colors, sparks and geometry.",
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [{ "path": "lib/electric.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "electric-bar-visualizer",
+      "type": "registry:ui",
+      "title": "Electric Bar Visualizer",
+      "description": "Frequency-band bars drawn as crackling filaments.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/electric",
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        {
+          "path": "components/ui/electric-bar-visualizer.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "electric-waveform",
+      "type": "registry:ui",
+      "title": "Electric Waveform",
+      "description": "An electric wave or oscilloscope trace with forks and sparks.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/electric",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [
+        { "path": "components/ui/electric-waveform.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "spectrum",
+      "type": "registry:ui",
+      "title": "Spectrum",
+      "description": "A frequency spectrum analyser with axes, grid and peak hold.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-frame-source",
+        "@audiocn-solid/use-reduced-motion",
+        "@audiocn-solid/use-visibility"
+      ],
+      "files": [{ "path": "components/ui/spectrum.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "use-audio-player",
+      "type": "registry:hook",
+      "title": "useAudioPlayer",
+      "description": "Owned media playback with reactive controls and smooth time frames.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": ["@audiocn-solid/core"],
+      "files": [
+        { "path": "hooks/use-audio-player.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-sound",
+      "type": "registry:hook",
+      "title": "useSound",
+      "description": "Cached decoding and low-latency short sound playback.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-context",
+        "@audiocn-solid/use-gain-node"
+      ],
+      "files": [{ "path": "hooks/use-sound.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-waveform-data",
+      "type": "registry:hook",
+      "title": "useWaveformData",
+      "description": "Decode files or audio buffers into cached waveform peaks.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-context",
+        "@audiocn-solid/use-sound"
+      ],
+      "files": [
+        { "path": "hooks/use-waveform-data.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-web-audio-mixer",
+      "type": "registry:hook",
+      "title": "useWebAudioMixer",
+      "description": "Mixer graph with gain, pan, monitoring, limiting and ducking.",
+      "dependencies": ["solid-js@^1.9.15"],
+      "registryDependencies": [
+        "@audiocn-solid/core",
+        "@audiocn-solid/use-audio-context",
+        "@audiocn-solid/use-audio-analyser",
+        "@audiocn-solid/use-mixer"
+      ],
+      "files": [
+        { "path": "hooks/use-web-audio-mixer.ts", "type": "registry:hook" }
+      ]
+    },
+    {
       "name": "use-level",
       "type": "registry:hook",
       "title": "useLevel",

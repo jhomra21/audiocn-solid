@@ -30,6 +30,8 @@ jobs:
             test-results/audio-hooks
             test-results/visualizers
             test-results/popover
+            test-results/playback
+            test-results/web-audio-mixer
             playwright-report
           if-no-files-found: ignore
 
@@ -54,6 +56,8 @@ jobs:
             test-results/audio-hooks
             test-results/visualizers
             test-results/popover
+            test-results/playback
+            test-results/web-audio-mixer
             playwright-report
           if-no-files-found: ignore
 

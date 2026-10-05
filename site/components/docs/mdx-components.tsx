@@ -26,6 +26,17 @@ import { DbReadoutDemo } from "@/components/examples/db-readout-demo";
 import { DbReadoutZones } from "@/components/examples/db-readout-zones";
 import { DbScaleDemo } from "@/components/examples/db-scale-demo";
 import { DbScaleVertical } from "@/components/examples/db-scale-vertical";
+import ElectricBarVisualizerColors from "@/components/examples/electric-bar-visualizer-colors";
+import ElectricBarVisualizerDemo from "@/components/examples/electric-bar-visualizer-demo";
+import ElectricBarVisualizerIntensity from "@/components/examples/electric-bar-visualizer-intensity";
+import ElectricBarVisualizerMicrophone from "@/components/examples/electric-bar-visualizer-microphone";
+import ElectricBarVisualizerMirrored from "@/components/examples/electric-bar-visualizer-mirrored";
+import ElectricBarVisualizerStates from "@/components/examples/electric-bar-visualizer-states";
+import ElectricWaveformDemo from "@/components/examples/electric-waveform-demo";
+import ElectricWaveformIntensity from "@/components/examples/electric-waveform-intensity";
+import ElectricWaveformMicrophone from "@/components/examples/electric-waveform-microphone";
+import ElectricWaveformModes from "@/components/examples/electric-waveform-modes";
+import ElectricWaveformStates from "@/components/examples/electric-waveform-states";
 import FaderBipolar from "@/components/examples/fader-bipolar";
 import FaderDemo from "@/components/examples/fader-demo";
 import FaderSilence from "@/components/examples/fader-silence";
@@ -63,6 +74,9 @@ import SmoothWaveformDemo from "@/components/examples/smooth-waveform-demo";
 import SmoothWaveformMicrophone from "@/components/examples/smooth-waveform-microphone";
 import SmoothWaveformModes from "@/components/examples/smooth-waveform-modes";
 import SmoothWaveformStates from "@/components/examples/smooth-waveform-states";
+import SpectrumDemo from "@/components/examples/spectrum-demo";
+import SpectrumMicrophone from "@/components/examples/spectrum-microphone";
+import SpectrumVariants from "@/components/examples/spectrum-variants";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import VolumeControlPopover from "@/components/examples/volume-control-popover";
 import {
@@ -337,6 +351,20 @@ export const Tab = (props: TabProps) => (
 type ExampleName = keyof typeof examples;
 
 const examples = {
+  "electric-bar-visualizer-demo": ElectricBarVisualizerDemo,
+  "electric-bar-visualizer-colors": ElectricBarVisualizerColors,
+  "electric-bar-visualizer-intensity": ElectricBarVisualizerIntensity,
+  "electric-bar-visualizer-mirrored": ElectricBarVisualizerMirrored,
+  "electric-bar-visualizer-states": ElectricBarVisualizerStates,
+  "electric-bar-visualizer-microphone": ElectricBarVisualizerMicrophone,
+  "electric-waveform-demo": ElectricWaveformDemo,
+  "electric-waveform-intensity": ElectricWaveformIntensity,
+  "electric-waveform-modes": ElectricWaveformModes,
+  "electric-waveform-states": ElectricWaveformStates,
+  "electric-waveform-microphone": ElectricWaveformMicrophone,
+  "spectrum-demo": SpectrumDemo,
+  "spectrum-variants": SpectrumVariants,
+  "spectrum-microphone": SpectrumMicrophone,
   "bar-visualizer-align": BarVisualizerAlign,
   "bar-visualizer-demo": BarVisualizerDemo,
   "bar-visualizer-mini": BarVisualizerMini,

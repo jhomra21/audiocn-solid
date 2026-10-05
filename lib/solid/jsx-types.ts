@@ -4,6 +4,8 @@ export type ButtonDOMProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export type DivDOMProps = JSX.HTMLAttributes<HTMLDivElement>;
 
+export type CanvasDOMProps = JSX.IntrinsicElements["canvas"];
+
 export type GroupDOMProps = JSX.IntrinsicElements["g"];
 
 export type HeadingDOMProps = JSX.HTMLAttributes<HTMLHeadingElement>;

@@ -2,10 +2,15 @@ import { Show, createSignal } from "solid-js";
 
 import { BarVisualizer } from "@/components/ui/bar-visualizer";
 import type { BarVisualizerActions } from "@/components/ui/bar-visualizer";
+import { ElectricBarVisualizer } from "@/components/ui/electric-bar-visualizer";
+import type { ElectricBarVisualizerActions } from "@/components/ui/electric-bar-visualizer";
+import { ElectricWaveform } from "@/components/ui/electric-waveform";
+import type { ElectricWaveformActions } from "@/components/ui/electric-waveform";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import type { LiveWaveformActions } from "@/components/ui/live-waveform";
 import { SmoothWaveform } from "@/components/ui/smooth-waveform";
 import type { SmoothWaveformActions } from "@/components/ui/smooth-waveform";
+import { Spectrum } from "@/components/ui/spectrum";
 import type { VisualFrame } from "@/lib/audio/types";
 import type { MutableRef } from "@/lib/solid/ref";
 
@@ -40,6 +45,16 @@ export const VisualizersApp = () => {
   const smooth: MutableRef<SmoothWaveformActions | null> = { current: null };
   const live: MutableRef<LiveWaveformActions | null> = { current: null };
 
+  const electricBars: MutableRef<ElectricBarVisualizerActions | null> = {
+    current: null,
+  };
+
+  const electricWave: MutableRef<ElectricWaveformActions | null> = {
+    current: null,
+  };
+
+  const [actions, setActions] = createSignal("waiting");
+
   return (
     <main class="mx-auto w-full max-w-xl p-4">
       <h1>Visualizer contracts</h1>
@@ -47,6 +62,9 @@ export const VisualizersApp = () => {
         <BarVisualizer source={source} barCount={count()} actionsRef={bars} />
         <SmoothWaveform source={source} actionsRef={smooth} />
         <LiveWaveform source={source} actionsRef={live} />
+        <ElectricBarVisualizer source={source} actionsRef={electricBars} />
+        <ElectricWaveform source={source} actionsRef={electricWave} />
+        <Spectrum source={source} peakHold grid={false} />
       </Show>
       <button
         onClick={() => {
@@ -61,12 +79,31 @@ export const VisualizersApp = () => {
           bars.current?.paint([0.9]);
           smooth.current?.paint(frame);
           live.current?.paint(frame);
+          electricBars.current?.paint([0.9]);
+          electricWave.current?.paint(frame);
+          setActions(
+            electricBars.current && electricWave.current ? "ready" : "missing"
+          );
         }}
       >
         Paint actions
       </button>
-      <button onClick={() => setMounted(false)}>Remove visualizers</button>
+      <button
+        onClick={() => {
+          setMounted(false);
+          queueMicrotask(() =>
+            setActions(
+              electricBars.current || electricWave.current
+                ? "leaked"
+                : "cleared"
+            )
+          );
+        }}
+      >
+        Remove visualizers
+      </button>
       <output data-testid="visual-subscriptions">{subscriptions()}</output>
+      <output data-testid="electric-actions">{actions()}</output>
     </main>
   );
 };

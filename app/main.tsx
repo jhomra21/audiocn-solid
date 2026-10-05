@@ -3,8 +3,10 @@ import { render } from "solid-js/web";
 import { AudioHooksApp } from "@/app/audio-hooks";
 import { ContractApp } from "@/app/contracts";
 import { App } from "@/app/gallery";
+import { PlaybackApp } from "@/app/playback";
 import { PopoverApp } from "@/app/popover";
 import { VisualizersApp } from "@/app/visualizers";
+import { WebAudioMixerApp } from "@/app/web-audio-mixer";
 
 import "@/app/styles.css";
 
@@ -16,7 +18,11 @@ if (!root) {
 
 render(
   () =>
-    location.pathname === "/popover" ? (
+    location.pathname === "/web-audio-mixer" ? (
+      <WebAudioMixerApp />
+    ) : location.pathname === "/playback" ? (
+      <PlaybackApp />
+    ) : location.pathname === "/popover" ? (
       <PopoverApp />
     ) : location.pathname === "/visualizers" ? (
       <VisualizersApp />
