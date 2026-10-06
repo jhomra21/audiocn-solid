@@ -11,6 +11,7 @@ import { runPaintersSuite } from "./painters-suite";
 import { runParitySuite } from "./parity-suite";
 import { runPlaybackSuite } from "./playback-suite";
 import { runPopoverSuite } from "./popover-suite";
+import { runSliderReviewEdges } from "./slider-review-edges";
 import { runSoundPadSuite } from "./sound-pad-suite";
 import { runVisualizersSuite } from "./visualizers-suite";
 import { runWaveformSuite } from "./waveform-suite";
@@ -21,6 +22,8 @@ runAudioPlayerSuite("solid-2");
 runBlocksSuite("solid-2");
 
 runControlsSuite("solid-2");
+
+runSliderReviewEdges("solid-2");
 
 runAudioDeviceSelectSuite("solid-2");
 

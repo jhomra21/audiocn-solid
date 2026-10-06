@@ -3,6 +3,141 @@ import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 export const runWaveformSuite = (runtime: string) => {
+  test("waveform retains its first captured touch when a second finger releases", async ({
+    page,
+    context,
+  }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Emulation.setTouchEmulationEnabled", {
+      enabled: true,
+      maxTouchPoints: 2,
+    });
+    await page.goto("/waveform?case=gesture");
+    const waveform = page.getByRole("slider", { name: "Gesture waveform" });
+    const box = (await waveform.boundingBox())!;
+    const y = box.y + box.height / 2;
+    const first = { id: 1, x: box.x + box.width * 0.75, y };
+    const second = { id: 2, x: box.x + box.width * 0.25, y };
+    await waveform.evaluate((node) => {
+      const events: { type: string; pointerId: number }[] = [];
+
+      const types = [
+        "pointerdown",
+        "gotpointercapture",
+        "lostpointercapture",
+      ] as const;
+
+      for (const type of types) {
+        node.addEventListener(type, (event) => {
+          if (!(event instanceof PointerEvent))
+            throw new Error("Expected a native pointer capture event");
+
+          events.push({ type, pointerId: event.pointerId });
+          node.dataset.captureEvents = JSON.stringify(events);
+        });
+      }
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [first],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ ...first, x: first.x - 1 }],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [first, second],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [second],
+    });
+    await expect(waveform).toHaveAttribute("data-dragging", "");
+    await expect
+      .poll(() =>
+        waveform.evaluate((node) =>
+          Number(node.style.getPropertyValue("--waveform-position"))
+        )
+      )
+      .toBeCloseTo(0.75, 2);
+    await expect(page.getByTestId("seek-commits")).toHaveText("[]");
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect(page.getByTestId("seek-commits")).toHaveText("[90]");
+    await expect(waveform).not.toHaveAttribute("data-dragging", "");
+    await info.attach("native-multi-touch-capture", {
+      body: (await waveform.getAttribute("data-capture-events")) ?? "[]",
+      contentType: "application/json",
+    });
+    await page.screenshot({
+      path: info.outputPath(`multi-touch-${runtime}.png`),
+    });
+    await cdp.detach();
+  });
+
+  test("waveform gesture isolates streamed and controlled playback until release", async ({
+    page,
+  }, info) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/waveform?case=gesture");
+    const waveform = page.getByRole("slider", { name: "Gesture waveform" });
+
+    const position = () =>
+      page
+        .locator('[data-slot="waveform"]')
+        .evaluate((node) =>
+          Number(node.style.getPropertyValue("--waveform-position"))
+        );
+
+    const box = (await waveform.boundingBox())!;
+
+    const hold = async () => {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width * 0.75, box.y + box.height / 2);
+    };
+
+    await hold();
+    await page
+      .getByRole("button", { name: "Advance playback" })
+      .dispatchEvent("click");
+    await expect(page.getByTestId("playback-time")).toHaveText("30");
+    await expect.poll(position).toBe(0.75);
+    await expect(page.getByTestId("seek-commits")).toHaveText("[]");
+    await page.mouse.up();
+    await expect(page.getByTestId("seek-commits")).toHaveText("[90]");
+    await page.getByRole("button", { name: "Advance playback" }).click();
+    await expect.poll(position).toBe(1);
+
+    await hold();
+    await page
+      .getByRole("button", { name: "Reset playback" })
+      .dispatchEvent("click");
+    await waveform.dispatchEvent("pointercancel", { pointerId: 1 });
+    await page.mouse.up();
+    await expect.poll(position).toBe(0);
+    await expect(page.getByTestId("seek-commits")).toHaveText("[90]");
+    await waveform.press("ArrowRight");
+    await expect(page.getByTestId("seek-commits")).toHaveText("[90,5]");
+
+    await hold();
+    await page
+      .getByRole("button", { name: "Disable seeking" })
+      .dispatchEvent("click");
+    await page.mouse.up();
+    await expect.poll(position).toBeCloseTo(5 / 120, 5);
+    await expect(page.getByTestId("seek-commits")).toHaveText("[90,5]");
+    await mkdir(`test-results/waveform/${runtime}`, { recursive: true });
+    await page.screenshot({
+      path: `test-results/waveform/${runtime}/gesture-${info.repeatEachIndex}.png`,
+    });
+    expect(errors).toEqual([]);
+  });
   test("waveform demo renders synthesised audio and moves its real media playhead", async ({
     page,
   }) => {

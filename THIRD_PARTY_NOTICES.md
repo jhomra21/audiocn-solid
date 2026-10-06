@@ -1,6 +1,6 @@
 # Third-party notices
 
-`site/components/docs/phosphor-icons.tsx` contains regular SVG geometry from [Phosphor Icons](https://phosphoricons.com).
+`components/icons/phosphor.tsx` and `site/components/docs/phosphor-icons.tsx` contain regular SVG geometry from [Phosphor Icons](https://phosphoricons.com). Consumer registry installs retain this notice in `lib/audiocn-license.txt`.
 
 ```text
 MIT License

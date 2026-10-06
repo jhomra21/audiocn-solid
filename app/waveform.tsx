@@ -34,10 +34,48 @@ const HoverCase = () => {
   );
 };
 
+const GestureCase = () => {
+  const [time, setTime] = createSignal(0);
+  const [interactive, setInteractive] = createSignal(true);
+  const [commits, setCommits] = createSignal<number[]>([]);
+  const source = createFrameEmitter<number>();
+
+  const playback = (next: number) => {
+    setTime(next);
+    source.emit(next);
+  };
+
+  return (
+    <main class="mx-auto grid max-w-xl gap-6 p-6">
+      <Waveform
+        aria-label="Gesture waveform"
+        currentTime={time()}
+        duration={120}
+        interactive={interactive()}
+        onSeekCommitted={(next) => {
+          setCommits((current) => [...current, next]);
+          playback(next);
+        }}
+        peaks={PEAKS}
+        time={source}
+      />
+      <output data-testid="playback-time">{time()}</output>
+      <output data-testid="seek-commits">{JSON.stringify(commits())}</output>
+      <button onClick={() => playback(Math.min(120, time() + 30))}>
+        Advance playback
+      </button>
+      <button onClick={() => playback(0)}>Reset playback</button>
+      <button onClick={() => setInteractive(false)}>Disable seeking</button>
+    </main>
+  );
+};
+
 export const WaveformApp = () => {
   const testCase = new URLSearchParams(location.search).get("case");
 
   if (testCase === "hover") return <HoverCase />;
+
+  if (testCase === "gesture") return <GestureCase />;
 
   if (testCase === "data-without-web-audio") return <WaveformDataCase />;
 

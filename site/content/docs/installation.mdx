@@ -7,7 +7,7 @@ audiocn Solid is a [shadcn registry](https://ui.shadcn.com/docs/registry). You a
 
 ## Requirements
 
-- Solid 1.9.15 or later, or Solid 2.
+- Solid 1.9.15 or later. Solid 2.0.0-rc.13 is an experimental lane, tested with Kobalte 2.0.0-alpha.2.
 - Tailwind CSS v4.
 - A project set up with shadcn and a `components.json`. audiocn Solid components use the standard shadcn tokens (`background`, `muted`, `primary`, `ring`...) and the `cn` helper from `@/lib/utils`.
 - Interactive primitives use Kobalte. The runtime-specific registry installs the matching Kobalte line for you.
@@ -16,12 +16,178 @@ audiocn Solid is a [shadcn registry](https://ui.shadcn.com/docs/registry). You a
 
 <Step>
 
-### Set up shadcn
+### Set up a Solid project
 
-Skip this if your project already has a `components.json`.
+Skip this if your Solid project already has Tailwind v4, the theme tokens below, and a `components.json`. Use this manual Solid setup instead of the React-oriented shadcn initializer.
 
-```npm
-npx shadcn@latest init
+```bash title="Create the app"
+bunx --bun create-vite@9.2.1 audio-app --template solid-ts --no-interactive --no-immediate
+cd audio-app
+bun add -d tailwindcss@4.3.3 @tailwindcss/vite@4.3.3 typescript@7.0.2
+```
+
+Choose one runtime. The stable Solid 1 setup:
+
+```bash title="Solid 1 dependencies"
+bun add solid-js@1.9.15
+bun add -d vite@7.3.6 vite-plugin-solid@2.11.14
+```
+
+The experimental Solid 2 setup:
+
+```bash title="Solid 2 dependencies"
+bun remove vite-plugin-solid
+bun add solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13
+bun add -d vite@8.3.2 @solidjs/vite-plugin@3.0.0-next.47
+```
+
+Replace `tsconfig.json` with the following. Solid 1 uses `"jsxImportSource": "solid-js"`; for Solid 2, change that one value to `"jsxImportSource": "@solidjs/web"`.
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}
+```
+
+Replace `vite.config.ts` with the matching configuration.
+
+```ts title="Solid 1 vite.config.ts"
+import { fileURLToPath, URL } from "node:url";
+import solid from "vite-plugin-solid";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [solid(), tailwindcss()],
+  resolve: {
+    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+  },
+});
+```
+
+```ts title="Solid 2 vite.config.ts"
+import { fileURLToPath, URL } from "node:url";
+import solid from "@solidjs/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [solid(), tailwindcss()],
+  resolve: {
+    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+    dedupe: ["solid-js", "@solidjs/web"],
+  },
+});
+```
+
+Replace the demo `src/App.tsx` with your app. For Solid 2, also change the render import in `src/index.tsx` from `solid-js/web` to `@solidjs/web`. Keep the global CSS import, replacing `src/index.css` with:
+
+```css title="src/index.css"
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+:root {
+  --radius: 0.625rem;
+  --background: white;
+  --foreground: oklch(0.145 0 0);
+  --card: var(--background);
+  --card-foreground: var(--foreground);
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: white;
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: var(--primary);
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: var(--secondary);
+  --accent-foreground: var(--primary);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: var(--border);
+  --ring: oklch(0.708 0 0);
+}
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.556 0 0);
+}
+```
+
+Create a `components.json`. The style identifies CLI formatting, not a React component dependency; add only the `@audiocn-solid` items.
+
+```json title="components.json"
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-rhea",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/index.css",
+    "baseColor": "stone",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "utils": "@/lib/utils",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+Check the configuration without installing React primitives:
+
+```npm title="Check the CLI configuration"
+npx shadcn@4.21.0 info
 ```
 
 </Step>
@@ -59,7 +225,7 @@ Solid 2:
 ### Add a component
 
 ```npm
-npx shadcn@latest add @audiocn-solid/level-meter
+npx shadcn@4.21.0 add @audiocn-solid/level-meter
 ```
 
 The CLI copies the component and everything it depends on: the audio core (`lib/audio`), Solid compatibility helpers, audio theme tokens, and any hooks it uses.
@@ -90,6 +256,7 @@ export const MicLevel = (props: { peakDb: number }) => (
 | `hooks/use-*.ts` | Hooks: frame sources, Web Audio, mixer state |
 | `lib/audio/*.ts` | The framework-neutral audio core: decibels, ballistics, tapers, types |
 | `lib/solid/*.ts` | Small Solid compatibility helpers used by registry files |
+| `lib/audiocn-license.txt` | Upstream MIT and Phosphor copyright and permission notices; retain this file when redistributing |
 | global CSS | Six audio tokens: `--meter-ok`, `--meter-warn`, `--meter-clip`, `--channel-mute`, `--channel-solo`, `--channel-monitor` |
 
 The paths follow the aliases in your `components.json`, so they adapt to projects with a `src` folder or custom aliases.
@@ -118,5 +285,5 @@ The two registry URLs expose the same public audiocn API. The Solid 1 registry t
 Every block pulls in the components it uses. The full mixer installs most of the library in one step:
 
 ```npm
-npx shadcn@latest add @audiocn-solid/system-audio-mixer
+npx shadcn@4.21.0 add @audiocn-solid/system-audio-mixer
 ```

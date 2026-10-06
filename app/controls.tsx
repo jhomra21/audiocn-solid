@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import { AudioDeviceSelect } from "@/components/ui/audio-device-select";
-import { AudioPlayer } from "@/components/ui/audio-player";
+import { AudioPlayer, AudioPlayerSeek } from "@/components/ui/audio-player";
 import { MuteToggle } from "@/components/ui/channel-toggle";
 import { Fader } from "@/components/ui/fader";
 import {
@@ -153,7 +153,9 @@ const ControlEffects = () => {
         aria-label={`Effect player ${revision()}`}
         player={player}
         onTimeUpdate={(next) => setTimes((previous) => [...previous, next])}
-      />
+      >
+        <AudioPlayerSeek />
+      </AudioPlayer>
       <button onClick={() => setRevision((value) => value + 1)}>
         Unrelated player update
       </button>
@@ -169,6 +171,76 @@ export const ControlsApp = () => {
   return (
     <main class="mx-auto grid max-w-4xl grid-cols-2 gap-4 p-6">
       <h1 class="col-span-2">Control contracts</h1>
+      <ControlCase
+        id="rtl-slider"
+        render={(callbacks) => (
+          <Fader
+            min={0}
+            max={100}
+            defaultValue={50}
+            step={1}
+            detents={[]}
+            dir="rtl"
+            {...callbacks}
+          />
+        )}
+      />
+      <ControlCase
+        id="rtl-slider-inverted"
+        render={(callbacks) => (
+          <Fader
+            min={0}
+            max={100}
+            defaultValue={50}
+            step={1}
+            detents={[]}
+            inverted
+            dir="rtl"
+            {...callbacks}
+          />
+        )}
+      />
+      <ControlCase
+        id="fader-vertical-drag"
+        render={(callbacks) => (
+          <Fader
+            orientation="vertical"
+            class="h-48"
+            defaultValue={-24}
+            {...callbacks}
+          />
+        )}
+      />
+      <ControlCase
+        id="fader-disabled-drag"
+        render={(callbacks) => (
+          <Fader
+            orientation="vertical"
+            class="h-48"
+            defaultValue={-24}
+            disabled
+            {...callbacks}
+          />
+        )}
+      />
+      <ControlCase
+        id="parameter-drag"
+        render={(callbacks) => (
+          <ParameterSlider defaultValue={40} {...callbacks}>
+            <ParameterSliderControl />
+          </ParameterSlider>
+        )}
+      />
+      <ControlCase
+        id="volume-vertical-drag"
+        render={(callbacks) => (
+          <VolumeControl
+            orientation="vertical"
+            defaultValue={0.4}
+            {...callbacks}
+          />
+        )}
+      />
       <ControlCase
         id="fader-mic"
         render={(callbacks) => (
@@ -367,10 +439,7 @@ export const ControlsApp = () => {
       <ControlCase
         id="volume-zero"
         render={(callbacks) => (
-          <VolumeControl
-            defaultValue={0}
-            onValueChange={callbacks.onValueChange}
-          />
+          <VolumeControl defaultValue={0} {...callbacks} />
         )}
       />
       <section data-testid="device-selected">

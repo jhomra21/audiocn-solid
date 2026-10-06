@@ -534,8 +534,9 @@ export const AudioPlayerSkipForward = (props: AudioPlayerSkipProps) => {
   );
 };
 
-const SeekCompat = () => {
+const SeekCompat = (props: { onChangeEnd: () => void }) => {
   useKobalteSliderCompat(SliderPrimitive.useSliderContext(), {
+    onChangeEnd: () => props.onChangeEnd(),
     suppressStep: true,
   });
 
@@ -564,6 +565,7 @@ export const AudioPlayerSeek = (props: AudioPlayerSeekProps) => {
   const settings = usePlayerPart("AudioPlayerSeek");
   const [time, setTime] = createSignal(settings.player.currentTime);
   const [drag, setDrag] = createSignal<number | null>(null);
+  let latestDrag: number | null = null;
   useFrameSource(
     () => settings.player.time,
     (next) => {
@@ -585,6 +587,7 @@ export const AudioPlayerSeek = (props: AudioPlayerSeekProps) => {
 
   const seek = (next: number) => {
     settings.player.seek(next);
+    latestDrag = null;
     setTime(next);
     setDrag(null);
   };
@@ -624,14 +627,17 @@ export const AudioPlayerSeek = (props: AudioPlayerSeekProps) => {
       maxValue={Math.max(duration(), 0.001)}
       step={0.01}
       value={sliderValue()}
-      onChange={(values) => setDrag(values[0] ?? 0)}
+      onChange={(values) => {
+        latestDrag = values[0] ?? 0;
+        setDrag(latestDrag);
+      }}
       onChangeEnd={(values) => seek(values[0] ?? 0)}
       getValueLabel={() =>
         `${formatTime(value())} of ${formatTime(duration())}`
       }
       {...rest}
     >
-      <SeekCompat />
+      <SeekCompat onChangeEnd={() => seek(latestDrag ?? value())} />
       <SliderPrimitive.Track class="relative flex h-4 w-full items-center px-1.5 before:absolute before:inset-x-0 before:-inset-y-1.5 pointer-coarse:before:-inset-y-3">
         <div
           class="bg-input/90 relative h-1 w-full grow rounded-full"

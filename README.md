@@ -71,13 +71,21 @@ Run `bun install` afterward to restore the repository's Solid 1 development depe
 
 ## Registry and site validation
 
-`bun run registry:spike:3` generates both registries, installs and builds every entry in fresh consumer projects, and exercises installed controls and blocks in both runtimes. Reports and screenshots are written to `artifacts/`.
+`bun run registry:spike:3` generates both registries, installs each of the 65 entries in its own fresh consumer project per runtime, typechecks every installed source file, builds each item, and exercises installed controls and blocks. Consumer setup executes the documented Solid bootstrap; item projects share Bun's download cache, never sources or `node_modules`. The report records all 130 file/dependency/license plans and excludes React packages. Reports and screenshots are written to `artifacts/`.
 
 Run `cd site && bun run typecheck && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"` for production-site acceptance. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
 
 Every page has a committed 1200x630 social card in `site/public/og`, indexed by `site/lib/social-images.json`. `cd site && bun run og:build` regenerates them: it builds the site in `--mode social`, which adds the capture-only `/social-preview/:id` route, and captures each card in Chromium with a paused clock. `bun run og:build -- --verify` captures every card twice and fails on any byte difference. Edit `site/lib/social-catalog.ts` for card copy and `site/components/social/` for compositions. The build also refreshes the GitHub star count in `site/lib/github-stars.json` and keeps the committed count if GitHub is unreachable.
 
 The generated registries live at `site/public/r/solid1` and `site/public/r/solid2`. Consumers install component sources and their declared dependencies, not the site or its examples.
+
+## Source-registry release
+
+Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. `bun run registry:test-contracts` checks the release and isolated-install contracts.
+
+Consumers follow `site/content/docs/installation.mdx`: create a Solid Vite app, configure Tailwind and `components.json` manually, then use `shadcn@4.21.0 add @audiocn-solid/<name>` with the runtime-matched registry URL. The React-oriented shadcn initializer is not this port's bootstrap. Solid 1 is stable; Solid 2/Kobalte 2 remain the explicitly tested experimental lane.
+
+Before announcing a release, choose the real HTTPS origin in `site/lib/site.ts` and the installation instructions, validate the final commit in remote CI, and tag that reviewed source revision. Build and deploy only `site/dist/client`; verify the actual host honors the generated Markdown `_headers`, returns `404.html` with status 404 for unknown URLs, and serves both registry JSON inventories. Test the documented bootstrap against that HTTPS origin in fresh consumer apps. The unversioned registry URLs represent the currently deployed source revision; consumers own copied code and must review later updates. No hosting/deployment or public release is implied by local acceptance.
 
 Parity checks keep exact presentation slots, example inventories, accessible control names, and layout measurements. Native ranges and ARIA sliders are compared as one interactive control, excluding hidden form duplicates. Solid-specific prose uses exact, route-scoped source adapters in `site/e2e/parity/content-adapters.json`; stale upstream text fails instead of silently expanding an exemption. Captures wait for synthesized audio and lazy tiles to finish loading.
 
@@ -86,7 +94,7 @@ Beyond each route's main content, parity also compares:
 - **Head:** title, description, robots, canonical, every `og:*` and `twitter:*` tag, and the `icon` and `apple-touch-icon` links, as a sorted set of exact values. `site/e2e/parity/head.ts` rewrites only the site origin and name, `for React` wording, per-build image hashes and icon fingerprints. Any other wording difference needs an exact, route-scoped entry in `head-adapters.json`, which throws once upstream stops sending that text. Each page's declared `og:image` must load from our server as a 1200x630 PNG.
 - **Chrome:** the accessibility-tree inventory (role, accessible name, state, normalized href, order) of the header, docs sidebar and its controls, and footer, plus the brand context menu, and, at mobile width, the opened home menu and docs drawer. On desktop docs routes it also collapses the sidebar and records the collapsed, edge-peek and re-expanded states: the sidebar's `data-collapsed`/`data-hovered`/`inert` state and offset, the floating panel, every `aria-controls="nd-sidebar"` trigger's label, `aria-expanded` and inertness, and where focus lands. Star counts and the mobile contents progress value are live data and compare by wording only.
 - **Route inventory:** the routes in `dist/client/sitemap.xml` must equal upstream's `sitemap.xml` and the compared route list, so a missing or extra public page fails.
-- **Not found:** an unknown URL's status, title, heading, robots tag and action links. `not-found-adapters.json` records the two intended differences: `vite preview` answers 200 where Next answers 404 (the shipped `404.html` is asserted in `page-states.spec.ts`), and our not-found page has its own title.
+- **Not found:** an unknown URL's status, title, heading, robots tag and action links. `not-found-adapters.json` records only the preview status difference: `vite preview` answers 200 where Next answers 404. The shipped `404.html` inherits the root title and is asserted in `page-states.spec.ts` and the strict static-host acceptance.
 
 `site/e2e/parity/contracts.spec.ts` corrupts each dimension (head tags, icons, og images, nav and sidebar links, the stars control, mobile menus, the collapsed sidebar, sitemap routes, the not-found heading) and fails unless the harness notices.
 
@@ -107,5 +115,7 @@ See `AGENTS.md` for the engineering rules and reference codebases.
 ## License
 
 MIT. Portions are adapted from audiocn/ui; see `license.md`. The Warcraft clip used by the docs is a site-only, non-MIT asset and is not included in consumer registry items.
+
+Every independently installable registry item includes `lib/audiocn-license.txt`, retaining the upstream MIT and applicable Phosphor notices without copying site assets. Keep it with redistributed source.
 
 The site brand-assets menu retains the upstream third-party notices in `THIRD_PARTY_NOTICES.md`, including the Outfit wordmark's SIL Open Font License.

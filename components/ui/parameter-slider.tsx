@@ -92,8 +92,12 @@ const decimalsOf = (step: number): number => {
 };
 
 const SliderCompat = () => {
+  const parameter = useParameterSlider("SliderCompat");
   const context = SliderPrimitive.useSliderContext();
-  useKobalteSliderCompat(context, { suppressStep: true });
+  useKobalteSliderCompat(context, {
+    onChangeEnd: parameter.commitLatest,
+    suppressStep: true,
+  });
 
   return null;
 };

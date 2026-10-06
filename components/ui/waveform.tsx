@@ -512,6 +512,8 @@ export const Waveform = (props: WaveformProps) => {
   let root: HTMLDivElement | undefined;
   let progress = 0;
   let latestTime = props.currentTime ?? props.defaultCurrentTime ?? 0;
+  let playbackTime = latestTime;
+  let pointerId: number | null = null;
   const shownTime = () => props.currentTime ?? internalTime();
 
   const position = (time: number) =>
@@ -523,11 +525,17 @@ export const Waveform = (props: WaveformProps) => {
     root?.style.setProperty("--waveform-position", progress.toFixed(5));
   };
 
+  const receivePlayback = (time: number) => {
+    playbackTime = time;
+
+    if (pointerId === null) write(time);
+  };
+
   createCompatEffect(
     () => ({ time: shownTime(), duration: props.duration }),
-    ({ time }) => write(time)
+    ({ time }) => receivePlayback(time)
   );
-  useFrameSource(() => props.time, write);
+  useFrameSource(() => props.time, receivePlayback);
 
   const active = () =>
     (props.interactive ?? true) &&
@@ -539,11 +547,26 @@ export const Waveform = (props: WaveformProps) => {
     const next = clamp(time, 0, props.duration);
     write(next);
 
-    if (props.currentTime === undefined) setInternalTime(next);
+    if (props.currentTime === undefined && (commit || pointerId === null))
+      setInternalTime(next);
     props.onSeek?.(next);
 
     if (commit) props.onSeekCommitted?.(next);
   };
+
+  const cancelDrag = (event?: PointerEvent) => {
+    if (pointerId === null || (event && event.pointerId !== pointerId)) return;
+    const captured = pointerId;
+    pointerId = null;
+    setDragging(false);
+    write(playbackTime);
+
+    if (root?.hasPointerCapture(captured)) root.releasePointerCapture(captured);
+  };
+
+  createCompatEffect(active, (enabled) => {
+    if (!enabled) cancelDrag();
+  });
 
   const timeAtPointer = (event: PointerEvent) => {
     const rect = root!.getBoundingClientRect();
@@ -653,7 +676,8 @@ export const Waveform = (props: WaveformProps) => {
       }
       onKeyDown={keyDown}
       onPointerDown={(event: PointerEvent) => {
-        if (!active() || event.button !== 0) return;
+        if (!active() || event.button !== 0 || pointerId !== null) return;
+        pointerId = event.pointerId;
         root!.setPointerCapture(event.pointerId);
         setDragging(true);
         seek(timeAtPointer(event), false);
@@ -663,17 +687,20 @@ export const Waveform = (props: WaveformProps) => {
         const time = timeAtPointer(event);
         setHover(time);
 
-        if (dragging()) seek(time, false);
+        if (pointerId === event.pointerId) seek(time, false);
       }}
       onPointerLeave={() => setHover(null)}
       onPointerUp={(event: PointerEvent) => {
-        if (!dragging()) return;
+        if (pointerId !== event.pointerId) return;
+        const next = latestTime;
+        pointerId = null;
         setDragging(false);
 
-        if (active()) seek(timeAtPointer(event), true);
+        if (active()) seek(next, true);
+        else write(playbackTime);
       }}
-      onPointerCancel={() => setDragging(false)}
-      onLostPointerCapture={() => setDragging(false)}
+      onPointerCancel={cancelDrag}
+      onLostPointerCapture={cancelDrag}
       {...rest}
       ref={(node: HTMLDivElement) => {
         root = node;

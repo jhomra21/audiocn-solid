@@ -5,12 +5,15 @@ import { expect, test } from "@playwright/test";
 
 const artifactDirectory = join(import.meta.dirname, "../artifacts/shell");
 
-test("capture upstream and local documentation shells", async ({ page }) => {
+test("capture upstream and local documentation shells", async ({
+  page,
+  baseURL,
+}) => {
   await mkdir(artifactDirectory, { recursive: true });
 
   for (const [name, url] of [
     ["upstream", "https://www.audiocn.dev/docs/components/level-meter"],
-    ["local", "http://127.0.0.1:4180/docs/components/level-meter"],
+    ["local", new URL("/docs/components/level-meter", baseURL).href],
   ] as const) {
     for (const [width, height, viewport] of [
       [1280, 900, "1280x900"],

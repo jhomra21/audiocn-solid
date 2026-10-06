@@ -24,6 +24,8 @@
     "site:spike:1": "cd site && bun run spike:1",
     "registry:build": "bun run tools/registry/build.ts",
     "registry:test-install": "bun run tools/registry/test-install.ts",
+    "registry:test-contracts": "bun test tools/registry/release-contracts.test.ts && playwright test --config tools/registry/playwright.config.ts",
+    "registry:test-release": "bun run tools/registry/test-release.ts",
     "registry:spike:3": "bun run registry:build && bun run registry:test-install && bun run registry:test-fader && bun run registry:test-parameter-slider && bun run registry:test-knob && bun run registry:test-pan-control && bun run registry:test-channel-toggle && bun run registry:test-volume-control && bun run registry:test-channel-strip && bun run registry:test-mixer && bun run registry:test-use-mixer && bun run registry:test-blocks",
     "kobalte:spike:4": "bun run tools/spikes/kobalte/run.ts",
     "site:spike:5": "cd site && bun run spike:5",

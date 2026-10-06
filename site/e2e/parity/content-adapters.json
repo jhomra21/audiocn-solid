@@ -41,8 +41,14 @@
       }
     ],
     "local": [
-      { "tag": "li", "text": "Solid 1.9.15 or later, or Solid 2." },
-      { "tag": "li", "text": "Tailwind CSS v4." },
+      {
+        "tag": "li",
+        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.13 is an experimental lane, tested with Kobalte 2.0.0-alpha.2."
+      },
+      {
+        "tag": "li",
+        "text": "Tailwind CSS v4."
+      },
       {
         "tag": "li",
         "text": "A project set up with shadcn and a components.json. audiocn Solid components use the standard shadcn tokens (background, muted, primary, ring...) and the cn helper from @/lib/utils."
@@ -55,17 +61,70 @@
   },
   {
     "route": "/docs/installation",
+    "reason": "Solid consumers must use the documented and consumer-tested manual Vite/Tailwind/TSX bootstrap rather than the React-oriented initializer; exact prose from installation.mdx.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Skip this if your project already has a components.json."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Skip this if your Solid project already has Tailwind v4, the theme tokens below, and a components.json. Use this manual Solid setup instead of the React-oriented shadcn initializer."
+      },
+      {
+        "tag": "p",
+        "text": "Choose one runtime. The stable Solid 1 setup:"
+      },
+      {
+        "tag": "p",
+        "text": "The experimental Solid 2 setup:"
+      },
+      {
+        "tag": "p",
+        "text": "Replace tsconfig.json with the following. Solid 1 uses \"jsxImportSource\": \"solid-js\"; for Solid 2, change that one value to \"jsxImportSource\": \"@solidjs/web\"."
+      },
+      {
+        "tag": "p",
+        "text": "Replace vite.config.ts with the matching configuration."
+      },
+      {
+        "tag": "p",
+        "text": "Replace the demo src/App.tsx with your app. For Solid 2, also change the render import in src/index.tsx from solid-js/web to @solidjs/web. Keep the global CSS import, replacing src/index.css with:"
+      },
+      {
+        "tag": "p",
+        "text": "Create a components.json. The style identifies CLI formatting, not a React component dependency; add only the @audiocn-solid items."
+      },
+      {
+        "tag": "p",
+        "text": "Check the configuration without installing React primitives:"
+      }
+    ]
+  },
+  {
+    "route": "/docs/installation",
     "reason": "Separate versioned registry URLs are built for Solid 1 and Solid 2; a public production domain has not been selected.",
     "upstream": [
-      { "tag": "p", "text": "Add the @audiocn namespace to components.json:" }
+      {
+        "tag": "p",
+        "text": "Add the @audiocn namespace to components.json:"
+      }
     ],
     "local": [
       {
         "tag": "p",
         "text": "Use the registry URL for the Solid version in your app. The production domain is selected at release."
       },
-      { "tag": "p", "text": "Solid 1:" },
-      { "tag": "p", "text": "Solid 2:" }
+      {
+        "tag": "p",
+        "text": "Solid 1:"
+      },
+      {
+        "tag": "p",
+        "text": "Solid 2:"
+      }
     ]
   },
   {
@@ -92,19 +151,36 @@
         "tag": "td",
         "text": "The audio core: decibels, ballistics, tapers, types"
       },
-      { "tag": "td", "text": "app/globals.css" }
+      {
+        "tag": "td",
+        "text": "app/globals.css"
+      }
     ],
     "local": [
       {
         "tag": "td",
         "text": "The framework-neutral audio core: decibels, ballistics, tapers, types"
       },
-      { "tag": "td", "text": "lib/solid/*.ts" },
+      {
+        "tag": "td",
+        "text": "lib/solid/*.ts"
+      },
       {
         "tag": "td",
         "text": "Small Solid compatibility helpers used by registry files"
       },
-      { "tag": "td", "text": "global CSS" }
+      {
+        "tag": "td",
+        "text": "lib/audiocn-license.txt"
+      },
+      {
+        "tag": "td",
+        "text": "Upstream MIT and Phosphor copyright and permission notices; retain this file when redistributing"
+      },
+      {
+        "tag": "td",
+        "text": "global CSS"
+      }
     ]
   },
   {
@@ -127,7 +203,10 @@
         "tag": "li",
         "text": "The six audio tokens land in your global CSS. If your theme already has status colours, point the tokens at them instead (see Theming)."
       },
-      { "tag": "li", "text": "The code compiles against an ES2022 lib." }
+      {
+        "tag": "li",
+        "text": "The code compiles against an ES2022 lib."
+      }
     ],
     "local": [
       {
@@ -138,7 +217,10 @@
         "tag": "li",
         "text": "The six audio tokens land in your global CSS. If your theme already has status colours, point the tokens at them instead (see Theming)."
       },
-      { "tag": "li", "text": "The code compiles against an ES2022 lib." }
+      {
+        "tag": "li",
+        "text": "The code compiles against an ES2022 lib."
+      }
     ]
   },
   {

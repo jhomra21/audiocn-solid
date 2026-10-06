@@ -160,6 +160,15 @@ const capturePage = async (
         await expect(card.locator('[data-slot="skeleton"]')).toHaveCount(0);
       }
 
+      await expect(page.locator('[data-slot="waveform-skeleton"]')).toHaveCount(
+        0
+      );
+      await expect(
+        page
+          .getByRole("article", { name: "Music player", exact: true })
+          .locator('[data-slot="track-list-item"]')
+      ).toHaveCount(3);
+
       await page.evaluate(() => window.scrollTo(0, 0));
     }
 
@@ -191,7 +200,7 @@ const capturePage = async (
   }
 };
 
-test("compare upstream and local page structure", async ({ page }) => {
+test("compare upstream and local page structure", async ({ page, baseURL }) => {
   test.setTimeout(1_800_000);
 
   await mkdir(artifactDirectory, { recursive: true });
@@ -258,7 +267,7 @@ test("compare upstream and local page structure", async ({ page }) => {
 
       const localCapture = await capturePage(
         page,
-        `http://127.0.0.1:4180${route}`,
+        new URL(route, baseURL).href,
         join(artifactDirectory, `${slug}-local-${viewport.name}.png`),
         viewport.width < 640
       );
@@ -517,6 +526,7 @@ test("compare upstream and local page structure: public route inventory", async 
 
 test("compare upstream and local page structure: not-found state", async ({
   page,
+  baseURL,
 }) => {
   await mkdir(artifactDirectory, { recursive: true });
   await page.emulateMedia({ colorScheme: "light" });
@@ -528,7 +538,7 @@ test("compare upstream and local page structure: not-found state", async ({
     `https://www.audiocn.dev${missing}`
   );
 
-  const local = await inspectNotFound(page, `http://127.0.0.1:4180${missing}`);
+  const local = await inspectNotFound(page, new URL(missing, baseURL).href);
 
   await writeFile(
     join(artifactDirectory, "not-found.json"),

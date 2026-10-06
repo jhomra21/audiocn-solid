@@ -99,8 +99,9 @@
           "type": "registry:lib"
         },
         {
-          "path": "lib/solid/kobalte-slider.ts",
-          "type": "registry:lib"
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ],
       "cssVars": {
@@ -178,6 +179,11 @@
         {
           "path": "lib/utils.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -192,6 +198,11 @@
         {
           "path": "hooks/use-frame-source.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -206,6 +217,11 @@
         {
           "path": "hooks/use-clip-hold.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -223,6 +239,11 @@
         {
           "path": "lib/solid/effect.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -240,6 +261,11 @@
         {
           "path": "lib/solid/effect.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -254,6 +280,11 @@
         {
           "path": "hooks/use-demo-signal.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -279,6 +310,11 @@
         {
           "path": "lib/solid/jsx-types.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -296,6 +332,11 @@
         {
           "path": "hooks/use-audio-analyser.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -313,6 +354,11 @@
         {
           "path": "lib/solid/effect.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -327,6 +373,11 @@
         {
           "path": "hooks/use-audio-config.tsx",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -344,6 +395,11 @@
         {
           "path": "components/ui/db-scale.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -361,6 +417,11 @@
         {
           "path": "components/ui/db-readout.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -379,6 +440,11 @@
         {
           "path": "components/ui/clip-indicator.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -402,6 +468,11 @@
         {
           "path": "components/ui/level-meter.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -428,6 +499,11 @@
         {
           "path": "lib/solid/kobalte-slider.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -453,6 +529,11 @@
         {
           "path": "lib/solid/kobalte-slider.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -471,6 +552,11 @@
         {
           "path": "components/ui/knob.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -496,6 +582,11 @@
         {
           "path": "lib/solid/kobalte-slider.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -513,6 +604,11 @@
         {
           "path": "components/ui/channel-toggle.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -534,6 +630,11 @@
         {
           "path": "lib/solid/kobalte-slider.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -548,6 +649,11 @@
         {
           "path": "components/ui/badge.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -566,6 +672,11 @@
         {
           "path": "components/ui/channel-strip.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -583,6 +694,11 @@
         {
           "path": "components/ui/mixer.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -597,6 +713,11 @@
         {
           "path": "components/ui/popover.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -617,6 +738,11 @@
         {
           "path": "components/ui/bar-visualizer.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -636,6 +762,11 @@
         {
           "path": "components/ui/smooth-waveform.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -655,6 +786,11 @@
         {
           "path": "components/ui/live-waveform.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -668,6 +804,11 @@
         {
           "path": "lib/electric.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -689,6 +830,11 @@
         {
           "path": "components/ui/electric-bar-visualizer.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -709,6 +855,11 @@
         {
           "path": "components/ui/electric-waveform.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -728,6 +879,11 @@
         {
           "path": "components/ui/spectrum.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -746,6 +902,11 @@
         {
           "path": "components/ui/waveform.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -760,6 +921,11 @@
         {
           "path": "components/ui/track-list.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -773,6 +939,11 @@
         {
           "path": "components/ui/kbd.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -791,6 +962,11 @@
         {
           "path": "components/ui/sound-pad.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -805,6 +981,11 @@
         {
           "path": "hooks/use-audio-player.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -823,6 +1004,11 @@
         {
           "path": "hooks/use-sound.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -841,6 +1027,11 @@
         {
           "path": "hooks/use-waveform-data.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -860,6 +1051,11 @@
         {
           "path": "hooks/use-web-audio-mixer.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -877,6 +1073,11 @@
         {
           "path": "hooks/use-level.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -894,6 +1095,11 @@
         {
           "path": "hooks/use-gain-node.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -908,6 +1114,11 @@
         {
           "path": "hooks/use-audio-devices.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -922,6 +1133,11 @@
         {
           "path": "hooks/use-system-audio.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -936,6 +1152,11 @@
         {
           "path": "hooks/use-mixer.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -950,6 +1171,11 @@
         {
           "path": "components/ui/select.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -968,6 +1194,11 @@
         {
           "path": "components/ui/audio-device-select.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -987,6 +1218,11 @@
         {
           "path": "components/ui/audio-player.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1000,6 +1236,11 @@
         {
           "path": "components/ui/card.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1013,6 +1254,11 @@
         {
           "path": "components/ui/alert.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1026,6 +1272,11 @@
         {
           "path": "components/ui/empty.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1039,6 +1290,11 @@
         {
           "path": "components/ui/label.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1052,6 +1308,11 @@
         {
           "path": "components/ui/separator.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1065,6 +1326,11 @@
         {
           "path": "components/ui/switch.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1078,6 +1344,11 @@
         {
           "path": "components/ui/toggle.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1095,6 +1366,11 @@
         {
           "path": "components/ui/field.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1108,6 +1384,11 @@
         {
           "path": "lib/solid/kobalte-dom-collection.tsx",
           "type": "registry:lib"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1124,6 +1405,11 @@
         {
           "path": "components/ui/context-menu.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1137,6 +1423,11 @@
         {
           "path": "components/ui/tabs.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1171,6 +1462,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1200,6 +1496,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1233,6 +1534,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1263,6 +1569,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1293,6 +1604,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     },
@@ -1339,6 +1655,11 @@
         {
           "path": "components/icons/phosphor.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "lib/audiocn-license.txt",
+          "type": "registry:file",
+          "target": "@lib/audiocn-license.txt"
         }
       ]
     }

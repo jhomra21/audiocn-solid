@@ -337,7 +337,7 @@ export const buildAiPrompt = ({
   }
 
   sections.push(
-    "The project needs Tailwind CSS v4 and a shadcn registry setup. If there is no `components.json`, run `npx shadcn@latest init` first.",
+    `The project needs Tailwind CSS v4 and a shadcn registry setup. If there is no \`components.json\`, follow the manual Solid setup at ${absoluteUrl("/docs/installation.md")} first; do not use the React-oriented shadcn initializer.`,
     "Choose exactly one runtime branch matching the project's installed Solid version. Do not mix the branches' dependencies or compatibility files.",
     `Register the matching URL below in \`components.json\`, then add the item with the project's package manager (\`pnpm dlx\`, \`yarn dlx\`, \`bunx --bun\` or \`npx\`):\n\n\`\`\`bash\n${command}\n\`\`\``
   );
@@ -364,7 +364,7 @@ export const buildAiPrompt = ({
         : `This writes \`${primaryFile(item)}\`.`,
       `Files written by this runtime's install:\n\n${[...files].map((path) => `- \`${path}\``).join("\n")}`,
       "Copy compatibility files from this runtime's registry, not the other branch.",
-      `If the CLI cannot run, fetch ${registryItemUrl(item.name, plan.runtime)} and every item in its \`registryDependencies\` from the same \`/r/${plan.runtime}/\` registry, then write each \`files[].content\` to its \`files[].path\`.`
+      `If the CLI cannot run, fetch ${registryItemUrl(item.name, plan.runtime)} and every item in its \`registryDependencies\` from the same \`/r/${plan.runtime}/\` registry, then write each \`files[].content\` using \`files[].target\` when present, otherwise \`files[].path\`, resolving aliases from \`components.json\`. Retain the installed \`lib/audiocn-license.txt\` notice with redistributed source.`
     );
   }
 

@@ -125,9 +125,12 @@ const incrementFor = (
   return event.shiftKey ? largeStep : step;
 };
 
-const SliderCompat = () => {
+const SliderCompat = (props: { onChangeEnd: () => void }) => {
   const context = SliderPrimitive.useSliderContext();
-  useKobalteSliderCompat(context, { suppressStep: true });
+  useKobalteSliderCompat(context, {
+    onChangeEnd: () => props.onChangeEnd(),
+    suppressStep: true,
+  });
 
   return null;
 };
@@ -330,6 +333,9 @@ export const FaderThumb = (props: FaderThumbProps) => {
       aria-labelledby={context.ariaLabelledBy()}
       aria-valuetext={context.format()(context.value())}
       class={cn(
+        context.orientation() === "vertical"
+          ? "left-1/2 -translate-x-1/2"
+          : "top-1/2 -translate-y-1/2",
         thumbVariants({
           orientation: context.orientation(),
           variant: context.variant(),
@@ -966,7 +972,7 @@ export const Fader = (props: FaderProps) => {
       value={sliderValue()}
       {...rest}
     >
-      <SliderCompat />
+      <SliderCompat onChangeEnd={() => commit(latestValue)} />
 
       {props.children ?? (
         <FaderTrack>

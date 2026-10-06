@@ -37,13 +37,22 @@ export const AudioPlayerApp = () => {
   const player = useAudioPlayer(() => ({ src: tracks()[1]?.src }));
   const [next, setNext] = createSignal(0);
   const [external, setExternal] = createSignal(false);
+  const seekOptions = { ownedWrite: true, name: "player.seekCalls" };
+  const [seekCalls, setSeekCalls] = createSignal<number[]>([], seekOptions);
+
+  const trackedPlayer = Object.assign(Object.create(player), {
+    seek: (value: number) => {
+      setSeekCalls((previous) => [...previous, value]);
+      player.seek(value);
+    },
+  });
 
   return (
     <main class="mx-auto grid max-w-xl gap-4 p-4">
       <h1>Audio player contracts</h1>
       <AudioPlayer
         aria-label="Demo player"
-        player={player}
+        player={trackedPlayer}
         onNext={() => setNext((count) => count + 1)}
       >
         <AudioPlayerTitle>Low Tide</AudioPlayerTitle>
@@ -67,6 +76,7 @@ export const AudioPlayerApp = () => {
         {Math.round(player.currentTime)}
       </output>
       <output data-testid="transport-next">{next()}</output>
+      <output data-testid="seek-calls">{JSON.stringify(seekCalls())}</output>
       <AudioPlayer
         aria-label="Composable player"
         player={external() ? player : undefined}
@@ -90,7 +100,9 @@ export const AudioPlayerApp = () => {
       </button>
       <button onClick={() => player.pause()}>Pause external</button>
       <output data-testid="external-playing">{String(player.playing)}</output>
-      <div hidden>{player.element}</div>
+      <div data-testid="seek-media" hidden>
+        {player.element}
+      </div>
     </main>
   );
 };

@@ -2,9 +2,9 @@
   {
     "route": "/docs/installation",
     "upstream": "Set up shadcn/ui",
-    "local": "Set up shadcn",
+    "local": "Set up a Solid project",
     "level": 3,
-    "reason": "Both installation MDX files use this step for their respective framework's shadcn setup."
+    "reason": "The Solid port uses tested manual Vite/Tailwind/components.json setup instead of the upstream React-oriented shadcn initializer."
   },
   {
     "route": "/docs/installation",

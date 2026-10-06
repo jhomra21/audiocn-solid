@@ -4,6 +4,8 @@ import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import { createServer } from "vite";
 
+import { dragSlider } from "./slider-drag";
+
 const section = (page: Page, id: string) => page.getByTestId(id);
 
 const journal = (page: Page, id: string) =>
@@ -35,9 +37,188 @@ const dialBounds = async (dial: Locator) => {
 };
 
 export const runControlsSuite = (runtime: string) => {
+  const dragEvidence: unknown[] = [];
+
   test.describe("control contracts", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/controls");
+    });
+
+    test.afterAll(async () => {
+      const artifacts = new URL("../artifacts/", import.meta.url);
+
+      await mkdir(artifacts, { recursive: true });
+      await writeFile(
+        new URL(`slider-drag-${runtime}.json`, artifacts),
+        JSON.stringify(dragEvidence, null, 2)
+      );
+    });
+
+    for (const id of [
+      "fader-vertical-drag",
+      "parameter-drag",
+      "volume-vertical-drag",
+      "fader-mic",
+      "parameter-sync",
+      "volume-zero",
+    ]) {
+      test(`sustained pointer dragging and release commits ${id}`, async ({
+        page,
+      }, testInfo) => {
+        const thumb = section(page, id).locator('[role="slider"]').first();
+
+        for (const start of ["thumb", "track"] as const) {
+          const before = await readJournal(page, id);
+
+          const path = await dragSlider(page, thumb, start, async () => {
+            expect(
+              (await readJournal(page, id))
+                .slice(before.length)
+                .filter((entry) => entry.type === "commit")
+            ).toHaveLength(0);
+          });
+
+          const after = await readJournal(page, id);
+          expect(
+            after
+              .slice(before.length)
+              .filter((entry) => entry.type === "commit")
+          ).toHaveLength(1);
+          dragEvidence.push({
+            id,
+            ...path,
+            callbacks: after.slice(before.length),
+          });
+          await testInfo.attach(`${runtime}-${id}-${start}`, {
+            body: JSON.stringify({
+              ...path,
+              events: after.slice(before.length),
+            }),
+            contentType: "application/json",
+          });
+        }
+      });
+    }
+
+    test("seek dragging changes position while held and seeks once on release", async ({
+      page,
+    }, testInfo) => {
+      const root = section(page, "effects");
+      const thumb = root.locator('[data-slot="audio-player-seek-thumb"]');
+
+      for (const start of ["thumb", "track"] as const) {
+        const before: number[] = JSON.parse(
+          (await root.getByTestId("player-times").textContent()) ?? "[]"
+        );
+
+        const path = await dragSlider(page, thumb, start, async () => {
+          await expect(root.getByTestId("player-times")).toHaveText(
+            JSON.stringify(before)
+          );
+        });
+
+        await expect
+          .poll(
+            async () =>
+              JSON.parse(
+                (await root.getByTestId("player-times").textContent()) ?? "[]"
+              ).length
+          )
+          .toBe(before.length + 1);
+        dragEvidence.push({ id: "seek", ...path });
+        await testInfo.attach(`${runtime}-seek-${start}`, {
+          body: JSON.stringify(path),
+          contentType: "application/json",
+        });
+      }
+    });
+
+    test("native touch dragging captures the vertical thumb and commits on release", async ({
+      page,
+      context,
+    }, testInfo) => {
+      const thumb = section(page, "fader-vertical-drag").locator(
+        '[data-slot="fader-thumb"]'
+      );
+
+      await thumb.scrollIntoViewIfNeeded();
+      const bounds = await thumb.boundingBox();
+
+      if (!bounds) throw new Error("Slider has no bounds.");
+      const cdp = await context.newCDPSession(page);
+      const x = bounds.x + bounds.width / 2;
+      const y = bounds.y + bounds.height / 2;
+      const values: string[] = [];
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchStart",
+        touchPoints: [{ x, y }],
+      });
+
+      try {
+        for (const offset of [20, 40, 10]) {
+          const before = await thumb.getAttribute("aria-valuenow");
+          await cdp.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [{ x: x + 50, y: y + offset }],
+          });
+          await expect(thumb).not.toHaveAttribute("aria-valuenow", before!);
+          values.push((await thumb.getAttribute("aria-valuenow"))!);
+          expect(
+            (await readJournal(page, "fader-vertical-drag")).filter(
+              (entry) => entry.type === "commit"
+            )
+          ).toHaveLength(0);
+        }
+      } finally {
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: "touchEnd",
+          touchPoints: [],
+        });
+        await cdp.detach();
+      }
+
+      expect(
+        (await readJournal(page, "fader-vertical-drag")).filter(
+          (entry) => entry.type === "commit"
+        )
+      ).toHaveLength(1);
+      dragEvidence.push({
+        id: "native-touch",
+        x,
+        y,
+        values,
+        callbacks: await readJournal(page, "fader-vertical-drag"),
+      });
+      await testInfo.attach(`${runtime}-native-touch`, {
+        body: JSON.stringify({ x, y, values }),
+        contentType: "application/json",
+      });
+    });
+
+    test("disabled vertical slider ignores native thumb and track dragging", async ({
+      page,
+    }) => {
+      const root = section(page, "fader-disabled-drag");
+      const thumb = root.locator('[data-slot="fader-thumb"]');
+      const before = await thumb.getAttribute("aria-valuenow");
+      const track = root.locator('[data-slot="fader-track"]');
+      await track.scrollIntoViewIfNeeded();
+
+      for (const target of [thumb, track]) {
+        const bounds = await target.boundingBox();
+
+        if (!bounds) throw new Error("Slider has no bounds.");
+
+        await page.mouse.move(
+          bounds.x + bounds.width / 2,
+          bounds.y + bounds.height / 2
+        );
+        await page.mouse.down();
+        await page.mouse.move(bounds.x + 50, bounds.y + 20, { steps: 5 });
+        await page.mouse.up();
+        await expect(thumb).toHaveAttribute("aria-valuenow", before!);
+        expect(await readJournal(page, "fader-disabled-drag")).toEqual([]);
+      }
     });
 
     test("control faders expose dB, exact steps, endpoints and keyboard commits", async ({
@@ -175,6 +356,7 @@ export const runControlsSuite = (runtime: string) => {
       await page.mouse.wheel(0, -100);
       await expect(dial).toHaveAttribute("aria-valuenow", "50");
       await dial.focus();
+      await dial.hover();
       await page.mouse.wheel(0, -100);
       await expect(dial).toHaveAttribute("aria-valuenow", "51");
       await disabled.focus();

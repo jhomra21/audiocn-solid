@@ -65,6 +65,14 @@ const prompt = buildAiPrompt({
 });
 
 describe("buildAiPrompt", () => {
+  it("links the manual Solid bootstrap without recommending React init", () => {
+    expect(prompt).not.toContain("shadcn@latest init");
+    expect(prompt).toContain(
+      "https://audiocn-solid.workers.dev/docs/installation.md"
+    );
+    expect(prompt).toContain("manual Solid setup");
+  });
+
   it("opens with the page, its source and its description", () => {
     expect(prompt).toMatch(
       /^# Add Bar Visualizer from audiocn to this project\n/u

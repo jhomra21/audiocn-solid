@@ -21,6 +21,7 @@ import {
   registryItemPath,
   registryItemUrl,
 } from "@/site/lib/docs/registry";
+import { lockBodyScroll } from "@/site/lib/docs/scroll-lock";
 import { siteConfig } from "@/site/lib/site";
 
 export interface DocsFrontmatter {
@@ -134,7 +135,10 @@ const SidebarCollapseTrigger = (props: {
   </button>
 );
 
-const DocsNavigation = (props: { currentPath: string }) => (
+const DocsNavigation = (props: {
+  currentPath: string;
+  onNavigate?: () => void;
+}) => (
   <nav aria-label="Documentation" class="flex flex-col gap-0.5">
     <div class="mb-4 flex flex-col gap-0.5">
       <For each={SECTION_LINKS}>
@@ -145,6 +149,7 @@ const DocsNavigation = (props: { currentPath: string }) => (
               props.currentPath.startsWith(link.href) ? "true" : undefined
             }
             href={link.href}
+            onClick={props.onNavigate}
           >
             {link.label}
           </a>
@@ -171,6 +176,7 @@ const DocsNavigation = (props: { currentPath: string }) => (
                         aria-current={current() ? "page" : undefined}
                         class={NAV_LINK_CLASS}
                         href={item.href}
+                        onClick={props.onNavigate}
                       >
                         {item.label}
                       </a>
@@ -185,6 +191,101 @@ const DocsNavigation = (props: { currentPath: string }) => (
     </For>
   </nav>
 );
+
+const MobileSidebar = (props: { currentPath: string; onClose: () => void }) => {
+  let dialog: HTMLDialogElement | undefined;
+  let closeButton: HTMLButtonElement | undefined;
+
+  onSettled(() => {
+    const previous = document.activeElement;
+    const releaseScroll = lockBodyScroll();
+    const desktop = window.matchMedia("(min-width: 48rem)");
+
+    const resize = () => {
+      if (desktop.matches) props.onClose();
+    };
+
+    dialog?.showModal();
+    closeButton?.focus();
+    desktop.addEventListener("change", resize);
+
+    return () => {
+      desktop.removeEventListener("change", resize);
+      dialog?.close();
+      releaseScroll();
+
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus();
+    };
+  });
+
+  return (
+    <dialog
+      aria-label="Documentation navigation"
+      class="text-foreground backdrop:bg-foreground/20 fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:backdrop-blur-xs"
+      onCancel={(event) => {
+        event.preventDefault();
+        props.onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) props.onClose();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          props.onClose();
+        } else if (event.key === "Tab") {
+          const targets = Array.from(
+            event.currentTarget.querySelectorAll<HTMLElement>(
+              "a[href], button:not(:disabled), select:not(:disabled)"
+            )
+          );
+
+          const index = targets.findIndex(
+            (target) => target === document.activeElement
+          );
+
+          const next =
+            (index + (event.shiftKey ? -1 : 1) + targets.length) %
+            targets.length;
+
+          event.preventDefault();
+          targets[next]?.focus();
+        }
+      }}
+      ref={(node) => {
+        dialog = node;
+      }}
+    >
+      <aside
+        class="bg-background fixed inset-y-0 end-0 z-40 flex w-[85%] max-w-[380px] flex-col border-s text-[0.9375rem] shadow-lg md:hidden"
+        id="docs-sidebar-mobile"
+      >
+        <div class="text-muted-foreground flex items-center gap-1.5 p-4 pb-2">
+          <SidebarControls />
+          <button
+            aria-expanded="true"
+            aria-label="Close Sidebar"
+            class={`${ICON_BUTTON_CLASS} bg-secondary rounded-lg border`}
+            onClick={props.onClose}
+            ref={(node) => {
+              closeButton = node;
+            }}
+            type="button"
+          >
+            <PanelLeftIcon />
+          </button>
+        </div>
+        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
+          <DocsNavigation
+            currentPath={props.currentPath}
+            onNavigate={props.onClose}
+          />
+        </div>
+      </aside>
+    </dialog>
+  );
+};
 
 const TableOfContents = (props: {
   active: string;
@@ -399,7 +500,10 @@ export const DocsShell = (props: DocsShellProps) => {
             aria-expanded={mobileOpen() ? "true" : "false"}
             aria-label={mobileOpen() ? "Close Sidebar" : "Open Sidebar"}
             class={`${ICON_BUTTON_CLASS} p-2`}
-            onClick={() => setMobileOpen((open) => !open)}
+            onClick={(event) => {
+              event.currentTarget.focus();
+              setMobileOpen((open) => !open);
+            }}
             type="button"
           >
             <PanelLeftIcon />
@@ -486,30 +590,10 @@ export const DocsShell = (props: DocsShellProps) => {
         </div>
 
         <Show when={mobileOpen()}>
-          <div
-            class="bg-foreground/20 fixed inset-0 z-40 backdrop-blur-xs md:hidden"
-            onClick={() => setMobileOpen(false)}
+          <MobileSidebar
+            currentPath={props.currentPath}
+            onClose={() => setMobileOpen(false)}
           />
-          <aside
-            class="bg-background fixed inset-y-0 end-0 z-40 flex w-[85%] max-w-[380px] flex-col border-s text-[0.9375rem] shadow-lg md:hidden"
-            id="docs-sidebar-mobile"
-          >
-            <div class="text-muted-foreground flex items-center gap-1.5 p-4 pb-2">
-              <SidebarControls />
-              <button
-                aria-expanded="true"
-                aria-label="Close Sidebar"
-                class={`${ICON_BUTTON_CLASS} bg-secondary rounded-lg border`}
-                onClick={() => setMobileOpen(false)}
-                type="button"
-              >
-                <PanelLeftIcon />
-              </button>
-            </div>
-            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-              <DocsNavigation currentPath={props.currentPath} />
-            </div>
-          </aside>
         </Show>
 
         <Show when={headings().length > 0}>

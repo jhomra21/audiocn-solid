@@ -86,6 +86,8 @@ jobs:
       - run: bun run site:spike:1
       - run: cd site && bun run spike:2
       - run: bun run registry:spike:3
+      - run: bun run registry:test-contracts
+      - run: bun run registry:test-release
       - run: bun run kobalte:spike:4
       - run: bun run site:spike:5
       - run: cd site && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"
@@ -97,6 +99,7 @@ jobs:
             site/artifacts/spike-1.json
             site/artifacts/spike-2.json
             artifacts/registry-install.json
+            artifacts/registry-release-build.json
             artifacts/fader-e2e.json
             artifacts/fader-solid1.png
             artifacts/fader-solid2.png

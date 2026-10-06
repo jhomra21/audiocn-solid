@@ -7,6 +7,7 @@ import {
   useColorTheme,
 } from "@/site/components/docs/theme-controls";
 import { DOCS_NAVIGATION } from "@/site/lib/docs/navigation";
+import { lockBodyScroll } from "@/site/lib/docs/scroll-lock";
 import { THEMES } from "@/site/lib/docs/site-themes";
 import { searchDocs } from "@/site/lib/search";
 import { searchGroups } from "@/site/lib/search-groups";
@@ -138,14 +139,13 @@ const SearchDialog = (props: { onClose: () => void }) => {
 
   onSettled(() => {
     const previous = document.activeElement;
-    const overflow = document.body.style.overflow;
+    const releaseScroll = lockBodyScroll();
     dialog?.showModal();
-    document.body.style.overflow = "hidden";
     input?.focus();
 
     return () => {
       dialog?.close();
-      document.body.style.overflow = overflow;
+      releaseScroll();
 
       if (previous instanceof HTMLElement && previous.isConnected)
         previous.focus();
@@ -415,8 +415,12 @@ const SearchDialog = (props: { onClose: () => void }) => {
 
 const OPEN_SEARCH_EVENT = "audiocn-open-search";
 
-export const openSearch = () =>
+export const openSearch = (event?: MouseEvent) => {
+  // WebKit does not focus pointer-clicked buttons before opening a modal.
+  if (event?.currentTarget instanceof HTMLElement) event.currentTarget.focus();
+
   window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
+};
 
 /** The search dialog, opened with Cmd/Ctrl+K or `openSearch()`. */
 export const SiteSearch = () => {
