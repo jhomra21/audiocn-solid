@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import PanControlDoc, {
   frontmatter,
@@ -7,16 +5,11 @@ import PanControlDoc, {
 
 export default function PanControlPage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/components/pan-control"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <PanControlDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/components/pan-control"
+      frontmatter={frontmatter}
+    >
+      <PanControlDoc />
+    </DocsShell>
   );
 }

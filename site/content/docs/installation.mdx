@@ -94,6 +94,18 @@ export const MicLevel = (props: { peakDb: number }) => (
 
 The paths follow the aliases in your `components.json`, so they adapt to projects with a `src` folder or custom aliases.
 
+## For AI agents
+
+Every component, hook and block page has a **Copy prompt for AI** button. It copies a single document with the install steps, the usage, every example and the full API, written for an agent to follow.
+
+The same document is served at the page URL with `.md` appended, so an agent can fetch it directly:
+
+```bash
+curl https://<domain>/docs/components/bar-visualizer.md
+```
+
+[llms.txt](/llms.txt) indexes every page, and [llms-full.txt](/llms-full.txt) is the whole documentation in one file.
+
 ## Solid 1 and Solid 2
 
 The two registry URLs expose the same public audiocn API. The Solid 1 registry targets Solid 1.9.15+ and the Solid 1 Kobalte line. The Solid 2 registry targets Solid 2 and the Solid 2 Kobalte line. Runtime-specific compatibility files are selected when the registry is built; application code should not branch on the Solid version.

@@ -17,6 +17,20 @@ export default function Document(props: { children: JSX.Element }) {
       <head>
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <link
+          href="/favicon.ico"
+          rel="icon"
+          sizes="48x48"
+          type="image/x-icon"
+        />
+        <link href="/icon.png" rel="icon" sizes="64x64" type="image/png" />
+        <link href="/icon.svg" rel="icon" sizes="any" type="image/svg+xml" />
+        <link
+          href="/apple-icon.png"
+          rel="apple-touch-icon"
+          sizes="180x180"
+          type="image/png"
+        />
         <script innerHTML={themeBootstrap} />
         <HydrationScript />
       </head>

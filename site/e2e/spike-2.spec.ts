@@ -13,10 +13,7 @@ const docsComponents = [
   "type-table",
 ] as const;
 
-test("MDX pipeline prerenders docs content and custom components", async ({
-  page,
-  request,
-}) => {
+test("MDX pipeline prerenders docs content", async ({ request }) => {
   const docsResponse = await request.get("/docs/components/level-meter");
   const docsHtml = await docsResponse.text();
 
@@ -28,6 +25,11 @@ test("MDX pipeline prerenders docs content and custom components", async ({
   expect(docsHtml).toContain('id="installation"');
   expect(docsHtml).toContain("<table");
   expect(docsHtml).toContain('class="shiki');
+});
+
+// The fixture route exists only in spike builds: `bun run spike:2`.
+test("MDX fixture renders every custom docs component", async ({ page }) => {
+  test.skip(process.env.AUDIOCN_SPIKE !== "1", "spike mode only");
 
   await page.goto("/spikes/mdx");
 

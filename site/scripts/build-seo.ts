@@ -1,7 +1,8 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { siteConfig } from "../lib/site";
+import { buildDocsMarkdown } from "./build-docs-markdown";
 
 const siteRoot = join(import.meta.dirname, "../dist/client");
 
@@ -19,89 +20,28 @@ const walk = async (directory: string): Promise<void> => {
   }
 };
 
-const cleanText = (html: string): string =>
-  html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/giu, " ")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/giu, " ")
-    .replace(/<[^>]+>/gu, " ")
-    .replaceAll("&amp;", "&")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#x27;", "'")
-    .replace(/\s+/gu, " ")
-    .trim();
-
 await walk(siteRoot);
 
-const pages = await Promise.all(
-  htmlFiles.map(async (file) => {
-    const html = await readFile(file, "utf8");
+const docs = htmlFiles.flatMap((file) => {
+  const relativePath = file.slice(siteRoot.length + 1);
+  const pathname = `/${relativePath.replace(/\/index\.html$/u, "").replace(/\.html$/u, "")}`;
 
-    const relativePath = file.slice(siteRoot.length + 1);
-
-    const pathname =
-      relativePath === "index.html"
-        ? "/"
-        : `/${relativePath
-            .replace(/\/index\.html$/u, "")
-            .replace(/\.html$/u, "")}`;
-
-    const title =
-      html.match(/<title[^>]*>([\s\S]*?)<\/title>/iu)?.[1] ?? siteConfig.name;
-
-    const metaDescription = html.match(
-      /<meta\b[^>]*\bname="description"[^>]*>/iu
-    )?.[0];
-
-    const description =
-      metaDescription?.match(/\bcontent="([^"]*)"/iu)?.[1] ?? "";
-
-    return {
-      description,
-      pathname,
-      text: cleanText(html),
-      title,
-    };
-  })
-);
-
-const docs = pages.filter(({ pathname }) => pathname.startsWith("/docs"));
-
-const fullText = docs
-  .map(({ pathname, text, title }) => `# ${title} (${pathname})\n\n${text}`)
-  .join("\n\n");
-
-const llms = [
-  `# ${siteConfig.name}`,
-  "",
-  `> ${siteConfig.description}`,
-  "",
-  `Install components with the shadcn CLI after adding "${siteConfig.registryNamespace}" to registries in components.json.`,
-  "",
-  "## Docs",
-  "",
-  ...docs.map(
-    ({ description, pathname, title }) =>
-      `- [${title}](https://www.audiocn.dev${pathname}): ${description}`
-  ),
-  "",
-].join("\n");
+  return pathname.startsWith("/docs") ? [pathname] : [];
+});
 
 const urls = [
-  "https://www.audiocn.dev/",
-  "https://www.audiocn.dev/contributors",
-  ...docs.map(({ pathname }) => `https://www.audiocn.dev${pathname}`),
+  `${siteConfig.url}/`,
+  `${siteConfig.url}/contributors`,
+  ...docs.map((pathname) => `${siteConfig.url}${pathname}`),
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 
 await Promise.all([
-  writeFile(join(siteRoot, "llms.txt"), llms),
-  writeFile(join(siteRoot, "llms-full.txt"), `${fullText}\n`),
+  buildDocsMarkdown(siteRoot),
   writeFile(join(siteRoot, "sitemap.xml"), sitemap),
   writeFile(
     join(siteRoot, "robots.txt"),
-    "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: https://www.audiocn.dev/sitemap.xml\n"
+    `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${siteConfig.url}/sitemap.xml\n`
   ),
 ]);

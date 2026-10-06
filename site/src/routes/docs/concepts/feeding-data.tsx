@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import FeedingDataDoc, {
   frontmatter,
@@ -7,17 +5,11 @@ import FeedingDataDoc, {
 
 export default function FeedingDataPage() {
   return (
-    <>
-      <Title>{frontmatter.title} - audiocn Solid</Title>
-      <Meta content={frontmatter.description} name="description" />
-
-      <DocsShell
-        currentPath="/docs/concepts/feeding-data"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <FeedingDataDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/concepts/feeding-data"
+      frontmatter={frontmatter}
+    >
+      <FeedingDataDoc />
+    </DocsShell>
   );
 }

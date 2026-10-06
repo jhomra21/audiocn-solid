@@ -3,6 +3,8 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   use: {
+    // Timer-driven fake audio output keeps the audio clock independent of the host speakers.
+    launchOptions: { args: ["--disable-audio-output"] },
     baseURL: "http://127.0.0.1:4180",
     viewport: { height: 900, width: 1280 },
   },

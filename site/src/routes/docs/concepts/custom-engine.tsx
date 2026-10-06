@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import CustomEngineDoc, {
   frontmatter,
@@ -7,17 +5,11 @@ import CustomEngineDoc, {
 
 export default function CustomEnginePage() {
   return (
-    <>
-      <Title>{frontmatter.title} - audiocn Solid</Title>
-      <Meta content={frontmatter.description} name="description" />
-
-      <DocsShell
-        currentPath="/docs/concepts/custom-engine"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <CustomEngineDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/concepts/custom-engine"
+      frontmatter={frontmatter}
+    >
+      <CustomEngineDoc />
+    </DocsShell>
   );
 }

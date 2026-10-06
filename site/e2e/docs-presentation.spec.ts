@@ -50,17 +50,13 @@ test("mobile TOC closes after choosing a heading and marks the active section", 
   await page.goto("/docs/components/fader");
   const toggle = page.locator("[data-docs-toc-popover]");
 
-  const trigger = page.getByRole("button", {
-    name: "Installation",
-    exact: true,
-  });
+  const trigger = toggle.getByRole("button");
 
   await trigger.click();
   const link = toggle.getByRole("link", { name: "Keyboard", exact: true });
   await link.click();
-  await expect(
-    page.getByRole("button", { name: "Keyboard", exact: true })
-  ).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toHaveAccessibleName(/ Fader Keyboard$/);
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(link).toBeHidden();
   await page.screenshot({ path: "artifacts/docs-toc-mobile.png" });
 });
@@ -220,18 +216,26 @@ test("docs sidebar, appearance and mobile navigation work without page overflow"
       .evaluate((link) => getComputedStyle(link).backgroundColor)
   ).toBe("rgba(0, 0, 0, 0)");
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
-  await page.getByRole("button", { name: "Collapse Sidebar" }).click();
-  await expect(
-    page.getByRole("navigation", { name: "Documentation" })
-  ).toBeHidden();
-  await page.getByRole("button", { name: "Expand Sidebar" }).click();
+  await page
+    .locator("aside")
+    .getByRole("button", { name: "Collapse Sidebar" })
+    .click();
+  await expect(page.locator("#nd-sidebar")).toHaveAttribute(
+    "data-collapsed",
+    "true"
+  );
+  await expect(page.locator("#nd-sidebar")).toHaveJSProperty("inert", true);
+  await page
+    .locator("[data-sidebar-panel]")
+    .getByRole("button", { name: "Collapse Sidebar" })
+    .click();
   await page
     .getByRole("combobox", { name: "Theme", exact: true })
     .selectOption("ocean");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
   await page.getByRole("button", { name: "Toggle Theme", exact: true }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await page.getByRole("button", { name: "Search docs", exact: true }).click();
+  await page.getByRole("button", { name: "Search ⌘ K", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toBeHidden();
@@ -240,6 +244,7 @@ test("docs sidebar, appearance and mobile navigation work without page overflow"
   await page.getByRole("button", { name: "Open Sidebar", exact: true }).click();
   await expect(page.locator("#docs-sidebar-mobile")).toBeVisible();
   await page
+    .locator("#docs-sidebar-mobile")
     .getByRole("button", { name: "Close Sidebar", exact: true })
     .click();
   await expect(page.locator("#docs-sidebar-mobile")).toHaveCount(0);

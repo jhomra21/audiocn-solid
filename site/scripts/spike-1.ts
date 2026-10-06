@@ -176,12 +176,12 @@ try {
   const html = {
     home: await assertHtml(
       "/",
-      "audiocn Solid",
+      "audiocn Solid — Audio components for Solid",
       "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own."
     ),
     levelMeter: await assertHtml(
       "/docs/components/level-meter",
-      "Level Meter for Solid - audiocn Solid",
+      "Level Meter for Solid — audiocn Solid",
       "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light."
     ),
   };
@@ -211,7 +211,7 @@ try {
     evidence: {
       html,
       runtimeRoots,
-      upstreamSha: "9598cf2abbcf0dc844e61d77d18af46a6d17e8a9",
+      upstreamSha: "59411f58a7c3b47172e8105136b6502c98d1b170",
     },
   });
 } catch (error) {

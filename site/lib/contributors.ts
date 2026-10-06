@@ -1,11 +1,56 @@
 import { siteConfig } from "./site";
 
+// Twice the rendered avatar size, so retina screens stay sharp without pulling
+// full-resolution avatars for every contributor.
+const AVATAR_REQUEST_SIZE = "96";
+
+const REPOSITORY_NAME = /^[\w.-]+\/[\w.-]+$/u;
+
 export interface Contributor {
   login: string;
   avatarUrl: string;
   profileUrl: string;
   contributions: number;
 }
+
+export interface ContributorStats {
+  totalContributions: number;
+  totalContributors: number;
+}
+
+export interface ContributorsEnvironment {
+  /** Raises the rate limit, and reads the list while the repository is private. */
+  GITHUB_TOKEN?: string;
+  /** Lists another public repository, in `owner/repo` form. */
+  AUDIOCN_GITHUB_REPOSITORY?: string;
+  readonly [key: string]: string | undefined;
+}
+
+export type FetchImplementation = (
+  input: string,
+  init?: RequestInit
+) => Promise<Response>;
+
+/** The configured repository when it is a valid `owner/repo`, else the site's. */
+export const resolveContributorsRepository = (
+  environment: ContributorsEnvironment = process.env
+): string => {
+  const configured = environment.AUDIOCN_GITHUB_REPOSITORY?.trim();
+
+  return configured && REPOSITORY_NAME.test(configured)
+    ? configured
+    : siteConfig.githubRepo;
+};
+
+export const getContributorStats = (
+  contributors: readonly Contributor[]
+): ContributorStats => ({
+  totalContributions: contributors.reduce(
+    (total, contributor) => total + contributor.contributions,
+    0
+  ),
+  totalContributors: contributors.length,
+});
 
 const safeUrl = (
   value: unknown,
@@ -64,17 +109,24 @@ const isApiContributor = (entry: unknown): entry is ApiContributor => {
 };
 
 export const loadContributors = async (
-  request: typeof fetch = fetch
+  request: FetchImplementation = fetch,
+  environment: ContributorsEnvironment = process.env
 ): Promise<Contributor[]> => {
   try {
+    const headers = new Headers({
+      Accept: "application/vnd.github+json",
+      "User-Agent": siteConfig.name,
+      "X-GitHub-Api-Version": "2022-11-28",
+    });
+
+    if (environment.GITHUB_TOKEN) {
+      headers.set("Authorization", `Bearer ${environment.GITHUB_TOKEN}`);
+    }
+
     const response = await request(
-      `https://api.github.com/repos/${siteConfig.githubRepo}/contributors?per_page=100`,
+      `https://api.github.com/repos/${resolveContributorsRepository(environment)}/contributors?per_page=100`,
       {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": siteConfig.name,
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
+        headers,
         redirect: "error",
         signal: AbortSignal.timeout(3000),
       }
@@ -106,7 +158,7 @@ export const loadContributors = async (
         !/^\/u\/\d+$/.test(avatar.pathname)
       )
         continue;
-      avatar.search = "?s=96";
+      avatar.searchParams.set("s", AVATAR_REQUEST_SIZE);
       avatar.hash = "";
       contributors.push({
         login,

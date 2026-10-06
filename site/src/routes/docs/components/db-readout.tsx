@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import DbReadoutDoc, {
   frontmatter,
@@ -7,16 +5,11 @@ import DbReadoutDoc, {
 
 export default function DbReadoutPage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/components/db-readout"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <DbReadoutDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/components/db-readout"
+      frontmatter={frontmatter}
+    >
+      <DbReadoutDoc />
+    </DocsShell>
   );
 }

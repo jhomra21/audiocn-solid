@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import UseFrameSourceDoc, {
   frontmatter,
@@ -7,16 +5,11 @@ import UseFrameSourceDoc, {
 
 export default function UseFrameSourcePage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/hooks/use-frame-source"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <UseFrameSourceDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/hooks/use-frame-source"
+      frontmatter={frontmatter}
+    >
+      <UseFrameSourceDoc />
+    </DocsShell>
   );
 }

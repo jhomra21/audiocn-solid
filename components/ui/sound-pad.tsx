@@ -515,16 +515,13 @@ export const SoundPadProgress = (props: SoundPadProgressProps) => {
     (next) =>
       element?.style.setProperty("--pad-progress", clamp(next, 0, 1).toFixed(4))
   );
-  createCompatEffect(
-    () => ({ value: props.value, playing: settings.playing }),
-    ({ value, playing }) => {
-      if (value !== undefined || !playing)
-        element?.style.setProperty(
-          "--pad-progress",
-          value === undefined ? "0" : clamp(value, 0, 1).toFixed(4)
-        );
-    }
-  );
+
+  const progress = () =>
+    props.value === undefined
+      ? settings.playing
+        ? undefined
+        : "0"
+      : clamp(props.value, 0, 1).toFixed(4);
 
   const rest = omitProps(props, [
     "class",
@@ -554,7 +551,7 @@ export const SoundPadProgress = (props: SoundPadProgressProps) => {
       )}
       data-slot="sound-pad-progress"
       data-variant={props.variant ?? "bar"}
-      style={props.style}
+      style={mergeStyleVars(props.style, { "--pad-progress": progress() })}
       {...rest}
       ref={(node: HTMLDivElement) => {
         element = node;

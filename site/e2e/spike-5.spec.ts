@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+// The fixture route exists only in spike builds: `bun run spike:5`.
 test("static search finds docs by title and body content", async ({ page }) => {
+  test.skip(process.env.AUDIOCN_SPIKE !== "1", "spike mode only");
+
   const failures: string[] = [];
 
   page.on("console", (message) => {

@@ -5,7 +5,13 @@ import { AudioHooksApp } from "@/app/audio-hooks";
 import { AudioPlayerApp } from "@/app/audio-player";
 import { BlocksApp } from "@/app/blocks";
 import { ContractApp } from "@/app/contracts";
+import { ControlsApp } from "@/app/controls";
+import { DemoRoutingApp } from "@/app/demo-routing";
 import { App } from "@/app/gallery";
+import { HooksLabApp } from "@/app/hooks-lab";
+import { MetersApp } from "@/app/meters";
+import { MixerMediaApp } from "@/app/mixer-media";
+import { PaintersApp } from "@/app/painters";
 import { PlaybackApp } from "@/app/playback";
 import { PopoverApp } from "@/app/popover";
 import { SoundPadsApp } from "@/app/sound-pads";
@@ -23,7 +29,9 @@ if (!root) {
 
 render(
   () =>
-    location.pathname === "/blocks" ? (
+    location.pathname === "/controls" ? (
+      <ControlsApp />
+    ) : location.pathname === "/blocks" ? (
       <BlocksApp />
     ) : location.pathname === "/audio-devices" ? (
       <AudioDevicesApp />
@@ -43,6 +51,16 @@ render(
       <VisualizersApp />
     ) : location.pathname === "/audio-hooks" ? (
       <AudioHooksApp />
+    ) : location.pathname === "/meters" ? (
+      <MetersApp />
+    ) : location.pathname === "/painters" ? (
+      <PaintersApp />
+    ) : location.pathname === "/demo-routing" ? (
+      <DemoRoutingApp />
+    ) : location.pathname === "/mixer-media" ? (
+      <MixerMediaApp />
+    ) : location.pathname === "/hooks-lab" ? (
+      <HooksLabApp />
     ) : location.pathname === "/contracts" ? (
       <ContractApp />
     ) : (

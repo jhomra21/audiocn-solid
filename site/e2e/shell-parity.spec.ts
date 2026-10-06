@@ -28,7 +28,7 @@ test("capture upstream and local documentation shells", async ({ page }) => {
           page.getByRole("navigation", { name: "On this page" })
         ).toBeVisible();
         await expect(
-          page.getByRole("button", { name: "Search docs", exact: true })
+          page.getByRole("button", { name: "Search ⌘ K", exact: true })
         ).toBeVisible();
       }
     }

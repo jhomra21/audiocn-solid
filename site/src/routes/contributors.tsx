@@ -1,11 +1,12 @@
-import { Meta, Title } from "@solidjs/meta";
 import { For, Show } from "solid-js";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { PageMeta } from "@/site/components/docs/page-meta";
 import { SiteFooter } from "@/site/components/docs/site-footer";
 import { SiteHeader } from "@/site/components/docs/site-header";
+import { getContributorStats } from "@/site/lib/contributors";
 import contributorData from "@/site/lib/contributors.json";
 import { siteConfig } from "@/site/lib/site";
 
@@ -17,6 +18,8 @@ const contributors: {
   profileUrl: string;
   contributions: number;
 }[] = contributorData;
+
+const stats = getContributorStats(contributors);
 
 const repositoryUrl = `https://github.com/${siteConfig.githubRepo}`;
 
@@ -37,10 +40,10 @@ const SectionHeading = (props: { aside: string; title: string }) => (
 export default function ContributorsPage() {
   return (
     <>
-      <Title>Contributors - audiocn Solid</Title>
-      <Meta
-        content="Meet the people who build audiocn Solid, audio components built the shadcn way."
-        name="description"
+      <PageMeta
+        description="Meet the people who build audiocn Solid, audio components built the shadcn way."
+        pathname="/contributors"
+        title="Contributors"
       />
       <SiteHeader />
       <main class="mx-auto w-full max-w-4xl px-4 pt-12 pb-24 sm:px-6 sm:pt-16">
@@ -65,15 +68,11 @@ export default function ContributorsPage() {
               <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <For
                   each={[
-                    { label: "Contributors", value: contributors.length },
                     {
-                      label: "Commits",
-                      value: contributors.reduce(
-                        (total, contributor) =>
-                          total + contributor.contributions,
-                        0
-                      ),
+                      label: "Contributors",
+                      value: stats.totalContributors,
                     },
+                    { label: "Commits", value: stats.totalContributions },
                   ]}
                 >
                   {(stat) => (

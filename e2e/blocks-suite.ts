@@ -437,4 +437,116 @@ export const runBlocksSuite = (runtime: string) => {
     });
     expect(failures).toEqual([]);
   });
+  test("blocks rendered twice keep every DOM id unique", async ({ page }) => {
+    await page.goto("/blocks?case=twice");
+    await expect(
+      page.getByRole("switch", { name: "Mute microphone" })
+    ).toHaveCount(2);
+
+    const ids = await page.evaluate(() =>
+      [...document.querySelectorAll("[id]")].map(({ id }) => id)
+    );
+
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  test("blocks rendered twice toggle the switch of the instance whose label was clicked", async ({
+    page,
+  }) => {
+    await page.goto("/blocks?case=twice");
+
+    const switches = page.getByRole("switch", { name: "Mute microphone" });
+
+    await page.getByText("Mute microphone", { exact: true }).nth(1).click();
+    await expect(switches.nth(1)).toHaveAttribute("aria-checked", "true");
+    await expect(switches.first()).toHaveAttribute("aria-checked", "false");
+  });
+
+  test("system audio settings restart a capture that ended while enabled stayed true", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      let requests = 0;
+
+      Object.defineProperty(navigator.mediaDevices, "getDisplayMedia", {
+        value: () => {
+          requests += 1;
+          document.documentElement.dataset.displayRequests = String(requests);
+
+          return Promise.reject(
+            new DOMException("Cancelled", "NotAllowedError")
+          );
+        },
+      });
+    });
+    await page.goto("/blocks?case=system-enabled");
+
+    const requests = page.locator("html");
+
+    await expect(requests).toHaveAttribute("data-display-requests", "1");
+    await page
+      .getByRole("switch", { name: "Capture system audio", exact: true })
+      .click();
+    await expect(requests).toHaveAttribute("data-display-requests", "2");
+  });
+
+  test("system audio settings keep the live source when the parent changes", async ({
+    page,
+  }) => {
+    await page.goto("/blocks?case=system-rerender");
+    await page
+      .getByRole("switch", { name: "Capture system audio", exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => window.blockProbe.mediaStreamSources))
+      .toBeGreaterThan(0);
+
+    const before = await page.evaluate(() => ({ ...window.blockProbe }));
+
+    for (let tick = 0; tick < 3; tick += 1)
+      await page.getByRole("button", { name: "Tick" }).click();
+    await expect(page.locator("[class~=tick-3]")).toHaveCount(1);
+    expect(
+      await page.evaluate(() => window.blockProbe.mediaStreamSources)
+    ).toBe(before.mediaStreamSources);
+    expect(await page.evaluate(() => window.blockProbe.streamReports)).toBe(
+      before.streamReports
+    );
+  });
+
+  test("soundboard stop all stops every playing pad", async ({ page }) => {
+    await page.goto("/blocks");
+
+    const board = page.getByTestId("soundboard-block");
+    const pads = board.locator("[data-sound-pad]");
+
+    await expect(pads.nth(1)).not.toHaveAttribute("data-loading");
+    await pads.nth(0).click();
+    await pads.nth(1).click();
+    await expect(pads.nth(0)).toHaveAttribute("data-playing", "");
+    await expect(pads.nth(1)).toHaveAttribute("data-playing", "");
+    await board.getByRole("button", { name: "Stop all", exact: true }).click();
+    await expect(pads.nth(0)).not.toHaveAttribute("data-playing");
+    await expect(pads.nth(1)).not.toHaveAttribute("data-playing");
+  });
+
+  test("music player duck schedules its own release", async ({ page }) => {
+    await page.goto("/blocks?case=ducking");
+    await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
+    await page.evaluate(() =>
+      window.blockProbe.emitVoice({ channels: [{ peakDb: -10, rmsDb: -20 }] })
+    );
+
+    const schedules = await page.evaluate(
+      () => window.blockProbe.gainSchedules
+    );
+
+    expect(
+      schedules.some(({ at, madeAt, value }) => value < 1 && at === madeAt)
+    ).toBe(true);
+    expect(
+      schedules.some(({ at, madeAt, value }) => value === 1 && at > madeAt)
+    ).toBe(true);
+  });
 };

@@ -42,7 +42,7 @@ const isSearchIndexSummary = (value: unknown): value is SearchIndexSummary => {
 const run = (stage: string, command: string, args: string[]) => {
   const result = spawnSync(command, args, {
     cwd: siteRoot,
-    env: process.env,
+    env: { ...process.env, AUDIOCN_SPIKE: "1" },
     stdio: "inherit",
   });
 
@@ -73,7 +73,7 @@ try {
   run(stage, "bunx", ["tsc", "--noEmit"]);
 
   stage = "build";
-  run(stage, "bunx", ["vite", "build"]);
+  run(stage, "bunx", ["vite", "build", "--mode", "spike"]);
 
   const builtIndex = join(siteRoot, "dist", "client", "search-index.json");
 

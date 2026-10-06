@@ -16,7 +16,7 @@ const artifactPath = resolve(siteRoot, "artifacts", "spike-2.json");
 const run = (stage: string, command: string, args: string[]) => {
   const result = spawnSync(command, args, {
     cwd: siteRoot,
-    env: process.env,
+    env: { ...process.env, AUDIOCN_SPIKE: "1" },
     stdio: "inherit",
   });
 
@@ -40,7 +40,7 @@ try {
 
   stage = "build";
 
-  run(stage, "bunx", ["vite", "build"]);
+  run(stage, "bunx", ["vite", "build", "--mode", "spike"]);
 
   stage = "prerender-and-hydration";
 

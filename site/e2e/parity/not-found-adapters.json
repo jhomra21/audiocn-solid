@@ -1,0 +1,7 @@
+[
+  {
+    "reason": "Next answers unknown URLs with 404. Only `vite preview`, which the parity run uses, has no host-level not-found handling: it serves the SPA shell with 200 and the router renders the page. A static host answers 404 with the shipped 404.html; static-host.spec.ts asserts that against dist/client.",
+    "upstream": "404",
+    "local": "200"
+  }
+]

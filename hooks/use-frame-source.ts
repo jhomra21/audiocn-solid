@@ -1,3 +1,5 @@
+import { createMemo } from "solid-js";
+
 import type { FrameSource } from "@/lib/audio/types";
 import { readMaybeAccessor } from "@/lib/solid/accessor";
 import type { MaybeAccessor } from "@/lib/solid/accessor";
@@ -17,13 +19,13 @@ export const useFrameSource = <T>(
   onFrame: (frame: T) => void,
   options: MaybeAccessor<UseFrameSourceOptions> = {}
 ): void => {
-  createCompatEffect(
-    () => {
-      const current = readMaybeAccessor(source);
-      const { enabled = true } = readMaybeAccessor(options);
+  // Memos pass on only a changed value, so a source or option that is re-read
+  // without changing does not resubscribe.
+  const current = createMemo(() => readMaybeAccessor(source));
+  const enabled = createMemo(() => readMaybeAccessor(options).enabled ?? true);
 
-      return { current, enabled };
-    },
+  createCompatEffect(
+    () => ({ current: current(), enabled: enabled() }),
     ({ current, enabled }) => {
       if (!(current && enabled)) {
         return;

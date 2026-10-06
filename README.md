@@ -73,11 +73,22 @@ Run `bun install` afterward to restore the repository's Solid 1 development depe
 
 `bun run registry:spike:3` generates both registries, installs and builds every entry in fresh consumer projects, and exercises installed controls and blocks in both runtimes. Reports and screenshots are written to `artifacts/`.
 
-Run `cd site && bun run typecheck && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"` for production-site acceptance. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares all 56 scoped routes with the live upstream site at desktop and mobile sizes; a successful release build alone does not establish upstream parity.
+Run `cd site && bun run typecheck && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"` for production-site acceptance. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
+
+Every page has a committed 1200x630 social card in `site/public/og`, indexed by `site/lib/social-images.json`. `cd site && bun run og:build` regenerates them: it builds the site in `--mode social`, which adds the capture-only `/social-preview/:id` route, and captures each card in Chromium with a paused clock. `bun run og:build -- --verify` captures every card twice and fails on any byte difference. Edit `site/lib/social-catalog.ts` for card copy and `site/components/social/` for compositions. The build also refreshes the GitHub star count in `site/lib/github-stars.json` and keeps the committed count if GitHub is unreachable.
 
 The generated registries live at `site/public/r/solid1` and `site/public/r/solid2`. Consumers install component sources and their declared dependencies, not the site or its examples.
 
 Parity checks keep exact presentation slots, example inventories, accessible control names, and layout measurements. Native ranges and ARIA sliders are compared as one interactive control, excluding hidden form duplicates. Solid-specific prose uses exact, route-scoped source adapters in `site/e2e/parity/content-adapters.json`; stale upstream text fails instead of silently expanding an exemption. Captures wait for synthesized audio and lazy tiles to finish loading.
+
+Beyond each route's main content, parity also compares:
+
+- **Head:** title, description, robots, canonical, every `og:*` and `twitter:*` tag, and the `icon` and `apple-touch-icon` links, as a sorted set of exact values. `site/e2e/parity/head.ts` rewrites only the site origin and name, `for React` wording, per-build image hashes and icon fingerprints. Any other wording difference needs an exact, route-scoped entry in `head-adapters.json`, which throws once upstream stops sending that text. Each page's declared `og:image` must load from our server as a 1200x630 PNG.
+- **Chrome:** the accessibility-tree inventory (role, accessible name, state, normalized href, order) of the header, docs sidebar and its controls, and footer, plus the brand context menu, and, at mobile width, the opened home menu and docs drawer. On desktop docs routes it also collapses the sidebar and records the collapsed, edge-peek and re-expanded states: the sidebar's `data-collapsed`/`data-hovered`/`inert` state and offset, the floating panel, every `aria-controls="nd-sidebar"` trigger's label, `aria-expanded` and inertness, and where focus lands. Star counts and the mobile contents progress value are live data and compare by wording only.
+- **Route inventory:** the routes in `dist/client/sitemap.xml` must equal upstream's `sitemap.xml` and the compared route list, so a missing or extra public page fails.
+- **Not found:** an unknown URL's status, title, heading, robots tag and action links. `not-found-adapters.json` records the two intended differences: `vite preview` answers 200 where Next answers 404 (the shipped `404.html` is asserted in `page-states.spec.ts`), and our not-found page has its own title.
+
+`site/e2e/parity/contracts.spec.ts` corrupts each dimension (head tags, icons, og images, nav and sidebar links, the stars control, mobile menus, the collapsed sidebar, sitemap routes, the not-found heading) and fails unless the harness notices.
 
 ## Prerelease compatibility
 

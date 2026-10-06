@@ -10,10 +10,14 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "jsxImportSource": "@solidjs/web",
     "strict": true,
     "paths": {
+      "@kobalte/core/dropdown-menu": [
+        "../node_modules/@kobalte/core-solid2/dist/dropdown-menu/index.d.ts"
+      ],
       "@kobalte/core/primitives/create-dom-collection": [
         "../node_modules/@kobalte/core-solid2/dist/primitives/create-dom-collection/index.d.ts"
       ],
@@ -35,9 +39,12 @@
       "@/lib/solid/jsx-types": ["../lib/solid/compat/solid2/jsx-types.ts"],
       "@kobalte/core/slider": [
         "../node_modules/@kobalte/core-solid2/dist/slider/index.d.ts"
+      ],
+      "@kobalte/core/tooltip": [
+        "../node_modules/@kobalte/core-solid2/dist/tooltip/index.d.ts"
       ]
     },
-    "types": ["vite/client", "filesystem-routing/types", "node"]
+    "types": ["vite/client", "filesystem-routing/types", "node", "bun"]
   },
   "include": ["src", "e2e", "scripts", "../components", "../hooks", "../lib"],
   "exclude": ["../lib/solid/jsx-types.ts"]

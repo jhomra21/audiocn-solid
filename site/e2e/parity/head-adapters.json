@@ -1,0 +1,51 @@
+[
+  {
+    "route": "/",
+    "keys": ["title", "og:title", "twitter:title"],
+    "reason": "The home title names the Solid port, and the Solid registry does not require shadcn/ui as a separate framework.",
+    "upstream": "audiocn — Audio components for React and shadcn/ui",
+    "local": "audiocn Solid — Audio components for Solid"
+  },
+  {
+    "route": "/",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "The home description names Solid instead of React and shadcn/ui, like siteConfig.description.",
+    "upstream": "Copy-and-paste audio components for React and shadcn/ui. Build mixers, players, meters, knobs and waveforms with accessible UI you own.",
+    "local": "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own."
+  },
+  {
+    "route": "/contributors",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "The contributors page introduces the people of this port, which is named audiocn Solid.",
+    "upstream": "Meet the people who build audiocn, the audio components for React built the shadcn way.",
+    "local": "Meet the people who build audiocn Solid, audio components built the shadcn way."
+  },
+  {
+    "route": "/docs/blocks",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "The blocks index names Solid blocks and the shadcn CLI, matching the frontmatter of content/docs/blocks/index.mdx.",
+    "upstream": "Build with complete React audio blocks for shadcn/ui. Install a system mixer, music player, soundboard or microphone setup, then customize the source.",
+    "local": "Build with complete Solid audio blocks for shadcn. Install a system mixer, music player, soundboard or microphone setup, then customize the source."
+  },
+  {
+    "route": "/docs/components",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "The components index names Solid components and the shadcn CLI, matching the frontmatter of content/docs/components/index.mdx.",
+    "upstream": "Browse React audio components for shadcn/ui, including level meters, faders, knobs, waveforms, visualizers, mixers and players. Copy the source and make it yours.",
+    "local": "Browse Solid audio components for shadcn, including level meters, faders, knobs, waveforms, visualizers, mixers and players. Copy the source and make it yours."
+  },
+  {
+    "route": "/docs/hooks/use-level",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "useLevel reads a meter into Solid state rather than React state.",
+    "upstream": "Read a meter source into React state at a low rate, for labels and conditional UI.",
+    "local": "Read a meter source into Solid state at a low rate, for labels and conditional UI."
+  },
+  {
+    "route": "/docs/installation",
+    "keys": ["description", "og:description", "twitter:description"],
+    "reason": "Installation describes the separate Solid registry namespace, like the prose adapters for this route.",
+    "upstream": "Add the audiocn registry to a shadcn/ui project and install components with the shadcn CLI.",
+    "local": "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI."
+  }
+]

@@ -22,12 +22,135 @@ import {
 } from "@/components/ui/parameter-slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  AudioContextProvider,
+  getSharedAudioContext,
+} from "@/hooks/use-audio-context";
 import { useMixer } from "@/hooks/use-mixer";
+import { createFrameEmitter } from "@/lib/audio/frame-source";
+import type { MeterFrame } from "@/lib/audio/types";
 import { useDemoSounds, useDemoTracks } from "@/lib/docs/use-demo-audio";
 
 const SILENT_METER = { subscribe: () => () => {} };
 
+const DEMO_TRACKS = [{ id: "demo", src: "demo.wav", title: "Demo" }];
+
+interface GainSchedule {
+  at: number;
+  /** The context time when the schedule was made. */
+  madeAt: number;
+  value: number;
+}
+
+interface BlockProbe {
+  emitVoice: (frame: MeterFrame) => void;
+  gainSchedules: GainSchedule[];
+  mediaStreamSources: number;
+  streamReports: number;
+}
+
+declare global {
+  interface Window {
+    blockProbe: BlockProbe;
+  }
+}
+
+/** Counts what the blocks ask of the shared context, which stays real. */
+const probeSharedContext = () => {
+  const context = getSharedAudioContext();
+
+  if (!context) throw new Error("This page has no AudioContext");
+  const voice = createFrameEmitter<MeterFrame>();
+  const createGain = context.createGain.bind(context);
+  const createSource = context.createMediaStreamSource.bind(context);
+
+  const probe: BlockProbe = {
+    emitVoice: (frame) => voice.emit(frame),
+    gainSchedules: [],
+    mediaStreamSources: 0,
+    streamReports: 0,
+  };
+
+  context.createGain = () => {
+    const node = createGain();
+    const setTarget = node.gain.setTargetAtTime.bind(node.gain);
+    node.gain.setTargetAtTime = (value, at, timeConstant) => {
+      probe.gainSchedules.push({ at, madeAt: context.currentTime, value });
+
+      return setTarget(value, at, timeConstant);
+    };
+
+    return node;
+  };
+
+  context.createMediaStreamSource = (stream) => {
+    probe.mediaStreamSources += 1;
+
+    return createSource(stream);
+  };
+
+  window.blockProbe = probe;
+
+  return { context, probe, voice };
+};
+
+const DuckingCase = () => {
+  const { context, voice } = probeSharedContext();
+
+  return (
+    <AudioContextProvider context={context}>
+      <MusicPlayer defaultTracks={DEMO_TRACKS} duckingSource={voice} />
+    </AudioContextProvider>
+  );
+};
+
+const SystemRerenderCase = () => {
+  const { context, probe } = probeSharedContext();
+  const [ticks, setTicks] = createSignal(0);
+
+  navigator.mediaDevices.getDisplayMedia = () =>
+    Promise.resolve(context.createMediaStreamDestination().stream);
+
+  return (
+    <AudioContextProvider context={context}>
+      <button onClick={() => setTicks((count) => count + 1)}>Tick</button>
+      <SystemAudioSettings
+        class={`tick-${ticks()}`}
+        onStreamChange={() => {
+          probe.streamReports += 1;
+        }}
+      />
+    </AudioContextProvider>
+  );
+};
+
+const TwiceCase = () => (
+  <>
+    <MicSetup />
+    <MicSetup />
+    <MusicPlayer defaultTracks={DEMO_TRACKS} duckingSource={null} />
+    <MusicPlayer defaultTracks={DEMO_TRACKS} duckingSource={null} />
+    <SystemAudioSettings />
+    <SystemAudioSettings />
+  </>
+);
+
 export const BlocksApp = () => {
+  switch (new URLSearchParams(location.search).get("case")) {
+    case "twice":
+      return <TwiceCase />;
+    case "system-enabled":
+      return <SystemAudioSettings enabled onEnabledChange={() => {}} />;
+    case "system-rerender":
+      return <SystemRerenderCase />;
+    case "ducking":
+      return <DuckingCase />;
+    default:
+      return <BlocksGallery />;
+  }
+};
+
+const BlocksGallery = () => {
   const tracks = useDemoTracks();
   const sounds = useDemoSounds();
   const [clearTracks, setClearTracks] = createSignal(false);

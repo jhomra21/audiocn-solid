@@ -4,5 +4,7 @@ export const siteConfig = {
   githubRepo: "jhomra21/audiocn-solid",
   name: "audiocn Solid",
   registryNamespace: "@audiocn-solid",
-  title: "audiocn Solid - Audio components for Solid",
+  title: "audiocn Solid — Audio components for Solid",
+  // Placeholder until the real workers.dev hostname is known.
+  url: "https://audiocn-solid.workers.dev",
 } as const;

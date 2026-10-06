@@ -118,7 +118,10 @@ export const runAcceptance = async (test: AcceptanceTest): Promise<void> => {
       try {
         await waitForServer(baseUrl);
 
-        const browser = await chromium.launch();
+        // Timer-driven fake audio output keeps the audio clock independent of the host speakers.
+        const browser = await chromium.launch({
+          args: ["--disable-audio-output"],
+        });
 
         try {
           const page = await browser.newPage({ viewport: test.viewport });

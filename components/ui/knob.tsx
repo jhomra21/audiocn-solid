@@ -772,9 +772,8 @@ export const KnobDial = (props: KnobDialProps) => {
 
   let drag: DragState | null = null;
 
-  const reset = (event?: Event) => {
+  const reset = () => {
     dial.change(dial.resetValue(), {
-      event,
       reason: "reset",
     });
 
@@ -870,7 +869,7 @@ export const KnobDial = (props: KnobDialProps) => {
         props.onDoubleClick?.(event);
 
         if (!context.disabled()) {
-          reset(event);
+          reset();
         }
       }}
       onKeyDown={(event: KeyboardEvent) => {
@@ -918,7 +917,7 @@ export const KnobDial = (props: KnobDialProps) => {
 
         if (event.altKey) {
           event.preventDefault();
-          reset(event);
+          reset();
 
           return;
         }
@@ -1536,9 +1535,9 @@ const KnobValueInput = (props: KnobValueInputProps) => {
 
         const input = event.currentTarget;
 
-        finish(event.key === "Enter");
-
         focusDial(input);
+
+        finish(event.key === "Enter");
       }}
       ref={(node) => {
         queueMicrotask(() => {

@@ -93,6 +93,37 @@ export const runWaveformSuite = (runtime: string) => {
     await expect(page.getByTestId("waveform-subscribers")).toHaveText("0");
     expect(failures).toEqual([]);
   });
+  test("waveform leaving clears the hover line even while seeking is off", async ({
+    page,
+  }) => {
+    await page.goto("/waveform?case=hover");
+
+    const waveform = page.locator('[data-slot="waveform"]');
+    const hover = page.locator('[data-slot="waveform-hover"]');
+    const box = (await waveform.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(hover).toHaveCount(1);
+
+    // A new track starts loading under the pointer: seeking turns off. The
+    // click is dispatched in the page so the pointer stays where it is.
+    const toggle = page.getByRole("button", { name: "Toggle loading" });
+    await toggle.dispatchEvent("click");
+    await expect(hover).toHaveCount(0);
+    await page.mouse.move(0, 0);
+    await toggle.dispatchEvent("click");
+    await expect(waveform).not.toHaveAttribute("data-loading");
+    await expect(hover).toHaveCount(0);
+  });
+  test("waveform data reports an error, not endless loading, without Web Audio", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      Reflect.deleteProperty(window, "AudioContext");
+      Reflect.deleteProperty(window, "webkitAudioContext");
+    });
+    await page.goto("/waveform?case=data-without-web-audio");
+    await expect(page.getByTestId("waveform-status")).toHaveText("error");
+  });
   test("waveform regions resize and move without seeking the clip", async ({
     page,
   }, info) => {

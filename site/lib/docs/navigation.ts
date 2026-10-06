@@ -30,11 +30,14 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
     groups: [
       {
         items: [
-          { href: "/docs/concepts/decibels", label: "Decibels" },
+          { href: "/docs/concepts/decibels", label: "Decibels and levels" },
           { href: "/docs/concepts/feeding-data", label: "Feeding data" },
           { href: "/docs/concepts/theming", label: "Theming" },
           { href: "/docs/concepts/accessibility", label: "Accessibility" },
-          { href: "/docs/concepts/custom-engine", label: "Custom engine" },
+          {
+            href: "/docs/concepts/custom-engine",
+            label: "Using your own audio engine",
+          },
         ],
       },
     ],
@@ -171,7 +174,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
             href: "/docs/blocks/system-audio-mixer",
             label: "System Audio Mixer",
           },
-          { href: "/docs/blocks/mic-setup", label: "Mic Setup" },
+          { href: "/docs/blocks/mic-setup", label: "Microphone Setup" },
           {
             href: "/docs/blocks/system-audio-settings",
             label: "System Audio Settings",

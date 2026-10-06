@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
 import { useFrameSource } from "@/hooks/use-frame-source";
 import { SILENCE_DB } from "@/lib/audio/decibels";
@@ -39,21 +39,26 @@ export const useLevel = (
     rmsDb: undefined,
   });
 
+  // Memos pass on only a changed value, so an option that is re-read without
+  // changing does not restart sampling.
+  const enabledOption = createMemo(
+    () => readMaybeAccessor(options).enabled ?? true
+  );
+
+  const intervalOption = createMemo(
+    () => readMaybeAccessor(options).intervalMs ?? 250
+  );
+
   useFrameSource(
     source,
     (frame) => {
       latest = frame;
     },
-    () => ({
-      enabled: readMaybeAccessor(options).enabled ?? true,
-    })
+    () => ({ enabled: enabledOption() })
   );
 
   createCompatEffect(
-    () => ({
-      enabled: readMaybeAccessor(options).enabled ?? true,
-      interval: readMaybeAccessor(options).intervalMs ?? 250,
-    }),
+    () => ({ enabled: enabledOption(), interval: intervalOption() }),
     ({ enabled, interval }) => {
       if (!enabled) return;
 

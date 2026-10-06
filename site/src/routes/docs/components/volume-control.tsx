@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import VolumeControlDoc, {
   frontmatter,
@@ -7,16 +5,11 @@ import VolumeControlDoc, {
 
 export default function VolumeControlPage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/components/volume-control"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <VolumeControlDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/components/volume-control"
+      frontmatter={frontmatter}
+    >
+      <VolumeControlDoc />
+    </DocsShell>
   );
 }

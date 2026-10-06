@@ -31,47 +31,48 @@ const cases = [
       "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own.",
     hasMeter: true,
     path: "/",
-    title: "audiocn Solid",
+    title: "audiocn Solid — Audio components for Solid",
   },
   {
     description: "Audio components for Solid, built the shadcn way.",
     hasMeter: false,
     path: "/docs",
-    title: "Introduction - audiocn Solid",
+    title: "Introduction — audiocn Solid",
   },
   {
     description:
       "Add the audiocn Solid registry to a shadcn project and install components with the shadcn CLI.",
     hasMeter: false,
     path: "/docs/installation",
-    title: "Installation - audiocn Solid",
+    title: "Installation — audiocn Solid",
   },
   {
     description:
       "The units audiocn uses, and the helpers in the audio core that convert between them.",
     hasMeter: false,
     path: "/docs/concepts/decibels",
-    title: "Decibels and levels - audiocn Solid",
-  },
-  {
-    description: "Every audiocn component, grouped by what it does.",
-    hasMeter: false,
-    path: "/docs/components",
-    title: "Components - audiocn Solid",
+    title: "Decibels and levels — audiocn Solid",
   },
   {
     description:
-      "Complete, working assemblies you install once and then make your own.",
+      "Browse Solid audio components for shadcn, including level meters, faders, knobs, waveforms, visualizers, mixers and players. Copy the source and make it yours.",
+    hasMeter: false,
+    path: "/docs/components",
+    title: "Audio components for Solid — audiocn Solid",
+  },
+  {
+    description:
+      "Build with complete Solid audio blocks for shadcn. Install a system mixer, music player, soundboard or microphone setup, then customize the source.",
     hasMeter: false,
     path: "/docs/blocks",
-    title: "Blocks - audiocn Solid",
+    title: "Audio blocks for Solid — audiocn Solid",
   },
   {
     description:
       "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
     hasMeter: true,
     path: "/docs/components/level-meter",
-    title: "Level Meter for Solid - audiocn Solid",
+    title: "Level Meter for Solid — audiocn Solid",
   },
 ] as const;
 
@@ -172,7 +173,7 @@ test("prerendered pages hydrate without warnings", async ({ page }) => {
       ).toHaveAttribute("aria-current", "page");
 
       await page
-        .getByRole("button", { name: "Search docs", exact: true })
+        .getByRole("button", { name: "Search ⌘ K", exact: true })
         .click();
 
       const dialog = page.getByRole("dialog", {

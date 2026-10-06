@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import DecibelsDoc, {
   frontmatter,
@@ -7,17 +5,8 @@ import DecibelsDoc, {
 
 export default function DecibelsPage() {
   return (
-    <>
-      <Title>{frontmatter.title} - audiocn Solid</Title>
-      <Meta content={frontmatter.description} name="description" />
-
-      <DocsShell
-        currentPath="/docs/concepts/decibels"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <DecibelsDoc />
-      </DocsShell>
-    </>
+    <DocsShell currentPath="/docs/concepts/decibels" frontmatter={frontmatter}>
+      <DecibelsDoc />
+    </DocsShell>
   );
 }

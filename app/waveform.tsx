@@ -10,9 +10,37 @@ import {
   WaveformRegion,
 } from "@/components/ui/waveform";
 import type { WaveformRegionValue } from "@/components/ui/waveform";
+import { useWaveformData } from "@/hooks/use-waveform-data";
 import { createFrameEmitter } from "@/lib/audio/frame-source";
 
+const PEAKS = [0.2, 0.6, 1, 0.6, 0.2];
+
+const WaveformDataCase = () => {
+  const waveform = useWaveformData("song.mp3");
+
+  return <output data-testid="waveform-status">{waveform.status}</output>;
+};
+
+const HoverCase = () => {
+  const [loading, setLoading] = createSignal(false);
+
+  return (
+    <main class="grid gap-4 p-6">
+      <Waveform duration={100} loading={loading()} peaks={PEAKS}>
+        <WaveformHover />
+      </Waveform>
+      <button onClick={() => setLoading(!loading())}>Toggle loading</button>
+    </main>
+  );
+};
+
 export const WaveformApp = () => {
+  const testCase = new URLSearchParams(location.search).get("case");
+
+  if (testCase === "hover") return <HoverCase />;
+
+  if (testCase === "data-without-web-audio") return <WaveformDataCase />;
+
   if (new URLSearchParams(location.search).has("demo"))
     return (
       <main class="p-6">

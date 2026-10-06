@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import ParameterSliderDoc, {
   frontmatter,
@@ -7,16 +5,11 @@ import ParameterSliderDoc, {
 
 export default function ParameterSliderPage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/components/parameter-slider"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <ParameterSliderDoc />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/components/parameter-slider"
+      frontmatter={frontmatter}
+    >
+      <ParameterSliderDoc />
+    </DocsShell>
   );
 }

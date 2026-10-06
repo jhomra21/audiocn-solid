@@ -85,6 +85,7 @@ export const searchDocs = async (
 
   const results = await search(await database(), {
     term,
+    threshold: 0,
     limit: 10,
   });
 

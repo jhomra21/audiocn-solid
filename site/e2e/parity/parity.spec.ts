@@ -6,8 +6,35 @@ import type { Page } from "@playwright/test";
 
 import { readPrerenderedRoutes } from "../../scripts/prerendered-routes";
 import allowlist from "./allowlist.json" with { type: "json" };
+import {
+  adaptChrome,
+  adaptCollapsedSidebar,
+  inspectBrandMenu,
+  inspectChrome,
+  inspectCollapsedSidebar,
+  inspectMobileMenu,
+  normalizeChrome,
+  normalizeCollapsedSidebar,
+} from "./chrome";
 import { adaptContent } from "./content-adapters";
+import {
+  adaptHead,
+  checkOgImage,
+  inspectHead,
+  normalizeLocalHead,
+} from "./head";
 import { inspectPage } from "./metrics";
+import {
+  adaptNotFound,
+  inspectNotFound,
+  normalizeLocalNotFound,
+} from "./not-found";
+import {
+  inventoryDifferences,
+  readLocalSitemap,
+  readUpstreamSitemap,
+  sitemapRoutes,
+} from "./sitemap";
 
 // Explicit comparison scope. Remaining prerendered routes are inventoried as gaps below.
 const routes = [
@@ -69,10 +96,17 @@ const routes = [
   "/docs/blocks/soundboard",
 ] as const;
 
+// Contributors lists live repository data and upstream renders its header
+// inside the page's main, so only its head, chrome and headings can match by
+// construction. Its data logic is covered by e2e/contributor-build.spec.ts.
+const contributorsRoute = "/contributors";
+
+const publicRoutes = [...routes, contributorsRoute];
+
 const artifactDirectory = join(import.meta.dirname, "../../artifacts/parity");
 
 const expectedExamples = async (root: string, route: string) => {
-  if (route === "/") return [];
+  if (route === "/" || route === contributorsRoute) return [];
   const relative = route.slice("/docs".length) || "/index";
   let path = join(root, "content/docs", `${relative.slice(1)}.mdx`);
 
@@ -86,7 +120,12 @@ const expectedExamples = async (root: string, route: string) => {
   );
 };
 
-const capturePage = async (page: Page, url: string, path: string) => {
+const capturePage = async (
+  page: Page,
+  url: string,
+  path: string,
+  mobile: boolean
+) => {
   try {
     const response = await page.goto(url, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
@@ -127,14 +166,33 @@ const capturePage = async (page: Page, url: string, path: string) => {
     const metrics = await inspectPage(page);
     await page.screenshot({ fullPage: true, path });
 
-    return { metrics, status: response?.status() ?? 0 };
+    const head = await inspectHead(page);
+    const chrome = await inspectChrome(page);
+    const brandMenu = await inspectBrandMenu(page);
+    const mobileMenu = mobile ? await inspectMobileMenu(page) : [];
+
+    // Last, because it leaves the sidebar collapsed.
+    const collapsedSidebar =
+      !mobile && new URL(url).pathname.startsWith("/docs")
+        ? await inspectCollapsedSidebar(page)
+        : null;
+
+    return {
+      brandMenu,
+      chrome,
+      collapsedSidebar,
+      head,
+      metrics,
+      mobileMenu,
+      status: response?.status() ?? 0,
+    };
   } catch (error) {
     return { error: String(error) };
   }
 };
 
 test("compare upstream and local page structure", async ({ page }) => {
-  test.setTimeout(600_000);
+  test.setTimeout(1_800_000);
 
   await mkdir(artifactDirectory, { recursive: true });
   await page.emulateMedia({ colorScheme: "light" });
@@ -154,7 +212,8 @@ test("compare upstream and local page structure", async ({ page }) => {
         gaps,
         outsideComparisonScope: routeInventory
           .filter(
-            ({ route }) => !routes.some((supported) => supported === route)
+            ({ route }) =>
+              !publicRoutes.some((supported) => supported === route)
           )
           .map(({ route, page, items }) => ({ route, page, items })),
       },
@@ -163,7 +222,8 @@ test("compare upstream and local page structure", async ({ page }) => {
     )
   );
 
-  for (const route of routes) {
+  for (const route of publicRoutes) {
+    const contentScope = route !== contributorsRoute;
     const slug = route === "/" ? "home" : route.slice(1).replaceAll("/", "-");
 
     const viewports = [
@@ -192,13 +252,15 @@ test("compare upstream and local page structure", async ({ page }) => {
       const upstreamCapture = await capturePage(
         page,
         `https://www.audiocn.dev${route}`,
-        join(artifactDirectory, `${slug}-upstream-${viewport.name}.png`)
+        join(artifactDirectory, `${slug}-upstream-${viewport.name}.png`),
+        viewport.width < 640
       );
 
       const localCapture = await capturePage(
         page,
         `http://127.0.0.1:4180${route}`,
-        join(artifactDirectory, `${slug}-local-${viewport.name}.png`)
+        join(artifactDirectory, `${slug}-local-${viewport.name}.png`),
+        viewport.width < 640
       );
 
       const differences = [];
@@ -265,7 +327,68 @@ test("compare upstream and local page structure", async ({ page }) => {
         });
       }
 
-      if (JSON.stringify(upstream.slots) !== JSON.stringify(local.slots)) {
+      if (upstreamCapture.collapsedSidebar && localCapture.collapsedSidebar) {
+        const expectedSteps = adaptCollapsedSidebar(
+          upstreamCapture.collapsedSidebar
+        );
+
+        const actualSteps = normalizeCollapsedSidebar(
+          localCapture.collapsedSidebar
+        );
+
+        if (JSON.stringify(expectedSteps) !== JSON.stringify(actualSteps))
+          differences.push({
+            field: "collapsedSidebar",
+            local: actualSteps,
+            upstream: expectedSteps,
+          });
+      }
+
+      const upstreamHead = adaptHead(route, upstreamCapture.head);
+      const localHead = normalizeLocalHead(localCapture.head);
+
+      if (JSON.stringify(upstreamHead) !== JSON.stringify(localHead)) {
+        differences.push({
+          field: "head",
+          local: localHead,
+          upstream: upstreamHead,
+        });
+      }
+
+      const ogImage = await checkOgImage(page, localCapture.head);
+
+      if (
+        JSON.stringify(ogImage) !==
+        JSON.stringify({
+          contentType: "image/png",
+          height: 630,
+          status: 200,
+          width: 1200,
+        })
+      ) {
+        differences.push({ field: "ogImage", local: ogImage, upstream: null });
+      }
+
+      for (const [field, upstreamItems, localItems] of [
+        ["chrome", upstreamCapture.chrome, localCapture.chrome],
+        ["brandMenu", upstreamCapture.brandMenu, localCapture.brandMenu],
+        ["mobileMenu", upstreamCapture.mobileMenu, localCapture.mobileMenu],
+      ] as const) {
+        const expectedItems = adaptChrome(upstreamItems);
+        const actualItems = normalizeChrome(localItems);
+
+        if (JSON.stringify(expectedItems) !== JSON.stringify(actualItems))
+          differences.push({
+            field,
+            local: actualItems,
+            upstream: expectedItems,
+          });
+      }
+
+      if (
+        contentScope &&
+        JSON.stringify(upstream.slots) !== JSON.stringify(local.slots)
+      ) {
         differences.push({
           field: "slots",
           local: local.slots,
@@ -274,6 +397,7 @@ test("compare upstream and local page structure", async ({ page }) => {
       }
 
       if (
+        contentScope &&
         JSON.stringify(upstream.examples) !== JSON.stringify(local.examples)
       ) {
         differences.push({
@@ -284,8 +408,9 @@ test("compare upstream and local page structure", async ({ page }) => {
       }
 
       if (
+        contentScope &&
         JSON.stringify(adaptContent(route, upstream.content)) !==
-        JSON.stringify(local.content)
+          JSON.stringify(local.content)
       ) {
         differences.push({
           field: "content",
@@ -302,7 +427,10 @@ test("compare upstream and local page structure", async ({ page }) => {
         });
       }
 
-      if (JSON.stringify(upstream.layout) !== JSON.stringify(local.layout)) {
+      if (
+        contentScope &&
+        JSON.stringify(upstream.layout) !== JSON.stringify(local.layout)
+      ) {
         differences.push({
           field: "layout",
           upstream: upstream.layout,
@@ -367,4 +495,44 @@ test("compare upstream and local page structure", async ({ page }) => {
     summary.filter(({ unallowed }) => unallowed > 0),
     "unallowlisted upstream/local structure differences"
   ).toEqual([]);
+});
+
+test("compare upstream and local page structure: public route inventory", async () => {
+  const upstream = sitemapRoutes(await readUpstreamSitemap());
+  const local = sitemapRoutes(await readLocalSitemap());
+
+  expect(
+    inventoryDifferences(upstream, local),
+    "routes only one site publishes"
+  ).toEqual({ extra: [], missing: [] });
+
+  expect(
+    inventoryDifferences(
+      upstream,
+      [...publicRoutes].sort((left, right) => left.localeCompare(right))
+    ),
+    "sitemap routes outside the compared scope"
+  ).toEqual({ extra: [], missing: [] });
+});
+
+test("compare upstream and local page structure: not-found state", async ({
+  page,
+}) => {
+  await mkdir(artifactDirectory, { recursive: true });
+  await page.emulateMedia({ colorScheme: "light" });
+
+  const missing = "/parity-route-that-does-not-exist";
+
+  const upstream = await inspectNotFound(
+    page,
+    `https://www.audiocn.dev${missing}`
+  );
+
+  const local = await inspectNotFound(page, `http://127.0.0.1:4180${missing}`);
+
+  await writeFile(
+    join(artifactDirectory, "not-found.json"),
+    `${JSON.stringify({ local, upstream }, null, 2)}\n`
+  );
+  expect(normalizeLocalNotFound(local)).toEqual(adaptNotFound(upstream));
 });

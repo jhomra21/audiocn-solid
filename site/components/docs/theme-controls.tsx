@@ -87,6 +87,13 @@ export const useColorTheme = () => {
   return [theme, saveTheme] as const;
 };
 
+const isTypingTarget = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT");
+
 export const useAppearance = () => {
   const [appearance, setAppearance] = createSignal<Appearance>("light");
 
@@ -120,4 +127,35 @@ export const useAppearance = () => {
   };
 
   return [appearance, saveAppearance] as const;
+};
+
+/** Toggles light and dark with D. Mount once; each press flips the saved choice. */
+export const ThemeHotkey = () => {
+  const [, saveAppearance] = useAppearance();
+
+  onSettled(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const plain = !(event.metaKey || event.ctrlKey || event.altKey);
+
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        !plain ||
+        event.key.toLowerCase() !== "d" ||
+        isTypingTarget(event.target)
+      ) {
+        return;
+      }
+
+      saveAppearance(
+        document.documentElement.classList.contains("dark") ? "light" : "dark"
+      );
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
+  return null;
 };

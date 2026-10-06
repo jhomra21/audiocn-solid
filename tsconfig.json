@@ -31,7 +31,7 @@
         "./node_modules/@kobalte/core-solid1/dist/slider/index.d.ts"
       ]
     },
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node", "bun"]
   },
   "include": [
     "components",

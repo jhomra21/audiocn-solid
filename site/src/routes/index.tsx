@@ -1,7 +1,6 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { buttonVariants } from "@/components/ui/button";
 import { InstallCommand } from "@/site/components/docs/mdx-components";
+import { PageMeta } from "@/site/components/docs/page-meta";
 import { SiteFooter } from "@/site/components/docs/site-footer";
 import { SiteHeader } from "@/site/components/docs/site-header";
 import { HeroThreads } from "@/site/components/home/hero-threads";
@@ -14,8 +13,7 @@ const componentCount = 23;
 export default function Home() {
   return (
     <>
-      <Title>{siteConfig.name}</Title>
-      <Meta content={siteConfig.description} name="description" />
+      <PageMeta pathname="/" title={siteConfig.name} />
 
       <SiteHeader />
 

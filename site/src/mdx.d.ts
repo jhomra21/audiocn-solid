@@ -1,10 +1,9 @@
 declare module "*.mdx" {
   import type { Component } from "solid-js";
 
-  export const frontmatter: {
-    description: string;
-    title: string;
-  };
+  import type { DocsFrontmatter } from "@/site/components/docs/docs-shell";
+
+  export const frontmatter: DocsFrontmatter;
 
   const MDXContent: Component;
 

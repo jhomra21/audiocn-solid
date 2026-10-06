@@ -1,5 +1,3 @@
-import { Meta, Title } from "@solidjs/meta";
-
 import { DocsShell } from "@/site/components/docs/docs-shell";
 import Content, {
   frontmatter,
@@ -7,16 +5,11 @@ import Content, {
 
 export default function ElectricBarVisualizerPage() {
   return (
-    <>
-      <Title>{`${frontmatter.title} for Solid - audiocn Solid`}</Title>
-      <Meta content={frontmatter.description} name="description" />
-      <DocsShell
-        currentPath="/docs/components/electric-bar-visualizer"
-        description={frontmatter.description}
-        title={frontmatter.title}
-      >
-        <Content />
-      </DocsShell>
-    </>
+    <DocsShell
+      currentPath="/docs/components/electric-bar-visualizer"
+      frontmatter={frontmatter}
+    >
+      <Content />
+    </DocsShell>
   );
 }

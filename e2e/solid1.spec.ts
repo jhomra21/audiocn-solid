@@ -2,6 +2,12 @@ import { runAudioDeviceSelectSuite } from "./audio-device-select-suite";
 import { runAudioHooksSuite } from "./audio-hooks-suite";
 import { runAudioPlayerSuite } from "./audio-player-suite";
 import { runBlocksSuite } from "./blocks-suite";
+import { runControlsSuite } from "./controls-suite";
+import { runDemoRoutingSuite } from "./demo-routing-suite";
+import { runHooksSuite } from "./hooks-suite";
+import { runMetersSuite } from "./meters-suite";
+import { runMixerMediaSuite } from "./mixer-media-suite";
+import { runPaintersSuite } from "./painters-suite";
 import { runParitySuite } from "./parity-suite";
 import { runPlaybackSuite } from "./playback-suite";
 import { runPopoverSuite } from "./popover-suite";
@@ -14,6 +20,8 @@ runAudioPlayerSuite("solid-1");
 
 runBlocksSuite("solid-1");
 
+runControlsSuite("solid-1");
+
 runAudioDeviceSelectSuite("solid-1");
 
 runSoundPadSuite("solid-1");
@@ -25,6 +33,16 @@ runWebAudioMixerSuite("solid-1");
 runPlaybackSuite("solid-1");
 
 runVisualizersSuite("solid-1");
+
+runMetersSuite("solid-1");
+
+runPaintersSuite();
+
+runHooksSuite();
+
+runMixerMediaSuite();
+
+runDemoRoutingSuite();
 
 runPopoverSuite("solid-1");
 
