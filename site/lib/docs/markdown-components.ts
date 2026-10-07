@@ -9,7 +9,7 @@ import { toMarkdown } from "mdast-util-to-markdown";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 
-import { remarkSiteUrl } from "./remark-site-url";
+import { remarkSiteUrl } from "./remark-site-url.ts";
 
 const repositoryRoot = resolve(import.meta.dirname, "../../..");
 

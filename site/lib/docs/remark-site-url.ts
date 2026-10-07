@@ -1,7 +1,7 @@
 import type { Root } from "mdast";
 import { visit } from "unist-util-visit";
 
-import { siteConfig } from "../site";
+import { siteConfig } from "../site.ts";
 
 const DOMAIN_MARKER = "https://<domain>";
 
