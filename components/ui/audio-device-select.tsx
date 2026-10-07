@@ -26,6 +26,8 @@ import { cn } from "@/lib/utils";
 
 const NONE_VALUE = "__none__";
 
+const EMPTY_COLLECTION_VALUE = "__empty_collection__";
+
 export type AudioDeviceStatus =
   | "available"
   | "unavailable"
@@ -45,6 +47,7 @@ interface DeviceItem {
   device?: AudioDevice;
   missing?: boolean;
   none?: boolean;
+  emptyCollection?: boolean;
 }
 
 interface DeviceContextValue {
@@ -328,6 +331,18 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
     return list;
   });
 
+  const selectOptions = createMemo<DeviceItem[]>(() =>
+    items().length > 0
+      ? items()
+      : [
+          {
+            emptyCollection: true,
+            label: "No selectable devices",
+            value: EMPTY_COLLECTION_VALUE,
+          },
+        ]
+  );
+
   const selected = () =>
     items().find(
       (item) =>
@@ -358,10 +373,11 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
 
   return provideContext(DeviceContext, settings, () => (
     <Select<DeviceItem>
-      options={items()}
+      options={selectOptions()}
       optionValue="value"
       optionTextValue="label"
       optionDisabled={(item) =>
+        Boolean(item.emptyCollection) ||
         Boolean(item.missing) ||
         Boolean(item.device?.status && item.device.status !== "available")
       }
@@ -369,6 +385,8 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
       disabled={props.disabled}
       placeholder={props.loading ? "Finding devices…" : "Select a device"}
       onChange={(next) => {
+        if (next?.emptyCollection) return;
+
         const id = !next || next.value === NONE_VALUE ? null : next.value;
 
         if (props.value === undefined) setUncontrolled(id);
@@ -376,10 +394,14 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
       }}
       itemComponent={(itemProps) => (
         <AudioDeviceSelectItem
+          aria-hidden={itemProps.item.rawValue.emptyCollection ? "true" : undefined}
+          class={itemProps.item.rawValue.emptyCollection ? "hidden" : undefined}
           item={itemProps.item}
           device={itemProps.item.rawValue.device}
         >
-          {itemProps.item.rawValue.none || itemProps.item.rawValue.missing
+          {itemProps.item.rawValue.emptyCollection ||
+          itemProps.item.rawValue.none ||
+          itemProps.item.rawValue.missing
             ? itemProps.item.rawValue.label
             : undefined}
         </AudioDeviceSelectItem>

@@ -516,6 +516,9 @@ test("volume icons and device affordances survive production hydration", async (
   );
   await liveDevice.getByRole("combobox").click();
   await expect(page.getByRole("listbox")).toBeVisible();
+  await expect(
+    page.locator('[data-slot="audio-device-select-permission"]')
+  ).toBeVisible();
   await page.keyboard.press("Escape");
 
   const trigger = page
