@@ -1,6 +1,5 @@
 const siteUrl = (
-  process.env.AUDIOCN_SITE_URL ??
-  process.env.VITE_AUDIOCN_SITE_URL
+  process.env.AUDIOCN_SITE_URL ?? process.env.VITE_AUDIOCN_SITE_URL
 )?.replace(/\/+$/u, "");
 
 if (!siteUrl) {
@@ -63,9 +62,7 @@ for (const runtime of ["solid1", "solid2"]) {
   const mixerResponse = await expectStatus(`/r/${runtime}/mixer.json`);
   const mixer = await mixerResponse.json();
 
-  if (
-    !mixer.registryDependencies?.includes("@audiocn-solid/channel-strip")
-  ) {
+  if (!mixer.registryDependencies?.includes("@audiocn-solid/channel-strip")) {
     throw new Error(
       `${runtime}/mixer: channel-strip registry dependency is missing.`
     );
@@ -80,7 +77,9 @@ const missing = await expectStatus(
 const missingBody = await missing.text();
 
 if (!/page not found/i.test(missingBody)) {
-  throw new Error("The deployed 404 response did not contain the not-found page.");
+  throw new Error(
+    "The deployed 404 response did not contain the not-found page."
+  );
 }
 
 console.log(`Hosted release checks passed for ${siteUrl}.`);

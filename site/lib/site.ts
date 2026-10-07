@@ -1,6 +1,5 @@
 const siteUrl = (
-  import.meta.env?.VITE_AUDIOCN_SITE_URL ??
-  "https://audiocn-solid.workers.dev"
+  import.meta.env?.VITE_AUDIOCN_SITE_URL ?? "https://audiocn-solid.workers.dev"
 ).replace(/\/+$/u, "");
 
 export const siteConfig = {
