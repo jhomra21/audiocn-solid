@@ -63,18 +63,18 @@ const homeRoutingHarness = (): Plugin => ({
       return undefined;
 
     return `
-import FadersTile from "@/site/components/home/tiles/faders-tile";
-import MixerTile from "@/site/components/home/tiles/mixer-tile";
+import { ShowcaseCard } from "@/site/components/home/showcase-card";
+import { ShowcaseTile } from "@/site/components/home/showcase-tile";
 
 export default function HomeRoutingHarness() {
   return (
     <main class="grid gap-8 p-8">
-      <article aria-label="Mixer">
-        <MixerTile />
-      </article>
-      <article aria-label="Faders">
-        <FadersTile />
-      </article>
+      <ShowcaseCard href="/docs/components/mixer" label="Mixer">
+        <ShowcaseTile name="mixer" />
+      </ShowcaseCard>
+      <ShowcaseCard href="/docs/components/fader" label="Faders">
+        <ShowcaseTile name="faders" />
+      </ShowcaseCard>
     </main>
   );
 }

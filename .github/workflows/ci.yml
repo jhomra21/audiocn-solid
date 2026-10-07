@@ -78,7 +78,7 @@ jobs:
             playwright-report
           if-no-files-found: ignore
 
-  site-spikes:
+  registry-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,24 +86,17 @@ jobs:
         with:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile
-      - run: cd site && bunx playwright install --with-deps chromium
-      - run: bun run site:spike:1
-      - run: cd site && bun run spike:2
+      - run: bunx playwright install --with-deps chromium
       - run: bun run registry:validate-shadcn
       - run: bun run registry:spike:3
       - run: bun run registry:test-contracts
       - run: bun run registry:test-release
       - run: bun run kobalte:spike:4
-      - run: bun run site:spike:5
-      - run: cd site && bunx playwright test --config playwright.home-routing.config.ts
-      - run: cd site && bun run build:release && bunx playwright test --config playwright.release.config.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: solid-2-site-spikes
+          name: registry-release
           path: |
-            site/artifacts/spike-1.json
-            site/artifacts/spike-2.json
             artifacts/registry-install.json
             artifacts/registry-release-build.json
             artifacts/fader-e2e.json
@@ -137,11 +130,35 @@ jobs:
             artifacts/blocks-solid1.png
             artifacts/blocks-solid2.png
             artifacts/spike-4.json
+          if-no-files-found: ignore
+
+  site-spikes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: cd site && bunx playwright install --with-deps chromium
+      - run: bun run site:spike:1
+      - run: cd site && bun run spike:2
+      - run: bun run site:spike:5
+      - run: cd site && bunx playwright test --config playwright.home-routing.config.ts
+      - run: cd site && bun run build:release && bunx playwright test --config playwright.release.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solid-2-site-spikes
+          path: |
+            site/artifacts/spike-1.json
+            site/artifacts/spike-2.json
             site/artifacts/spike-5.json
+            artifacts/home-tile-browser
+            artifacts/home-tile-contract-*.json
             site/artifacts/
             site/test-results/
             site/dist/client
             site/dist/server
-            site/test-results
             site/playwright-report
           if-no-files-found: ignore
