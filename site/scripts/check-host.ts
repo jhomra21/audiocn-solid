@@ -25,14 +25,44 @@ const expectStatus = async (pathname: string, status = 200) => {
 
 for (const pathname of [
   "/",
+  "/contributors",
   "/docs",
   "/docs/components/fader",
+  "/search-index.json",
   "/sitemap.xml",
   "/robots.txt",
   "/llms.txt",
   "/llms-full.txt",
+  "/brand/logo.svg",
 ]) {
   await expectStatus(pathname);
+}
+
+const home = await (await expectStatus("/")).text();
+
+if (!home.includes(`href="${siteUrl}/"`)) {
+  throw new Error("Home canonical URL does not match the deployed origin.");
+}
+
+const sitemap = await (await expectStatus("/sitemap.xml")).text();
+
+if (!sitemap.includes(`<loc>${siteUrl}/</loc>`)) {
+  throw new Error("Sitemap URLs do not match the deployed origin.");
+}
+
+const robots = await (await expectStatus("/robots.txt")).text();
+
+if (!robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`)) {
+  throw new Error("robots.txt does not point at the deployed sitemap.");
+}
+
+const llms = await (await expectStatus("/llms.txt")).text();
+
+if (
+  !llms.includes(`${siteUrl}/r/solid1/{name}.json`) ||
+  !llms.includes(`${siteUrl}/r/solid2/{name}.json`)
+) {
+  throw new Error("llms.txt does not contain the deployed registry origins.");
 }
 
 for (const pathname of [
