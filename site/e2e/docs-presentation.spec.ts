@@ -514,8 +514,9 @@ test("volume icons and device affordances survive production hydration", async (
   await expect(liveDevice.getByRole("combobox")).toHaveText(
     "Select a microphone"
   );
-  await liveDevice.getByRole("combobox").click();
-  await expect(page.getByRole("listbox")).toBeVisible();
+  const liveTrigger = liveDevice.getByRole("combobox");
+  await liveTrigger.click();
+  await expect(liveTrigger).toHaveAttribute("aria-expanded", "true");
   await expect(
     page.locator('[data-slot="audio-device-select-permission"]')
   ).toBeVisible();

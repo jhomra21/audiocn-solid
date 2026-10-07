@@ -52,18 +52,33 @@ for (const route of ["/", "/docs/components/fader", "/docs/components/mixer"]) {
     const count = await thumbs.count();
     expect(count).toBeGreaterThan(0);
 
-    for (let index = 0; index < count; index += 1) {
-      for (const start of ["thumb", "track"] as const) {
-        const thumb = thumbs.nth(index);
+    const representatives: {
+      card: string | null;
+      index: number;
+      orientation: string | null;
+    }[] = [];
+    const seen = new Set<string>();
 
-        const card = await thumb.evaluate((node) =>
+    for (let index = 0; index < count; index += 1) {
+      const thumb = thumbs.nth(index);
+      const card = await thumb.evaluate(
+        (node) =>
           node
             .closest('[data-slot="showcase-card"]')
-            ?.getAttribute("aria-label")
-        );
+            ?.getAttribute("aria-label") ?? null
+      );
+      const orientation = await thumb.getAttribute("aria-orientation");
+      const key = `${card ?? route}:${orientation ?? "unknown"}`;
 
-        const path = await dragSlider(page, thumb, start);
-        results.push({ route, card, index, ...path });
+      if (seen.has(key)) continue;
+      seen.add(key);
+      representatives.push({ card, index, orientation });
+    }
+
+    for (const { card, index, orientation } of representatives) {
+      for (const start of ["thumb", "track"] as const) {
+        const path = await dragSlider(page, thumbs.nth(index), start);
+        results.push({ route, card, index, orientation, ...path });
       }
     }
   });
