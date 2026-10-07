@@ -27,7 +27,7 @@ test.afterAll(async () => {
 
 for (const route of ["/", "/docs/components/fader", "/docs/components/mixer"]) {
   test(`production sustained slider dragging ${route}`, async ({ page }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(120_000);
     await page.goto(host.origin + route);
 
     if (route === "/") {

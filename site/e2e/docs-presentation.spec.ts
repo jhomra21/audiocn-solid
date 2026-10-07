@@ -506,6 +506,7 @@ test("volume icons and device affordances survive production hydration", async (
   await expect(mute).toHaveAttribute("data-level", "muted");
   await expect(mute.locator("svg:visible")).toHaveCount(1);
   await page.goto("/docs/components/audio-device-select");
+  await page.waitForFunction(() => window._$HY?.done);
   const liveDevice = page.locator('[data-example="audio-device-select-demo"]');
   await expect(liveDevice.getByRole("combobox")).not.toHaveAttribute(
     "data-loading"

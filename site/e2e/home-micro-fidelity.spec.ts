@@ -424,23 +424,34 @@ test("mobile menu overlays content and dismisses through keyboard and outside in
   await expect(trigger).toBeFocused();
 
   await page.keyboard.press("Enter");
-  const menuBounds = await page.locator("#site-menu").boundingBox();
-  expect(menuBounds).not.toBeNull();
-  const headingBounds = await heading.boundingBox();
-  expect(headingBounds).not.toBeNull();
+  await expect(page.locator("#site-menu")).toBeVisible();
 
-  const outsidePoint = {
-    x: Math.ceil(headingBounds!.x + headingBounds!.width / 2),
-    y: Math.ceil(headingBounds!.y + headingBounds!.height / 2),
-  };
+  const outsidePoint = await page.evaluate(() => {
+    const menu = document.querySelector("#site-menu");
 
-  const hitOutsideHeader = await page.evaluate(({ x, y }) => {
-    const header = document.querySelector("header");
+    if (!(menu instanceof HTMLElement)) {
+      throw new Error("Site menu is missing.");
+    }
 
-    return !header?.contains(document.elementFromPoint(x, y) ?? null);
-  }, outsidePoint);
+    const candidates = [
+      { x: window.innerWidth - 8, y: window.innerHeight - 8 },
+      { x: 8, y: window.innerHeight - 8 },
+      { x: Math.floor(window.innerWidth / 2), y: window.innerHeight - 8 },
+    ];
 
-  expect(hitOutsideHeader).toBe(true);
+    const point = candidates.find(({ x, y }) => {
+      const target = document.elementFromPoint(x, y);
+
+      return target !== null && !menu.contains(target);
+    });
+
+    if (!point) {
+      throw new Error("No point outside the site menu is available.");
+    }
+
+    return point;
+  });
+
   await page.mouse.click(outsidePoint.x, outsidePoint.y);
   await expect(page.locator("#site-menu")).toBeHidden();
 
