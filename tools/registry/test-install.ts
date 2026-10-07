@@ -51,36 +51,44 @@ const report = {
   pass: false,
   strategy:
     "isolated item sources and node_modules; documented Solid bootstrap",
-  upstreamSha: "9598cf2abbcf0dc844e61d77d18af46a6d17e8a9",
+  upstreamSha: "1c35867a34206820e34849eeb841dc52b2ced24f",
   itemNames,
   runtimes,
 };
 
-const server = createServer((request, response) => {
-  const url = new URL(request.url ?? "/", "http://registry");
-  const requested = resolve(registryRoot, `.${url.pathname}`);
+const hostedOrigin = process.env.AUDIOCN_REGISTRY_ORIGIN?.replace(/\/+$/u, "");
 
-  if (
-    !requested.startsWith(`${resolve(registryRoot)}${sep}`) ||
-    !existsSync(requested)
-  ) {
-    response.writeHead(404).end();
+const server = hostedOrigin
+  ? null
+  : createServer((request, response) => {
+      const url = new URL(request.url ?? "/", "http://registry");
+      const requested = resolve(registryRoot, `.${url.pathname}`);
 
-    return;
-  }
+      if (
+        !requested.startsWith(`${resolve(registryRoot)}${sep}`) ||
+        !existsSync(requested)
+      ) {
+        response.writeHead(404).end();
 
-  response.writeHead(200, { "Content-Type": "application/json" });
-  createReadStream(requested).pipe(response);
-});
+        return;
+      }
 
-server.listen(0, "127.0.0.1");
+      response.writeHead(200, { "Content-Type": "application/json" });
+      createReadStream(requested).pipe(response);
+    });
 
-await once(server, "listening");
+let origin: string;
 
-// SAFETY: a listening TCP server returns its assigned port as AddressInfo.
-const { port } = server.address() as AddressInfo;
+if (server) {
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
 
-const origin = `http://127.0.0.1:${port}`;
+  // SAFETY: a listening TCP server returns its assigned port as AddressInfo.
+  const { port } = server.address() as AddressInfo;
+  origin = `http://127.0.0.1:${port}`;
+} else {
+  origin = `${hostedOrigin}/r`;
+}
 
 const filesIn = async (directory: string): Promise<string[]> => {
   const files: string[] = [];
@@ -270,7 +278,7 @@ try {
 
   report.pass = true;
 } finally {
-  server.close();
+  server?.close();
   await mkdir(dirname(artifactPath), { recursive: true });
   await writeFile(artifactPath, `${JSON.stringify(report, null, 2)}\n`);
 }

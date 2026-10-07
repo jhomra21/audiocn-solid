@@ -79,6 +79,30 @@ Every page has a committed 1200x630 social card in `site/public/og`, indexed by 
 
 The generated registries live at `site/public/r/solid1` and `site/public/r/solid2`. Consumers install component sources and their declared dependencies, not the site or its examples.
 
+## Cloudflare staging
+
+The site deploys as static Worker assets. `wrangler.jsonc` serves `site/dist/client` and uses the generated `404.html` for unknown routes.
+
+Build with the exact staging origin so canonical links, AI prompts, social metadata, and registry URLs point at the deployed host:
+
+```sh
+VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
+  bun run --cwd site build:release
+bunx --bun wrangler deploy
+```
+
+After deployment, verify the public site and both registries:
+
+```sh
+AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
+  bun run --cwd site host:check
+
+AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
+  bun run registry:test-install
+```
+
+The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
+
 ## Source-registry release
 
 Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. `bun run registry:test-contracts` checks the release and isolated-install contracts.

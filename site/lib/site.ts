@@ -1,3 +1,8 @@
+const siteUrl = (
+  import.meta.env.VITE_AUDIOCN_SITE_URL ??
+  "https://audiocn-solid.workers.dev"
+).replace(/\/+$/u, "");
+
 export const siteConfig = {
   description:
     "Copy-and-paste audio components for Solid. Build mixers, players, meters, knobs and waveforms with accessible UI you own.",
@@ -5,6 +10,5 @@ export const siteConfig = {
   name: "audiocn Solid",
   registryNamespace: "@audiocn-solid",
   title: "audiocn Solid — Audio components for Solid",
-  // Placeholder until the real workers.dev hostname is known.
-  url: "https://audiocn-solid.workers.dev",
+  url: siteUrl,
 } as const;

@@ -17,7 +17,8 @@
     "spike:2": "bun run scripts/spike-2.ts",
     "search:index": "bun run scripts/build-search-index.ts",
     "og:build": "bun run scripts/build-social-images.ts",
-    "spike:5": "bun run scripts/spike-5.ts"
+    "spike:5": "bun run scripts/spike-5.ts",
+    "host:check": "bun run scripts/check-host.ts"
   },
   "dependencies": {
     "@orama/orama": "3.1.18",
