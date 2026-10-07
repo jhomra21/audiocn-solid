@@ -394,7 +394,9 @@ export const AudioDeviceSelect = (props: AudioDeviceSelectProps) => {
       }}
       itemComponent={(itemProps) => (
         <AudioDeviceSelectItem
-          aria-hidden={itemProps.item.rawValue.emptyCollection ? "true" : undefined}
+          aria-hidden={
+            itemProps.item.rawValue.emptyCollection ? "true" : undefined
+          }
           class={itemProps.item.rawValue.emptyCollection ? "hidden" : undefined}
           item={itemProps.item}
           device={itemProps.item.rawValue.device}
