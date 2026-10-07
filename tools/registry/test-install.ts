@@ -58,6 +58,10 @@ const report = {
 
 const hostedOrigin = process.env.AUDIOCN_REGISTRY_ORIGIN?.replace(/\/+$/u, "");
 
+if (hostedOrigin) {
+  await run("bun", ["run", "registry:build"], root);
+}
+
 const server = hostedOrigin
   ? null
   : createServer((request, response) => {
