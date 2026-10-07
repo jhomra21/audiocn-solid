@@ -103,6 +103,14 @@ AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
 
 The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
 
+For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and `SKIP_DEPENDENCY_INSTALL=1`, then use:
+
+- Build command: `bun install --frozen-lockfile && bun run --cwd site build:release`
+- Deploy command: `bunx --bun wrangler deploy`
+- Build variable: `VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev`
+
+If this is the account's first Worker and the `workers.dev` subdomain is not known yet, create the Worker once, copy its assigned URL, set `VITE_AUDIOCN_SITE_URL`, and redeploy the same commit before running the hosted checks.
+
 ## Source-registry release
 
 Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. `bun run registry:test-contracts` checks the release and isolated-install contracts.
