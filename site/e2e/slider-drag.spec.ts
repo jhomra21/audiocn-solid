@@ -57,16 +57,19 @@ for (const route of ["/", "/docs/components/fader", "/docs/components/mixer"]) {
       index: number;
       orientation: string | null;
     }[] = [];
+
     const seen = new Set<string>();
 
     for (let index = 0; index < count; index += 1) {
       const thumb = thumbs.nth(index);
+
       const card = await thumb.evaluate(
         (node) =>
           node
             .closest('[data-slot="showcase-card"]')
             ?.getAttribute("aria-label") ?? null
       );
+
       const orientation = await thumb.getAttribute("aria-orientation");
       const key = `${card ?? route}:${orientation ?? "unknown"}`;
 
