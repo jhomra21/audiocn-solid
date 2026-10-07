@@ -109,7 +109,31 @@ For Workers Builds, import this repository from the Cloudflare dashboard and kee
 - Deploy command: `bunx --bun wrangler deploy`
 - Build variable: `VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev`
 
-If this is the account's first Worker and the `workers.dev` subdomain is not known yet, create the Worker once, copy its assigned URL, set `VITE_AUDIOCN_SITE_URL`, and redeploy the same commit before running the hosted checks.
+The Cloudflare Worker must be named `audiocn-solid` to match `wrangler.jsonc`. If this is the account's first Worker and the `workers.dev` subdomain is not known yet, create the Worker once, copy its assigned URL, set `VITE_AUDIOCN_SITE_URL`, and redeploy the same commit before running the hosted checks.
+
+## shadcn Registry Directory submission
+
+Submit the stable Solid 1 registry to shadcn's public Registry Directory only after the deployed Worker passes both hosted checks above. The directory accepts one URL template per namespace, so `@audiocn-solid` points to Solid 1. Solid 2 users keep the explicit `/r/solid2/` registry URL in `components.json`.
+
+Fork `shadcn-ui/ui`, add this entry to `apps/v4/registry/directory.json`, replacing the example hostname with the verified Worker URL:
+
+```json
+{
+  "name": "@audiocn-solid",
+  "homepage": "https://audiocn-solid.<workers-subdomain>.workers.dev",
+  "url": "https://audiocn-solid.<workers-subdomain>.workers.dev/r/solid1/{name}.json",
+  "description": "Audio components for Solid, distributed as source through shadcn.",
+  "logo": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' fill='none' stroke='var(--foreground)' stroke-linecap='round'><path d='M38.4 102.9a43.5 43.5 0 1 1 51.2 0' stroke-width='8.6'/><path d='m63.3 70 20.5-23.8' stroke-width='8'/></svg>"
+}
+```
+
+From the shadcn repository, run its registry validation command:
+
+```sh
+pnpm validate:registries
+```
+
+Then open a pull request containing only the directory entry. After shadcn merges it, verify that the public directory resolves the namespace before testing a fresh consumer with `shadcn add @audiocn-solid/<item>`.
 
 ## Source-registry release
 
