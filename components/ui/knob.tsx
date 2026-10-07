@@ -853,7 +853,7 @@ export const KnobDial = (props: KnobDialProps) => {
       aria-valuenow={context.value()}
       aria-valuetext={context.format()(context.value())}
       class={cn(
-        "relative size-(--knob-size) cursor-grab touch-none rounded-full outline-none aria-disabled:cursor-default",
+        "group/knob-dial pointer-events-none relative size-(--knob-size) touch-none rounded-full outline-none data-dragging:pointer-events-auto",
         {
           "data-dragging:cursor-ew-resize":
             dial.dragDirection() === "horizontal",
@@ -979,6 +979,14 @@ export const KnobDial = (props: KnobDialProps) => {
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
       >
         {props.children}
+        <circle
+          class="[pointer-events:all] cursor-grab touch-none group-aria-disabled/knob-dial:cursor-default group-data-dragging/knob-dial:cursor-[inherit]"
+          cx={CENTER}
+          cy={CENTER}
+          data-slot="knob-hit-area"
+          fill="none"
+          r={CENTER}
+        />
       </svg>
     </div>
   );
