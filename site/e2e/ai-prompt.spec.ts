@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { siteConfig } from "../lib/site";
+
 const PAGE = "/docs/components/bar-visualizer";
 
 const INSTALL = "npx shadcn@latest add @audiocn-solid/bar-visualizer";
@@ -34,7 +36,7 @@ test("the examples become links to the page's own anchors", async ({
   expect(markdown).not.toContain("## Examples");
   expect(markdown).toContain("## Resources");
   expect(markdown).toContain(
-    `- Idle and loading: https://audiocn-solid.workers.dev${PAGE}#idle-and-loading`
+    `- Idle and loading: ${siteConfig.url}${PAGE}#idle-and-loading`
   );
   // The demo files the section used to inline.
   expect(markdown).not.toContain("bar-visualizer-states.tsx");

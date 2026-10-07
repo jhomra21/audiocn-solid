@@ -9,6 +9,8 @@ import { toMarkdown } from "mdast-util-to-markdown";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 
+import { remarkSiteUrl } from "./remark-site-url";
+
 const repositoryRoot = resolve(import.meta.dirname, "../../..");
 
 const readSource = async (path: string) => {
@@ -188,7 +190,7 @@ export const renderDocsMarkdown = async (source: string): Promise<string> => {
   };
 
   await compile(source, {
-    remarkPlugins: [remarkFrontmatter, remarkGfm, serialize],
+    remarkPlugins: [remarkFrontmatter, remarkGfm, remarkSiteUrl, serialize],
   });
 
   return markdown.trim();

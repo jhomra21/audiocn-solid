@@ -55,7 +55,7 @@ test("every docs page has equal static Markdown twins and no executable MDX wrap
       page.url.startsWith("/docs/blocks/")
     ) {
       expect(markdown).toContain(
-        "https://audiocn-solid.workers.dev/r/solid2/{name}.json"
+        `${siteConfig.url}/r/solid2/{name}.json`
       );
       expect(markdown).not.toContain("npx shadcn@latest add @audiocn/");
       expect(markdown).not.toContain("@base-ui/react");
@@ -107,4 +107,24 @@ test("page actions reset status icons, retry a failed prefetch and follow the vi
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toBe("bunx --bun shadcn@latest add @audiocn-solid/knob");
+});
+
+
+test("installation docs render the configured registry origin in HTML and Markdown", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/docs/installation");
+  await expect(page.locator("main")).toContainText(
+    `${siteConfig.url}/r/solid1/{name}.json`
+  );
+  await expect(page.locator("main")).toContainText(
+    `${siteConfig.url}/r/solid2/{name}.json`
+  );
+
+  const markdown = await (await request.get("/docs/installation.md")).text();
+
+  expect(markdown).toContain(`${siteConfig.url}/r/solid1/{name}.json`);
+  expect(markdown).toContain(`${siteConfig.url}/r/solid2/{name}.json`);
+  expect(markdown).not.toContain("https://<domain>");
 });

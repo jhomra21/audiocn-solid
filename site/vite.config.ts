@@ -18,6 +18,7 @@ import { codeHighlightOptions } from "./lib/docs/code-highlight.ts";
 import { markdownEndpoints } from "./lib/docs/markdown-endpoints.ts";
 import { remarkComponentSource } from "./lib/docs/remark-component-source.ts";
 import { remarkInstallCommand } from "./lib/docs/remark-install-command.ts";
+import { remarkSiteUrl } from "./lib/docs/remark-site-url.ts";
 
 export default defineConfig(({ mode }) => {
   // `bun run og:build` builds with this mode so the card routes exist only in
@@ -43,6 +44,7 @@ export default defineConfig(({ mode }) => {
             remarkFrontmatter,
             remarkMdxFrontmatter,
             remarkGfm,
+            remarkSiteUrl,
             remarkInstallCommand,
             remarkComponentSource,
             [remarkToc, { heading: "Contents", maxDepth: 3 }],
