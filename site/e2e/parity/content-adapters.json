@@ -105,7 +105,7 @@
   },
   {
     "route": "/docs/installation",
-    "reason": "Separate versioned registry URLs are built for Solid 1 and Solid 2; a public production domain has not been selected.",
+    "reason": "Solid 1 and Solid 2 use separate hosted registry paths.",
     "upstream": [
       {
         "tag": "p",
@@ -115,7 +115,7 @@
     "local": [
       {
         "tag": "p",
-        "text": "Use the registry URL for the Solid version in your app. The production domain is selected at release."
+        "text": "Use the registry URL for the Solid version in your app."
       },
       {
         "tag": "p",
