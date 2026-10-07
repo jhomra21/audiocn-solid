@@ -18,18 +18,18 @@ The same component source runs under Solid 1 and Solid 2. CI typechecks both ver
 
 The port mirrors upstream audiocn where that structure maps cleanly to Solid:
 
-- `components/ui/` — public component implementations;
-- `components/blocks/` — composed audio interfaces;
-- `components/examples/` — upstream-parity examples used by the gallery;
-- `components/docs/` — docs-preview presentation only;
-- `hooks/` — Solid/Web Audio lifecycle integrations;
-- `lib/audio/` — framework-neutral audio math, timing, frame, and meter logic;
-- `lib/solid/` — Solid-specific prop, ref, lifecycle, and Solid 1/2 compatibility helpers;
-- `app/` — local preview and acceptance harness, not library code;
-- `e2e/` — shared browser acceptance for both Solid runtimes;
-- `test/` — non-browser contracts such as public type-surface checks;
-- `tools/` — repository tooling that is not shipped with the library.
-- `site/` — static Solid 2 documentation, search, and examples, excluded from consumer installs.
+- `components/ui/`: public component implementations;
+- `components/blocks/`: composed audio interfaces;
+- `components/examples/`: upstream-parity examples used by the gallery;
+- `components/docs/`: docs-preview presentation only;
+- `hooks/`: Solid/Web Audio lifecycle integrations;
+- `lib/audio/`: framework-neutral audio math, timing, frame, and meter logic;
+- `lib/solid/`: Solid-specific prop, ref, lifecycle, and Solid 1/2 compatibility helpers;
+- `app/`: local preview and acceptance harness, not library code;
+- `e2e/`: shared browser acceptance for both Solid runtimes;
+- `test/`: non-browser contracts such as public type-surface checks;
+- `tools/`: repository tooling that is not shipped with the library.
+- `site/`: static Solid 2 documentation, search, and examples, excluded from consumer installs.
 
 The repository stays a single package until a subsystem has an independent runtime or distribution boundary. This keeps the source close to audiocn without introducing monorepo structure before it is useful.
 
