@@ -9,7 +9,6 @@ declare global {
 
 test.setTimeout(30_000);
 
-
 test("knobs ignore drags from the corners of their box", async ({ page }) => {
   await page.goto("/docs/components/knob#drag-directions");
   const dial = page.getByRole("slider", { exact: true, name: "Vertical" });
