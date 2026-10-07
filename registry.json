@@ -688,7 +688,8 @@
       "dependencies": ["solid-js@^1.9.15"],
       "registryDependencies": [
         "@audiocn-solid/core",
-        "@audiocn-solid/use-audio-config"
+        "@audiocn-solid/use-audio-config",
+        "@audiocn-solid/channel-strip"
       ],
       "files": [
         {

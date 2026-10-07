@@ -183,6 +183,14 @@ try {
           `${runtime}/${name}: installed file plan differs from registry.`
         );
 
+      if (
+        name === "mixer" &&
+        !installed.includes("components/ui/channel-strip.tsx")
+      )
+        throw new Error(
+          `${runtime}/mixer: documented ChannelStrip dependency was not installed.`
+        );
+
       const manifest = JSON.parse(
         await readFile(join(fixture, "package.json"), "utf8")
       );
