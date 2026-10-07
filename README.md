@@ -71,7 +71,7 @@ Run `bun install` afterward to restore the repository's Solid 1 development depe
 
 ## Registry and site validation
 
-`bun run registry:spike:3` generates both registries, installs each of the 65 entries in its own fresh consumer project per runtime, typechecks every installed source file, builds each item, and exercises installed controls and blocks. Consumer setup executes the documented Solid bootstrap; item projects share Bun's download cache, never sources or `node_modules`. The report records all 130 file/dependency/license plans and excludes React packages. Reports and screenshots are written to `artifacts/`.
+`bun run registry:validate-shadcn` runs the pinned shadcn CLI validator against the source registry. `bun run registry:spike:3` generates both registries, installs each of the 65 entries in its own fresh consumer project per runtime, typechecks every installed source file, builds each item, and exercises installed controls and blocks. Consumer setup executes the documented Solid bootstrap; item projects share Bun's download cache, never sources or `node_modules`. The report records all 130 file/dependency/license plans and excludes React packages. Reports and screenshots are written to `artifacts/`.
 
 Run `cd site && bun run typecheck && bun run build:release && bunx playwright test --grep-invert "compare upstream and local page structure"` for production-site acceptance. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
 

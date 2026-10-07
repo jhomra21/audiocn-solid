@@ -38,7 +38,8 @@
     "registry:test-channel-strip": "bun run tools/registry/test-channel-strip.ts",
     "registry:test-mixer": "bun run tools/registry/test-mixer.ts",
     "registry:test-use-mixer": "bun run tools/registry/test-use-mixer.ts",
-    "registry:test-blocks": "bun run tools/registry/test-blocks.ts"
+    "registry:test-blocks": "bun run tools/registry/test-blocks.ts",
+    "registry:validate-shadcn": "bunx --bun shadcn@4.21.0 registry validate"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
