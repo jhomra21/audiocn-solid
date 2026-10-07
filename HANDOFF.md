@@ -4,7 +4,7 @@
 
 - Repository: `https://github.com/jhomra21/audiocn-solid.git`
 - Branch: `feat/solid2-site-spikes`. Use `git rev-parse HEAD` for the current checkpoint.
-- Upstream reference: `audiocn/ui@1c35867a34206820e34849eeb841dc52b2ced24f`, which was still upstream `main` during the release audit.
+- Upstream reference: `audiocn/ui@4234aa114b8696e2704db7825c1289cf74d1e4f2`, including the current Knob circular hit-area fix.
 - Nothing has been merged, tagged, published to the shadcn Registry Directory, or deployed to Cloudflare yet.
 
 ## Release contents
