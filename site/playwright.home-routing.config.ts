@@ -12,7 +12,7 @@ export default defineConfig({
   globalTimeout: 180_000,
   // Whole-home RAF work can take longer than virtual time on a busy host.
   // Meter deadlines remain controlled by runFor, not this wall-clock budget.
-  timeout: 30_000,
+  timeout: 60_000,
   // Parallel site suites clean site/test-results; keep this lane outside it.
   outputDir: join(artifacts, "home-tile-browser", run),
   reporter: [
