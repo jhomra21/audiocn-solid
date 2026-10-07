@@ -100,7 +100,7 @@ test.afterAll(async () => {
 
 /**
  * Loads the home route and lets lazy tiles, fonts and network settle on the
- * running clock, then pauses it so time only moves in `advance` steps.
+ * running clock, then pauses it so tests control each time step explicitly.
  */
 const open = async (page: Page, card: string) => {
   await page.clock.install({ time: 0 });
@@ -120,6 +120,11 @@ const open = async (page: Page, card: string) => {
 
 const advance = async (page: Page, ms: number) => {
   await page.clock.runFor(ms);
+  elapsedMs += ms;
+};
+
+const jump = async (page: Page, ms: number) => {
+  await page.clock.fastForward(ms);
   elapsedMs += ms;
 };
 
@@ -222,7 +227,7 @@ test("MixerTile routes Microphone volume into Microphone level", async ({
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Microphone level")).toBeGreaterThan(-60);
   await press(page, tile, "Microphone volume", "Home");
-  await advance(page, FALL_MS);
+  await jump(page, FALL_MS);
   expect(await level(tile, "Microphone level")).toBeLessThanOrEqual(-60);
   await press(page, tile, "Microphone volume", "End");
   await advance(page, SETTLE_MS);
@@ -235,7 +240,7 @@ test("FadersTile routes Drums volume into Drums level", async ({ page }) => {
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Drums level")).toBeGreaterThan(-60);
   await press(page, tile, "Drums volume", "Home");
-  await advance(page, FALL_MS);
+  await jump(page, FALL_MS);
   expect(await level(tile, "Drums level")).toBeLessThanOrEqual(-60);
   await press(page, tile, "Drums volume", "End");
   await advance(page, SETTLE_MS);
@@ -261,13 +266,13 @@ test("MixerTile master follows channel faders and its own fader", async ({
     await page.keyboard.press("Home");
   }
 
-  await advance(page, FALL_MS);
+  await jump(page, FALL_MS);
   expect(await level(tile, "Master level")).toBeLessThan(-48);
   await press(page, tile, "Microphone volume", "End");
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Master level")).toBeGreaterThan(-60);
   await press(page, tile, "Master volume", "Home");
-  await advance(page, FALL_MS);
+  await jump(page, FALL_MS);
   expect(await level(tile, "Master level")).toBeLessThan(-48);
   expect(await level(tile, "Microphone level")).toBeGreaterThan(-60);
 });

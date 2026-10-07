@@ -54,9 +54,7 @@ test("every docs page has equal static Markdown twins and no executable MDX wrap
       page.url.startsWith("/docs/hooks/") ||
       page.url.startsWith("/docs/blocks/")
     ) {
-      expect(markdown).toContain(
-        `${siteConfig.url}/r/solid2/{name}.json`
-      );
+      expect(markdown).toContain(`${siteConfig.url}/r/solid2/{name}.json`);
       expect(markdown).not.toContain("npx shadcn@latest add @audiocn/");
       expect(markdown).not.toContain("@base-ui/react");
       expect(markdown).not.toContain("React 19");
@@ -108,7 +106,6 @@ test("page actions reset status icons, retry a failed prefetch and follow the vi
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toBe("bunx --bun shadcn@latest add @audiocn-solid/knob");
 });
-
 
 test("installation docs render the configured registry origin in HTML and Markdown", async ({
   page,
