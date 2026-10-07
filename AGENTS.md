@@ -1,8 +1,8 @@
-Do not make baseless or empty assumptions. Never say if this works like 'x' or 'y'. Always read source code or up to date docs. Codebases will outlive us. Every shortcut becomes someone else's burden. Every hack compounds into technical debt that slows the whole team down. You are not just writing code, you are shaping the future of this project. The patterns you establish will be copied. The corners you cut will be cut again.
+Do not guess about code, APIs, or current behavior. Read the relevant source and current documentation before changing anything.
 
-Fight entropy. Leave the codebase better than you found it. Do not write plausible code, write accurate code backed by the reality of a codebase
+Implement only the requested task. Prefer the smallest direct solution that fits the existing codebase. Do not add abstractions, dependencies, or files unless they solve a concrete need.
 
-Think carefully and only action the specific task I have given you with the most concise and elegant solution that takes into consideration existing code across codebase. Prefer the most concise and elegant solutions that changes or adds as little code as possible. Review your implementations before stopping. Check whether there is a better or simpler approach, whether any redundant code remains, whether duplicate logic was introduced, and whether any dead or unused code was left behind. If you find issues, fix them now; if not, briefly confirm the implementation is clean.
+Before stopping, review the diff for redundant code, duplicate logic, dead code, unused files, and unnecessary churn. Fix any issues you find.
 
 ## Reference codebases
 
