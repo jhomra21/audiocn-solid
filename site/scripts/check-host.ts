@@ -76,6 +76,7 @@ const missing = await expectStatus(
   "/__audiocn-solid-host-check-not-found__",
   404
 );
+
 const missingBody = await missing.text();
 
 if (!/page not found/i.test(missingBody)) {
