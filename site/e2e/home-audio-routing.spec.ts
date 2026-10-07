@@ -4,16 +4,14 @@ import { dirname, join } from "node:path";
 import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
-// Mirrors upstream test/demo-routing.test.tsx at 59411f5 for the `MixerTile`
-// and `FadersTile` rows, mounted by the home route's own showcase grid.
+// Mirrors upstream test/demo-routing.test.tsx for the production `MixerTile`
+// and `FadersTile` components in the isolated browser harness.
 
 const FRAME_MS = 16;
 
 const SETTLE_MS = 800;
 
 const FALL_MS = 4000;
-
-const FALL_STEP_MS = 250;
 
 const MUTE = /^Mute/u;
 
@@ -125,25 +123,6 @@ const advance = async (page: Page, ms: number) => {
   elapsedMs += ms;
 };
 
-/**
- * Advances a long decay in coarse slices. Ballistics use elapsed time, so this
- * preserves repeated source/painter updates without rendering every 16 ms frame.
- */
-const advanceCoarsely = async (page: Page, ms: number) => {
-  let remaining = ms;
-
-  while (remaining > 0) {
-    const step = Math.min(FALL_STEP_MS, remaining);
-    const skipped = Math.max(0, step - FRAME_MS);
-
-    if (skipped > 0) await page.clock.fastForward(skipped);
-    await page.clock.runFor(Math.min(FRAME_MS, step));
-
-    elapsedMs += step;
-    remaining -= step;
-  }
-};
-
 const level = async (tile: Locator, name: string) => {
   const value = Number(
     await tile.getByRole("meter", { name }).getAttribute("aria-valuenow")
@@ -243,7 +222,7 @@ test("MixerTile routes Microphone volume into Microphone level", async ({
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Microphone level")).toBeGreaterThan(-60);
   await press(page, tile, "Microphone volume", "Home");
-  await advanceCoarsely(page, FALL_MS);
+  await advance(page, FALL_MS);
   expect(await level(tile, "Microphone level")).toBeLessThanOrEqual(-60);
   await press(page, tile, "Microphone volume", "End");
   await advance(page, SETTLE_MS);
@@ -256,7 +235,7 @@ test("FadersTile routes Drums volume into Drums level", async ({ page }) => {
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Drums level")).toBeGreaterThan(-60);
   await press(page, tile, "Drums volume", "Home");
-  await advanceCoarsely(page, FALL_MS);
+  await advance(page, FALL_MS);
   expect(await level(tile, "Drums level")).toBeLessThanOrEqual(-60);
   await press(page, tile, "Drums volume", "End");
   await advance(page, SETTLE_MS);
@@ -282,13 +261,13 @@ test("MixerTile master follows channel faders and its own fader", async ({
     await page.keyboard.press("Home");
   }
 
-  await advanceCoarsely(page, FALL_MS);
+  await advance(page, FALL_MS);
   expect(await level(tile, "Master level")).toBeLessThan(-48);
   await press(page, tile, "Microphone volume", "End");
   await advance(page, SETTLE_MS);
   expect(await level(tile, "Master level")).toBeGreaterThan(-60);
   await press(page, tile, "Master volume", "Home");
-  await advanceCoarsely(page, FALL_MS);
+  await advance(page, FALL_MS);
   expect(await level(tile, "Master level")).toBeLessThan(-48);
   expect(await level(tile, "Microphone level")).toBeGreaterThan(-60);
 });

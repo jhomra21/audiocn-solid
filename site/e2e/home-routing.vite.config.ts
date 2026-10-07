@@ -55,6 +55,33 @@ const FAULTS = {
   },
 } satisfies Record<string, { file: string; from: string; to: string }>;
 
+const homeRoutingHarness = (): Plugin => ({
+  enforce: "pre",
+  name: "home-routing-harness",
+  transform(_code, id) {
+    if (!id.split("?")[0]?.endsWith("/site/src/routes/index.tsx"))
+      return undefined;
+
+    return `
+import FadersTile from "@/site/components/home/tiles/faders-tile";
+import MixerTile from "@/site/components/home/tiles/mixer-tile";
+
+export default function HomeRoutingHarness() {
+  return (
+    <main class="grid gap-8 p-8">
+      <article aria-label="Mixer">
+        <MixerTile />
+      </article>
+      <article aria-label="Faders">
+        <FadersTile />
+      </article>
+    </main>
+  );
+}
+`;
+  },
+});
+
 const fault = (name: string | undefined): Plugin | undefined => {
   if (!name) return undefined;
 
@@ -77,9 +104,10 @@ const fault = (name: string | undefined): Plugin | undefined => {
 };
 
 /**
- * An isolated build and preview for the home tile contract, so it
- * never shares state with the preview server that serves site/dist/. Setting
- * `HOME_ROUTING_FAULT` breaks one behavior to prove the contract notices.
+ * An isolated build and preview for the home tile audio contract. The test
+ * build replaces only the home route with the exact production Mixer/Faders
+ * tiles, avoiding unrelated home animations while preserving SSR/hydration.
+ * Setting `HOME_ROUTING_FAULT` breaks one behavior to prove the contract notices.
  */
 export default defineConfig(async (env: ConfigEnv) => {
   await mkdir(root, { recursive: true });
@@ -126,6 +154,10 @@ export default defineConfig(async (env: ConfigEnv) => {
       server: { host: "127.0.0.1", port: PORT, strictPort: true },
     }),
     // Solid also enforces "pre"; source mutations must precede its compiler.
-    plugins: [fault(process.env.HOME_ROUTING_FAULT), config.plugins],
+    plugins: [
+      fault(process.env.HOME_ROUTING_FAULT),
+      homeRoutingHarness(),
+      config.plugins,
+    ],
   };
 });
