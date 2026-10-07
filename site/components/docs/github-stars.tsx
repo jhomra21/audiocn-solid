@@ -1,9 +1,12 @@
 import * as TooltipPrimitive from "@kobalte/core/tooltip";
+import { createSignal, onCleanup } from "solid-js";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import stars from "@/site/lib/github-stars.json";
 import { siteConfig } from "@/site/lib/site";
+
+import "./github-stars.css";
 
 const compactCount = new Intl.NumberFormat("en-US", {
   compactDisplay: "short",
@@ -21,9 +24,27 @@ const fullCount = new Intl.NumberFormat("en-US").format(stars.stargazersCount);
  */
 export const GitHubStars = () => {
   let trigger: HTMLElement | undefined;
+  let exitTimer: ReturnType<typeof setTimeout> | undefined;
+  const [retained, setRetained] = createSignal(false);
+
+  const onOpenChange = (open: boolean) => {
+    clearTimeout(exitTimer);
+
+    if (open) {
+      setRetained(true);
+    } else {
+      exitTimer = setTimeout(() => setRetained(false), 150);
+    }
+  };
+
+  onCleanup(() => clearTimeout(exitTimer));
 
   return (
-    <TooltipPrimitive.Root openDelay={0}>
+    <TooltipPrimitive.Root
+      forceMount={retained()}
+      onOpenChange={onOpenChange}
+      openDelay={0}
+    >
       <TooltipPrimitive.Trigger
         aria-label={`${fullCount} stars on GitHub`}
         as="a"
@@ -47,7 +68,7 @@ export const GitHubStars = () => {
         </span>
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal mount={trigger?.closest("dialog") ?? undefined}>
-        <TooltipPrimitive.Content class="bg-foreground text-background data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 z-50 inline-flex w-fit max-w-xs origin-(--kb-tooltip-content-transform-origin) items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs">
+        <TooltipPrimitive.Content class="github-stars-tooltip bg-foreground text-background z-50 inline-flex w-fit max-w-xs origin-(--kb-tooltip-content-transform-origin) items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs">
           {fullCount} stars
           <TooltipPrimitive.Arrow />
         </TooltipPrimitive.Content>

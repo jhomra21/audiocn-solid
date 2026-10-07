@@ -1,3 +1,5 @@
+import { flush } from "solid-js";
+
 import { MoonIcon, SunIcon } from "@/site/components/docs/icons";
 import { useAppearance } from "@/site/components/docs/theme-controls";
 
@@ -8,12 +10,35 @@ const APPEARANCE_ICON_CLASS =
 export const AppearanceToggle = (props: { class: string; testId?: string }) => {
   const [appearance, setAppearance] = useAppearance();
 
+  const toggleAppearance = () => {
+    const next = appearance() === "dark" ? "light" : "dark";
+
+    const update = () => {
+      setAppearance(next);
+      flush();
+    };
+
+    const startViewTransition = document.startViewTransition;
+
+    if (
+      !startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      update();
+
+      return;
+    }
+
+    const transition = startViewTransition.call(document, update);
+    void transition.finished.catch(() => {});
+  };
+
   return (
     <button
       aria-label="Toggle Theme"
       class={props.class}
       data-testid={props.testId}
-      onClick={() => setAppearance(appearance() === "dark" ? "light" : "dark")}
+      onClick={toggleAppearance}
       type="button"
     >
       <SunIcon

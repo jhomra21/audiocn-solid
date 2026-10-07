@@ -58,3 +58,33 @@ test("contributors is a complete static page with safe profiles and contribution
     fullPage: true,
   });
 });
+
+test("contributors fits narrow viewports with long repository and profile names", async ({
+  page,
+}) => {
+  await page.goto("/contributors");
+  await page.waitForFunction(() => window._$HY?.done);
+  await page
+    .getByRole("region", { name: "Contributor list" })
+    .evaluate((list) => {
+      const repository = list.querySelector("h2 + p");
+
+      if (repository)
+        repository.textContent = "owner/" + "repository".repeat(20);
+
+      for (const name of list.querySelectorAll("a .font-heading")) {
+        name.textContent = "contributor".repeat(20);
+      }
+    });
+
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBe(width);
+    await page.screenshot({
+      path: `artifacts/contributors-long-names-${width}.png`,
+      fullPage: true,
+    });
+  }
+});

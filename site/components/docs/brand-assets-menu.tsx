@@ -1,5 +1,6 @@
 // Adapted from audiocn/ui's @ncdai/brand-assets-menu port, see THIRD_PARTY_NOTICES.md.
-import { Show, children, createSignal, onCleanup } from "solid-js";
+import { Portal } from "@solidjs/web";
+import { children, createSignal, onCleanup } from "solid-js";
 
 import {
   ContextMenu,
@@ -17,7 +18,14 @@ import {
   FilePngIcon,
   TextIcon,
 } from "@/site/components/docs/brand-assets-icons";
+import {
+  CopyErrorIcon,
+  CopyFeedback,
+} from "@/site/components/docs/copy-feedback";
+import { CheckIcon } from "@/site/components/docs/icons";
 import assets from "@/site/lib/brand-assets.json";
+import type { CopyFeedbackState } from "@/site/lib/docs/copy-feedback";
+import { createCopyFeedback } from "@/site/lib/docs/copy-feedback";
 
 export const BrandAssetsMenu = (props: {
   children: JSXElement;
@@ -25,10 +33,21 @@ export const BrandAssetsMenu = (props: {
 }) => {
   const content = children(() => props.children);
   const [message, setMessage] = createSignal("");
+
+  const [displayState, setDisplayState] =
+    createSignal<CopyFeedbackState>("idle");
+
+  const [lastResult, setLastResult] = createSignal<"done" | "error">("done");
+  const [copyState, copy] = createCopyFeedback(() => currentSvg);
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let currentSvg: string | undefined;
+  let request = 0;
   let touching = false;
   let touchOpened = false;
-  onCleanup(() => clearTimeout(timer));
+  onCleanup(() => {
+    request += 1;
+    clearTimeout(timer);
+  });
 
   const download = (href: string, filename: string) => {
     const link = document.createElement("a");
@@ -37,16 +56,27 @@ export const BrandAssetsMenu = (props: {
     link.click();
   };
 
-  const copy = async (svg: string) => {
-    try {
-      await navigator.clipboard.writeText(svg);
-      setMessage("Copied as SVG");
-    } catch {
-      setMessage("Could not copy. Download the brand assets instead.");
-    }
+  const copySvg = async (svg: string) => {
+    const copyRequest = ++request;
+    currentSvg = svg;
+    setDisplayState("idle");
+    await copy();
 
+    if (copyRequest !== request) return;
+
+    const result = copyState() === "error" ? "error" : "done";
+    setLastResult(result);
+    setDisplayState(result);
+    setMessage(
+      result === "done"
+        ? "Copied as SVG"
+        : "Could not copy. Download the brand assets instead."
+    );
     clearTimeout(timer);
-    timer = setTimeout(() => setMessage(""), 3000);
+    timer = setTimeout(() => {
+      setMessage("");
+      setDisplayState("idle");
+    }, 3000);
   };
 
   return (
@@ -96,7 +126,7 @@ export const BrandAssetsMenu = (props: {
         <ContextMenuContent aria-label="Brand assets" class="w-64">
           <ContextMenuGroup>
             <ContextMenuLabel>audiocn</ContextMenuLabel>
-            <ContextMenuItem onSelect={() => void copy(assets.logomarkSVG)}>
+            <ContextMenuItem onSelect={() => void copySvg(assets.logomarkSVG)}>
               <img
                 src="/brand/logo.svg"
                 class="size-4 dark:invert"
@@ -105,7 +135,7 @@ export const BrandAssetsMenu = (props: {
               />
               Copy logo as SVG
             </ContextMenuItem>
-            <ContextMenuItem onSelect={() => void copy(assets.logotypeSVG)}>
+            <ContextMenuItem onSelect={() => void copySvg(assets.logotypeSVG)}>
               <TextIcon class="size-4" />
               Copy wordmark as SVG
             </ContextMenuItem>
@@ -138,14 +168,25 @@ export const BrandAssetsMenu = (props: {
           </ContextMenuGroup>
         </ContextMenuContent>
       </ContextMenu>
-      <Show when={message()}>
+      <Portal>
         <div
           role="status"
-          class="bg-popover text-popover-foreground fixed right-4 bottom-4 z-60 rounded-xl border px-4 py-3 text-sm shadow-lg"
+          class="bg-popover text-popover-foreground fixed right-4 bottom-4 z-60 inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm shadow-lg transition-[opacity,visibility] delay-150 duration-150 data-[visible=false]:pointer-events-none data-[visible=false]:invisible data-[visible=false]:opacity-0 data-[visible=true]:delay-0 [&_svg]:size-5"
+          data-visible={message() ? "true" : "false"}
         >
+          <CopyFeedback
+            state={displayState}
+            renderIcon={(state) =>
+              (state === "idle" ? lastResult() : state) === "done" ? (
+                <CheckIcon />
+              ) : (
+                <CopyErrorIcon />
+              )
+            }
+          />
           {message()}
         </div>
-      </Show>
+      </Portal>
     </>
   );
 };

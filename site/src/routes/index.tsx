@@ -27,11 +27,22 @@ export default function Home() {
           </div>
           <div class="mx-auto flex max-w-7xl flex-col items-center gap-6 text-center">
             <a
-              class="text-muted-foreground hover:text-foreground hover:bg-muted/60 focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3"
+              class="home-hero-pill text-muted-foreground hover:text-foreground hover:bg-muted/60 focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3"
               href="/docs/components"
             >
               Audio components for shadcn/ui
-              <span aria-hidden="true">→</span>
+              <svg
+                aria-hidden="true"
+                class="home-hero-pill-arrow size-3 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
             </a>
             <h1 class="font-heading max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
               Audio UI, mixed and mastered.
@@ -81,7 +92,19 @@ export default function Home() {
               href="/docs/components"
             >
               Browse all {componentCount} components
-              <span aria-hidden="true">→</span>
+              <svg
+                aria-hidden="true"
+                class="size-4"
+                data-icon="inline-end"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
             </a>
           </div>
         </div>

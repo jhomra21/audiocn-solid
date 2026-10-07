@@ -7,7 +7,6 @@ import {
   createSignal,
   createUniqueId,
   omit,
-  onCleanup,
   onSettled,
 } from "solid-js";
 
@@ -106,6 +105,10 @@ import {
 } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import {
+  CopyErrorIcon,
+  CopyFeedback,
+} from "@/site/components/docs/copy-feedback";
+import {
   CheckIcon,
   ChevronDownIcon,
   ClipboardIcon,
@@ -114,31 +117,7 @@ import {
   LinkIcon,
 } from "@/site/components/docs/icons";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
-
-const COPIED_RESET_MS = 1500;
-
-/** Copies `read()` and reports it as copied for a moment. */
-const createCopy = (read: () => string | undefined) => {
-  const [copied, setCopied] = createSignal(false);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-
-  onCleanup(() => clearTimeout(timer));
-
-  const copy = async () => {
-    const text = read();
-
-    if (text === undefined) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    clearTimeout(timer);
-    timer = setTimeout(() => setCopied(false), COPIED_RESET_MS);
-  };
-
-  return [copied, copy] as const;
-};
+import { createCopyFeedback } from "@/site/lib/docs/copy-feedback";
 
 export const MdxA = (props: ComponentProps<"a">) => <a {...props} />;
 
@@ -161,7 +140,7 @@ const Heading = (props: HeadingProps) => {
   const Tag = dynamic(() => props.as);
   const rest = omit(props, "as", "children");
 
-  const [copied, copy] = createCopy(() => {
+  const [copyState, copy] = createCopyFeedback(() => {
     const url = new URL(window.location.href);
     url.hash = props.id || "";
 
@@ -183,11 +162,24 @@ const Heading = (props: HeadingProps) => {
         onClick={() => void copy()}
         type="button"
       >
-        <Show fallback={<LinkIcon />} when={copied()}>
-          <CheckIcon />
-        </Show>
+        <CopyFeedback
+          state={copyState}
+          renderIcon={(state) =>
+            state === "done" ? (
+              <CheckIcon />
+            ) : state === "error" ? (
+              <CopyErrorIcon />
+            ) : (
+              <LinkIcon />
+            )
+          }
+        />
         <span class="sr-only">
-          {copied() ? "Copied Anchor Link" : "Copy Anchor Link"}
+          {copyState() === "done"
+            ? "Copied Anchor Link"
+            : copyState() === "error"
+              ? "Copy failed"
+              : "Copy Anchor Link"}
         </span>
       </button>
     </Tag>
@@ -228,7 +220,7 @@ interface PreProps extends ComponentProps<"pre"> {
 export const MdxPre = (props: PreProps) => {
   let viewport: HTMLDivElement | undefined;
 
-  const [copied, copy] = createCopy(
+  const [copyState, copy] = createCopyFeedback(
     () => viewport?.querySelector("pre")?.textContent ?? undefined
   );
 
@@ -236,14 +228,29 @@ export const MdxPre = (props: PreProps) => {
     <button
       aria-live="polite"
       class={COPY_BUTTON_CLASS}
-      data-copied={copied() ? "" : undefined}
+      data-copied={copyState() === "done" ? "" : undefined}
       onClick={() => void copy()}
       type="button"
     >
-      <Show fallback={<ClipboardIcon />} when={copied()}>
-        <CheckIcon />
-      </Show>
-      <span class="sr-only">{copied() ? "Copied Text" : "Copy Text"}</span>
+      <CopyFeedback
+        state={copyState}
+        renderIcon={(state) =>
+          state === "done" ? (
+            <CheckIcon />
+          ) : state === "error" ? (
+            <CopyErrorIcon />
+          ) : (
+            <ClipboardIcon />
+          )
+        }
+      />
+      <span class="sr-only">
+        {copyState() === "done"
+          ? "Copied Text"
+          : copyState() === "error"
+            ? "Copy failed"
+            : "Copy Text"}
+      </span>
     </button>
   );
 
@@ -630,7 +637,7 @@ const InstallTabs = (props: InstallCommandProps) => {
   const commands = packageCommands(props.command);
   const [selected, setSelected] = createSignal("pnpm");
   const current = () => commands.find(([manager]) => manager === selected())!;
-  const [copied, copy] = createCopy(() => current()[1]);
+  const [copyState, copy] = createCopyFeedback(() => current()[1]);
   onSettled(() => {
     try {
       const saved = localStorage.getItem("packageManager");
@@ -713,23 +720,31 @@ const InstallTabs = (props: InstallCommandProps) => {
       <button
         data-slot="button"
         aria-label={
-          copied() ? "Copied install command" : "Copy install command"
+          copyState() === "done"
+            ? "Copied install command"
+            : copyState() === "error"
+              ? "Copy failed"
+              : "Copy install command"
         }
         aria-live="polite"
         class={`${COPY_BUTTON_CLASS} absolute top-2 right-2 size-6`}
         onClick={() => void copy()}
         type="button"
       >
-        <Show
-          fallback={
-            <span data-slot="idle-icon">
-              <CopyIcon />
-            </span>
+        <CopyFeedback
+          state={copyState}
+          renderIcon={(state) =>
+            state === "done" ? (
+              <CheckIcon />
+            ) : state === "error" ? (
+              <CopyErrorIcon />
+            ) : (
+              <span data-slot="idle-icon">
+                <CopyIcon />
+              </span>
+            )
           }
-          when={copied()}
-        >
-          <CheckIcon />
-        </Show>
+        />
       </button>
     </section>
   );

@@ -4,6 +4,46 @@
 
 @source ".";
 
+.home-hero-pill:hover .home-hero-pill-arrow {
+  transform: translateX(2px);
+}
+
+.copy-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+
+.copy-feedback-icon {
+  display: inline-flex;
+  grid-area: 1 / 1;
+}
+
+.copy-feedback-icon[data-copy-phase="exit"] {
+  position: absolute;
+}
+
+.site-menu {
+  position: absolute;
+  inset: 100% 0 auto;
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+  transition:
+    height 200ms ease,
+    opacity 200ms ease;
+}
+
+.site-menu[data-open="true"] {
+  height: var(--site-menu-height, 96px);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-menu {
+    transition-duration: 1ms;
+  }
+}
+
 /*
  * The fumadocs `prose` plugin reads these tokens. They follow the site theme,
  * as upstream's fumadocs-ui/css/shadcn.css maps them.

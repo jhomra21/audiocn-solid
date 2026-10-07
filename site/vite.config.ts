@@ -51,6 +51,12 @@ export default defineConfig(({ mode }) => {
       },
       solid({
         extensions: [".jsx", ".tsx", ".mdx"],
+        // Refresh prevents client constant folding while SSR still folds it,
+        // leaving the home count's hydration marker absent from server HTML.
+        refresh: { disabled: true },
+        // Spread attribute getters run before children only during SSR, so
+        // their conditional memos shift Kobalte tooltip descendant keys.
+        solid: { wrapConditionals: false },
         ssr: true,
         start: true,
       }),

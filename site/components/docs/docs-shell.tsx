@@ -64,8 +64,14 @@ const NAV_LINK_CLASS =
 const NAV_SEPARATOR_CLASS =
   "mt-6 mb-1 inline-flex items-center gap-2 px-2 first:mt-0";
 
+let sidebarScrollTop: number | undefined;
+
 const revealCurrentLink = (viewport: HTMLDivElement) => {
   onSettled(() => {
+    if (sidebarScrollTop !== undefined) {
+      viewport.scrollTop = sidebarScrollTop;
+    }
+
     const current = viewport.querySelector("[aria-current=page]");
 
     if (!current) {
@@ -75,9 +81,10 @@ const revealCurrentLink = (viewport: HTMLDivElement) => {
     const link = current.getBoundingClientRect();
     const container = viewport.getBoundingClientRect();
 
-    if (link.top < container.top || link.bottom > container.bottom) {
-      viewport.scrollTop +=
-        link.top - container.top - (container.height - link.height) / 2;
+    if (link.top < container.top) {
+      viewport.scrollTop += link.top - container.top;
+    } else if (link.bottom > container.bottom) {
+      viewport.scrollTop += link.bottom - container.bottom;
     }
   });
 };
@@ -369,6 +376,20 @@ export const DocsShell = (props: DocsShellProps) => {
   let sidebar: HTMLElement | undefined;
   let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 
+  onCleanup(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const viewport = document.querySelector<HTMLDivElement>(
+      "#nd-sidebar [data-docs-navigation-viewport]"
+    );
+
+    if (viewport) {
+      sidebarScrollTop = viewport.scrollTop;
+    }
+  });
+
   onCleanup(() => clearTimeout(leaveTimer));
 
   const toggleCollapsed = () => {
@@ -557,6 +578,7 @@ export const DocsShell = (props: DocsShellProps) => {
             </div>
             <div
               class="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto overscroll-contain mask-[linear-gradient(to_bottom,transparent,white_12px,white_calc(100%-12px),transparent)] p-4"
+              data-docs-navigation-viewport
               ref={revealCurrentLink}
             >
               <DocsNavigation currentPath={props.currentPath} />
