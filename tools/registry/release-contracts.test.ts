@@ -47,7 +47,7 @@ test("the root release command delegates to the site", async () => {
     await readFile(join(root, "package.json"), "utf8")
   );
 
-  expect(scripts["build:release"]).toBe("bun run --cwd site build:release");
+  expect(scripts["build:web"]).toBe("bun run --cwd site build:release");
 });
 
 test("installation documents manual Solid setup, not React init", async () => {

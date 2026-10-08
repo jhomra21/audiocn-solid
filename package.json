@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:release": "bun run --cwd site build:release",
+    "build:web": "bun run --cwd site build:release",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "format": "oxfmt",

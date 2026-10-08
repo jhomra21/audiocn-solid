@@ -88,7 +88,7 @@ Build with the exact staging origin so canonical links, AI prompts, social metad
 
 ```sh
 VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
-  bun run build:release
+  bun run build:web
 bunx wrangler deploy
 ```
 
@@ -104,9 +104,9 @@ AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
 
 The hosted site check requires an HTTPS origin only (no path, query, fragment, or credentials). It checks all 57 sitemap routes, each route's canonical and social card, all 55 Markdown endpoints, the search payload format and 55-document count, all 130 registry item identities, the brand SVG, robots/LLM resources, and 404 behavior. Only HTML routes may redirect once to the same-origin route plus a trailing slash, matching `auto-trailing-slash`; resource redirects fail. Each request and response body has a 10-second timeout. It verifies HTTP delivery and metadata, not browser hydration, search document identities, or every script/CSS asset. The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
 
-For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and `SKIP_DEPENDENCY_INSTALL=1`, then use:
+For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and leave automatic dependency installation enabled (do not set `SKIP_DEPENDENCY_INSTALL`), then use:
 
-- Build command: `bun install --frozen-lockfile && bun run build:release`
+- Build command: `bun run build:web`
 - Deploy command: `bunx wrangler deploy`
 - Build variable: `VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev`
 
