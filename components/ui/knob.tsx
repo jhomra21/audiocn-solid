@@ -11,7 +11,10 @@ import {
 
 import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
-import { getSharedAudioContext } from "@/hooks/use-audio-context";
+import {
+  getSharedAudioContext,
+  requestPlaybackAudioSession,
+} from "@/hooks/use-audio-context";
 import { clamp } from "@/lib/audio/decibels";
 import { linearTaper, logTaper } from "@/lib/audio/taper";
 import type { Taper } from "@/lib/audio/types";
@@ -418,8 +421,12 @@ const clickBuffer = (context: BaseAudioContext): AudioBuffer => {
 };
 
 const resumeContext = async (context: AudioContext): Promise<void> => {
+  requestPlaybackAudioSession();
+
   try {
-    await context.resume();
+    if (context.state === "suspended" || context.state === "interrupted") {
+      await context.resume();
+    }
   } catch {
     // A later user gesture can try again.
   }
@@ -436,9 +443,7 @@ const playClick = (): void => {
 
   lastClickAt = now;
 
-  if (context.state === "suspended") {
-    void resumeContext(context);
-  }
+  void resumeContext(context);
 
   const source = context.createBufferSource();
 

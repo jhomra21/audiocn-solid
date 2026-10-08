@@ -65,6 +65,8 @@ export const runAudioHooksSuite = (runtime: string) => {
     "ambient",
     "unsupported",
     "rejected",
+    "getter-rejected",
+    "type-getter-rejected",
   ]) {
     test(`selects playback audio session only from auto (${sessionType})`, async ({
       page,
@@ -75,11 +77,17 @@ export const runAudioHooksSuite = (runtime: string) => {
         let type = initialType === "rejected" ? "auto" : initialType;
         Object.defineProperty(navigator, "audioSession", {
           configurable: true,
-          value:
-            initialType === "unsupported"
+          get() {
+            if (initialType === "getter-rejected")
+              throw new Error("AudioSession getter rejected");
+
+            return initialType === "unsupported"
               ? undefined
               : {
                   get type() {
+                    if (initialType === "type-getter-rejected")
+                      throw new Error("AudioSession type getter rejected");
+
                     return type;
                   },
                   set type(value: string) {
@@ -89,7 +97,8 @@ export const runAudioHooksSuite = (runtime: string) => {
                       throw new Error("AudioSession type rejected");
                     type = value;
                   },
-                },
+                };
+          },
         });
         const NativeContext = window.AudioContext;
         window.AudioContext = class extends NativeContext {

@@ -9,47 +9,138 @@ declare global {
   }
 }
 
-test("requests playback before the first copy awaits the clipboard", async ({
+for (const surface of [
+  "brand",
+  "home-install",
+  "docs-install",
+  "code",
+  "anchor",
+] as const) {
+  test(`requests playback before the first ${surface} copy awaits the clipboard`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const events: string[] = [];
+
+      const audioSession = {
+        get type() {
+          return "auto";
+        },
+        set type(type: string) {
+          events.push(`session:${type}`);
+        },
+      };
+
+      Object.defineProperty(navigator, "audioSession", {
+        configurable: true,
+        value: audioSession,
+      });
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async () => {
+            events.push("clipboard");
+            Object.defineProperty(window, "__copyAudioEvents", {
+              value: events,
+            });
+          },
+        },
+      });
+    });
+    await page.goto(
+      surface === "brand" || surface === "home-install"
+        ? "/"
+        : "/docs/installation"
+    );
+    await page.waitForFunction(() => window._$HY?.done);
+
+    if (surface === "brand") {
+      await page.locator("[data-brand-assets-trigger]").first().focus();
+      await page.keyboard.press("Shift+F10");
+      await page.getByRole("menuitem", { name: "Copy logo as SVG" }).click();
+      await expect(page.getByRole("status")).toContainText("Copied as SVG");
+    } else {
+      const copy =
+        surface === "code"
+          ? page
+              .locator("figure")
+              .filter({ has: page.locator("pre") })
+              .first()
+              .getByRole("button")
+          : surface === "anchor"
+            ? page.locator("[data-docs-heading] button").first()
+            : page
+                .locator(
+                  '[data-docs-component="install-command"] button[aria-live="polite"]'
+                )
+                .first();
+
+      await copy.click();
+      await expect(copy).toHaveAccessibleName(/Copied/);
+    }
+
+    expect(await page.evaluate(() => window.__copyAudioEvents)).toEqual([
+      "session:playback",
+      "clipboard",
+    ]);
+  });
+}
+
+test("requests playback before read-error copy feedback without writing the clipboard", async ({
   page,
-}) => {
+}, info) => {
   await page.addInitScript(() => {
     const events: string[] = [];
-
-    const audioSession = {
-      get type() {
-        return "auto";
-      },
-      set type(type: string) {
-        events.push(`session:${type}`);
-      },
-    };
-
+    window.__copyAudioEvents = events;
+    let type = "auto";
     Object.defineProperty(navigator, "audioSession", {
       configurable: true,
-      value: audioSession,
-    });
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
       value: {
-        writeText: async () => {
-          events.push("clipboard");
-          Object.defineProperty(window, "__copyAudioEvents", { value: events });
+        get type() {
+          return type;
+        },
+        set type(next: string) {
+          events.push(`session:${next}:${navigator.userActivation.isActive}`);
+          type = next;
         },
       },
     });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => events.push("clipboard") },
+    });
+    const start = OscillatorNode.prototype.start;
+    OscillatorNode.prototype.start = function (when?: number) {
+      events.push(`sound:${type}`);
+      start.call(this, when);
+    };
   });
-  await page.goto("/");
+  await page.goto("/docs/installation");
   await page.waitForFunction(() => window._$HY?.done);
 
-  await page.locator("[data-brand-assets-trigger]").first().focus();
-  await page.keyboard.press("Shift+F10");
-  await page.getByRole("menuitem", { name: "Copy logo as SVG" }).click();
+  const code = page
+    .locator("figure")
+    .filter({ has: page.locator("pre") })
+    .first();
 
-  await expect(page.getByRole("status")).toContainText("Copied as SVG");
-  expect(await page.evaluate(() => window.__copyAudioEvents)).toEqual([
-    "session:playback",
-    "clipboard",
-  ]);
+  await code.locator('[role="region"]').evaluate((viewport) => {
+    viewport.querySelector = () => {
+      throw new Error("Copy source read failed");
+    };
+  });
+  await code.getByRole("button", { name: "Copy Text", exact: true }).click();
+  await expect(code.getByRole("button", { name: "Copy failed" })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.__copyAudioEvents))
+    .toContain("sound:playback");
+  const events = await page.evaluate(() => window.__copyAudioEvents);
+  expect(events[0]).toBe("session:playback:true");
+  expect(events).not.toContain("clipboard");
+  expect(events).toContain("sound:playback");
+  await info.attach("copy-read-error-native-calls", {
+    body: JSON.stringify(events),
+    contentType: "application/json",
+  });
 });
 
 test("brand copy reports success and clipboard failure in a viewport toast", async ({

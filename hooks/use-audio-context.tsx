@@ -42,19 +42,19 @@ type AudioSessionNavigator = Navigator & {
 
 /** Requests playback routing when available, without affecting native recovery. */
 export const requestPlaybackAudioSession = () => {
-  // SAFETY: This is the optional Web Audio Session extension to Navigator.
-  const session = (
-    typeof navigator === "undefined"
-      ? undefined
-      : (navigator as AudioSessionNavigator)
-  )?.audioSession;
+  try {
+    // SAFETY: This is the optional Web Audio Session extension to Navigator.
+    const session = (
+      typeof navigator === "undefined"
+        ? undefined
+        : (navigator as AudioSessionNavigator)
+    )?.audioSession;
 
-  if (session?.type === "auto") {
-    try {
+    if (session?.type === "auto") {
       session.type = "playback";
-    } catch {
-      // AudioSession is optional; still attempt native context recovery.
     }
+  } catch {
+    // AudioSession is optional; still attempt native context recovery.
   }
 };
 

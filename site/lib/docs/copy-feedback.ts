@@ -56,6 +56,7 @@ export const createCopyFeedback = (read: () => string | undefined) => {
     try {
       text = read();
     } catch {
+      requestPlaybackAudioSession();
       fail();
 
       return;

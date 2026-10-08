@@ -10,6 +10,8 @@ interface AudioProbe {
   plays: { active: boolean; error: string | null }[];
   outputs: GainNode[];
   speakerOutputs: Set<AudioNode>;
+  session: { type: string; requests: { type: string; active: boolean }[] };
+  starts: { type: string; active: boolean }[];
 }
 
 declare global {
@@ -27,9 +29,27 @@ test.beforeEach(async ({ page }) => {
       plays: [],
       outputs: [],
       speakerOutputs: new Set(),
+      session: { type: "auto", requests: [] },
+      starts: [],
     };
 
     window.safariAudioProbe = probe;
+    // Emulate the optional category API, not native audio or the iPhone ringer.
+    Object.defineProperty(navigator, "audioSession", {
+      configurable: true,
+      value: {
+        get type() {
+          return probe.session.type;
+        },
+        set type(type: string) {
+          probe.session.requests.push({
+            type,
+            active: navigator.userActivation.isActive,
+          });
+          probe.session.type = type;
+        },
+      },
+    });
     const NativeContext = window.AudioContext;
     window.AudioContext = class extends NativeContext {
       constructor(options?: AudioContextOptions) {
@@ -63,6 +83,15 @@ test.beforeEach(async ({ page }) => {
         const createSource = this.createBufferSource.bind(this);
         this.createBufferSource = () => {
           const source = createSource();
+          const start = source.start.bind(source);
+          source.start = () => {
+            probe.starts.push({
+              type: probe.session.type,
+              active: navigator.userActivation.isActive,
+            });
+            start();
+          };
+
           const connect = source.connect.bind(source);
           // SAFETY: useSound connects this source to one AudioNode, not an AudioParam.
           source.connect = ((destination: AudioNode) => {
@@ -122,6 +151,8 @@ test.afterEach(async ({ page }, info) => {
           })),
           resumes: probe.resumes,
           plays: probe.plays,
+          session: probe.session,
+          starts: probe.starts,
         };
       }),
       null,
@@ -133,6 +164,99 @@ test.afterEach(async ({ page }, info) => {
     body: await page.screenshot(),
     contentType: "image/png",
   });
+});
+
+for (const route of [
+  "/docs/components/sound-pad",
+  "/docs/blocks/soundboard",
+  "/docs/blocks/system-audio-mixer",
+]) {
+  test(`${route} routes its loaded sound to playback on first touch`, async ({
+    page,
+  }) => {
+    await page.goto(route);
+    await page.waitForFunction(() => window._$HY?.done);
+    const airhorn = page.getByRole("button", { name: /Airhorn/ }).first();
+
+    if (route.endsWith("system-audio-mixer")) {
+      const trigger = page
+        .getByRole("button", { name: "Sound pads", exact: true })
+        .first();
+
+      await expect(trigger).toBeEnabled();
+      await trigger.tap();
+    }
+
+    await expect(airhorn).toBeEnabled();
+    await airhorn.tap();
+    await expect
+      .poll(() => page.evaluate(() => window.safariAudioProbe.starts))
+      .toContainEqual({
+        type: "playback",
+        active: true,
+      });
+    expect(
+      await page.evaluate(() => window.safariAudioProbe.session.requests)
+    ).toEqual([{ type: "playback", active: true }]);
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          window.safariAudioProbe.contexts.some(
+            (context) => context.state === "running" && context.currentTime > 0
+          )
+        )
+      )
+      .toBe(true);
+  });
+}
+
+test("the native mixer music graph starts on first touch without capture permissions", async ({
+  page,
+}) => {
+  await page.goto("/docs/blocks/system-audio-mixer");
+  await page.waitForFunction(() => window._$HY?.done);
+
+  const play = page
+    .getByRole("button", { name: "Play music", exact: true })
+    .first();
+
+  await expect(play).toBeEnabled();
+  await play.tap();
+  await expect(
+    page.getByRole("button", { name: "Pause music", exact: true }).first()
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.safariAudioProbe.media.some((audio) => audio.currentTime > 0.1)
+      )
+    )
+    .toBe(true);
+  expect(
+    await page.evaluate(() => window.safariAudioProbe.plays)
+  ).toContainEqual({ active: true, error: null });
+  expect(
+    await page.evaluate(() => window.safariAudioProbe.session.requests)
+  ).toEqual([{ type: "playback", active: true }]);
+});
+
+test("the standalone documentation knob routes native clicks on its first keyboard gesture", async ({
+  page,
+}) => {
+  await page.goto("/docs/components/knob");
+  await page.waitForFunction(() => window._$HY?.done);
+  const dial = page.getByRole("slider", { name: "Volume", exact: true });
+  await dial.press("ArrowUp");
+  await dial.press("ArrowUp");
+  await expect
+    .poll(() => page.evaluate(() => window.safariAudioProbe.starts))
+    .toContainEqual({
+      type: "playback",
+      active: true,
+    });
+  expect(
+    await page.evaluate(() => window.safariAudioProbe.session.requests)
+  ).toEqual([{ type: "playback", active: true }]);
 });
 
 for (const name of ["Music player", "Audio player"]) {

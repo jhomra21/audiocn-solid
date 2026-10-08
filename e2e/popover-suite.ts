@@ -3,6 +3,30 @@ import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 export const runPopoverSuite = (runtime: string) => {
+  test.describe("native popover touch", () => {
+    test.use({ hasTouch: true });
+    test("volume popover opens once on a native touch and closes on a second touch", async ({
+      page,
+    }, info) => {
+      await page.goto("/popover");
+      const trigger = page.getByRole("button", { name: "Volume", exact: true });
+      await trigger.tap();
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await trigger.tap();
+      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await info.attach("native-popover-touch", {
+        body: JSON.stringify({
+          runtime,
+          openedOnce: true,
+          closedOnSecondTouch: true,
+        }),
+        contentType: "application/json",
+      });
+    });
+  });
+
   test("volume popover supports keyboard, mute restore, outside dismissal and focus return", async ({
     page,
   }, info) => {

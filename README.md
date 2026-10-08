@@ -169,6 +169,14 @@ Solid 1 and Solid 2 have different effect and context-provider contracts. The sm
 
 See `AGENTS.md` for the engineering rules and reference codebases.
 
+### Mobile playback routing
+
+The shared Web Audio hooks and standalone knob click sounds request `navigator.audioSession.type = "playback"` from a user gesture when the current type is `auto`. Suspended and Safari-interrupted contexts resume in that same gesture. The site's audible copy feedback requests playback before awaiting the clipboard, including source-read failures. Plain `useAudioPlayer` media elements retain their native playback behavior; media routed through an analyser or mixer also uses the shared context.
+
+This is an intentional Safari compatibility improvement over upstream. The optional session API affects the whole page; explicitly selected categories such as `ambient` and `play-and-record` are preserved. Unsupported or rejecting browsers retain native behavior, and older iOS versions may still require Silent Mode off. Passive meters, visualizers, synthetic frame sources, and offline demo rendering do not produce speaker audio. Microphone and screen capture still need browser support and permission; playback routing does not enable unsupported iOS screen capture.
+
+Browser acceptance checks gesture timing, category selection, native playback, and interrupted-context recovery. Desktop WebKit and emulated category APIs do not prove iPhone ringer or speaker behavior. Physical iPhone verification must cover the desired surfaces with Silent Mode on and off and audible media volume; the user's successful phone observation is not an all-surface certification.
+
 ## License
 
 MIT. Portions are adapted from audiocn/ui; see `license.md`. The Warcraft clip used by the docs is a site-only, non-MIT asset and is not included in consumer registry items.
