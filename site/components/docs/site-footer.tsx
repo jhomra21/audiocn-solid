@@ -4,8 +4,17 @@ const FOOTER_LINK_CLASS =
 export const SiteFooter = () => (
   <footer>
     <div class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:px-6 sm:text-left">
-      <p class="text-muted-foreground text-sm">
-        Built by{" "}
+      <p class="text-muted-foreground min-w-0 text-sm">
+        Solid port by{" "}
+        <a
+          class="underline underline-offset-4"
+          href="https://github.com/jhomra21"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          jhomra21
+        </a>
+        . Original AudioCN by{" "}
         <a
           class="underline underline-offset-4"
           href="https://x.com/fortysevenfx"
@@ -22,8 +31,8 @@ export const SiteFooter = () => (
           target="_blank"
         >
           orcdev
-        </a>{" "}
-        with <span aria-hidden="true">🪓🪓</span>
+        </a>
+        .
       </p>
       <nav
         aria-label="Secondary"

@@ -1,6 +1,9 @@
 import { Show, createSignal, onCleanup } from "solid-js";
 
-import { AudioContextProvider } from "@/hooks/use-audio-context";
+import {
+  AudioContextProvider,
+  useAudioContext,
+} from "@/hooks/use-audio-context";
 import { useAudioDevices } from "@/hooks/use-audio-devices";
 import { useGainNode } from "@/hooks/use-gain-node";
 import { useLevel } from "@/hooks/use-level";
@@ -14,6 +17,7 @@ interface HookProbeProps {
 }
 
 const HookProbe = (props: HookProbeProps) => {
+  const audio = useAudioContext();
   const [subscriptions, setSubscriptions] = createSignal(0);
   const listeners = new Set<(frame: MeterFrame) => void>();
   const [enabled, setEnabled] = createSignal(true);
@@ -166,6 +170,8 @@ const HookProbe = (props: HookProbeProps) => {
 
   return (
     <section>
+      <output data-testid="context-status">{audio.status}</output>
+      <button onClick={() => void audio.resume()}>Resume context</button>
       <output data-testid="subscriptions">{subscriptions()}</output>
       <output data-testid="level">
         {level.peakDb}/{level.rmsDb}/{level.zone}

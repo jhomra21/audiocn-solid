@@ -37,7 +37,7 @@ const GESTURE_EVENTS = ["pointerdown", "keydown", "touchend"] as const;
 export interface UseAudioContextResult {
   readonly context: AudioContext | null;
   readonly status: AudioContextStatus;
-  /** Resumes a suspended context. Call it from a user gesture. */
+  /** Resumes a suspended or interrupted context. Call it from a user gesture. */
   resume: () => Promise<void>;
 }
 
@@ -65,12 +65,8 @@ export const useAudioContext = (): UseAudioContextResult => {
       const readStatus = () => setStatus(current.state);
 
       const resumeOnGesture = async () => {
-        if (current.state !== "suspended") {
-          return;
-        }
-
         try {
-          await current.resume();
+          await resume();
         } catch {
           // The next gesture tries again.
         }
@@ -93,15 +89,22 @@ export const useAudioContext = (): UseAudioContextResult => {
     }
   );
 
+  // Safari uses "interrupted" after backgrounding or losing audio hardware.
+  // Invoke native resume synchronously, before yielding the user gesture.
+  const resume = async () => {
+    if (
+      context &&
+      (context.state === "suspended" || context.state === "interrupted")
+    ) {
+      await context.resume();
+    }
+  };
+
   return {
     get context() {
       return context;
     },
-    async resume() {
-      if (context && context.state === "suspended") {
-        await context.resume();
-      }
-    },
+    resume,
     get status() {
       return status();
     },

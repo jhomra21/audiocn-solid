@@ -3,6 +3,12 @@ import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+import {
+  installInterruptionProbe,
+  interruptContext,
+  resumeCalls,
+} from "./audio-hooks-suite";
+
 const tone = (seconds = 3) => {
   const rate = 8000;
   const samples = rate * seconds;
@@ -40,6 +46,44 @@ const audioRoutes = async (page: Page) => {
 };
 
 export const runPlaybackSuite = (runtime: string) => {
+  test("decoded playback resumes an interrupted native context directly in the play gesture", async ({
+    page,
+  }, info) => {
+    await installInterruptionProbe(page);
+    await audioRoutes(page);
+    await page.goto("/playback?decoded=1");
+    await expect(page.getByTestId("sound-loaded")).toHaveText("true");
+    await page.getByRole("heading").click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => window.interruptionProbe.contexts[0]?.state)
+      )
+      .toBe("running");
+    await interruptContext(page);
+    await page.evaluate(() => {
+      // Isolate useSound.play from the hook's document gesture listener.
+      window.addEventListener(
+        "pointerdown",
+        (event) => event.stopPropagation(),
+        { capture: true, once: true }
+      );
+    });
+    await page.getByRole("button", { name: "Play sound", exact: true }).click();
+    await expect
+      .poll(async () =>
+        Number(await page.getByTestId("sound-progress").textContent())
+      )
+      .toBeGreaterThan(0);
+
+    const calls = await resumeCalls(page);
+
+    expect(calls).toEqual([{ state: "interrupted", active: true }]);
+    await info.attach("native-resume-calls", {
+      body: JSON.stringify(calls),
+      contentType: "application/json",
+    });
+  });
+
   test("owned media playback mirrors events, smooth time, reactive options and disposal", async ({
     page,
   }, info) => {

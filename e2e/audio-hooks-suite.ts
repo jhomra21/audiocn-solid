@@ -1,8 +1,108 @@
 import { mkdir } from "node:fs/promises";
 
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+declare global {
+  interface Window {
+    interruptionProbe: {
+      contexts: AudioContext[];
+      calls: { state: string; active: boolean }[];
+    };
+  }
+}
+
+/**
+ * Safari exposes "interrupted" after backgrounding. Keep a real, suspended
+ * native context underneath that state, and record when native resume is called.
+ * This verifies recovery, not the host's speakers or iPhone interruption policy.
+ */
+export const installInterruptionProbe = (page: Page) =>
+  page.addInitScript(() => {
+    const NativeContext = window.AudioContext;
+    const contexts: AudioContext[] = [];
+    const calls: { state: string; active: boolean }[] = [];
+    Object.assign(window, { interruptionProbe: { contexts, calls } });
+    window.AudioContext = class extends NativeContext {
+      constructor(options?: AudioContextOptions) {
+        super(options);
+        contexts.push(this);
+        const resume = this.resume.bind(this);
+        this.resume = () => {
+          calls.push({
+            state: this.state,
+            active: navigator.userActivation.isActive,
+          });
+          Reflect.deleteProperty(this, "state");
+
+          return resume();
+        };
+      }
+    };
+  });
+
+export const interruptContext = (page: Page) =>
+  page.evaluate(async () => {
+    const probe = window.interruptionProbe;
+    const context = probe.contexts[0]!;
+    await context.suspend();
+    Object.defineProperty(context, "state", {
+      configurable: true,
+      value: "interrupted",
+    });
+    probe.calls.length = 0;
+    context.dispatchEvent(new Event("statechange"));
+  });
+
+export const resumeCalls = (page: Page) =>
+  page.evaluate(() => window.interruptionProbe.calls);
 
 export const runAudioHooksSuite = (runtime: string) => {
+  for (const explicit of [false, true]) {
+    test(`resumes Safari interrupted contexts ${explicit ? "from the public resume control" : "on the next gesture"}`, async ({
+      page,
+    }, info) => {
+      await installInterruptionProbe(page);
+      await page.goto("/audio-hooks");
+      await expect(page.getByTestId("context-status")).toBeVisible();
+      await page.getByRole("heading").click();
+      await expect(page.getByTestId("context-status")).toHaveText("running");
+      await interruptContext(page);
+      await expect(page.getByTestId("context-status")).toHaveText(
+        "interrupted"
+      );
+
+      if (explicit)
+        await page.evaluate(() =>
+          window.addEventListener(
+            "pointerdown",
+            (event) => event.stopPropagation(),
+            { capture: true, once: true }
+          )
+        );
+
+      await page
+        .getByRole("button", {
+          name: explicit ? "Resume context" : "Emit frame",
+          exact: true,
+        })
+        .click();
+      await expect(page.getByTestId("context-status")).toHaveText("running");
+      const calls = await resumeCalls(page);
+      expect(calls[0]).toEqual({ state: "interrupted", active: true });
+      expect(calls.every((call) => call.active)).toBe(true);
+      await info.attach("native-resume-calls", {
+        body: JSON.stringify(calls),
+        contentType: "application/json",
+      });
+
+      await page.getByRole("button", { name: "Remove hooks" }).click();
+      await interruptContext(page);
+      await page.getByRole("heading").click();
+      expect(await resumeCalls(page)).toEqual([]);
+    });
+  }
+
   test("samples levels reactively and releases subscriptions", async ({
     page,
   }, info) => {
