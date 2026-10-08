@@ -5,6 +5,7 @@ import type { Page } from "@playwright/test";
 
 declare global {
   interface Window {
+    audioSessionCalls: string[];
     interruptionProbe: {
       contexts: AudioContext[];
       calls: { state: string; active: boolean }[];
@@ -58,6 +59,108 @@ export const resumeCalls = (page: Page) =>
   page.evaluate(() => window.interruptionProbe.calls);
 
 export const runAudioHooksSuite = (runtime: string) => {
+  for (const sessionType of [
+    "auto",
+    "play-and-record",
+    "ambient",
+    "unsupported",
+    "rejected",
+  ]) {
+    test(`selects playback audio session only from auto (${sessionType})`, async ({
+      page,
+    }) => {
+      await page.addInitScript((initialType) => {
+        const calls: string[] = [];
+        Object.assign(window, { audioSessionCalls: calls });
+        let type = initialType === "rejected" ? "auto" : initialType;
+        Object.defineProperty(navigator, "audioSession", {
+          configurable: true,
+          value:
+            initialType === "unsupported"
+              ? undefined
+              : {
+                  get type() {
+                    return type;
+                  },
+                  set type(value: string) {
+                    calls.push(`type:${value}`);
+
+                    if (initialType === "rejected")
+                      throw new Error("AudioSession type rejected");
+                    type = value;
+                  },
+                },
+        });
+        const NativeContext = window.AudioContext;
+        window.AudioContext = class extends NativeContext {
+          resume() {
+            calls.push("resume");
+
+            return super.resume();
+          }
+        };
+      }, sessionType);
+      await page.goto("/audio-hooks");
+      await page.getByRole("heading").click();
+      await expect(page.getByTestId("context-status")).toHaveText("running");
+      await expect
+        .poll(() => page.evaluate(() => window.audioSessionCalls))
+        .toContain("resume");
+
+      const calls = await page.evaluate(() => window.audioSessionCalls);
+
+      if (sessionType === "auto" || sessionType === "rejected") {
+        expect(calls.indexOf("type:playback")).toBeGreaterThanOrEqual(0);
+        expect(calls.indexOf("type:playback")).toBeLessThan(
+          calls.indexOf("resume")
+        );
+      } else {
+        expect(calls).not.toContain("type:playback");
+        expect(calls).toContain("resume");
+      }
+    });
+  }
+
+  for (const state of ["running", "closed"] as const) {
+    test(`selects playback only for a nonclosed context (${state}) without native resume`, async ({
+      page,
+    }) => {
+      await installInterruptionProbe(page);
+      await page.goto("/audio-hooks");
+      await page.getByRole("heading").click();
+      await expect(page.getByTestId("context-status")).toHaveText("running");
+
+      if (state === "closed")
+        await page.evaluate(() =>
+          window.interruptionProbe.contexts[0]!.close()
+        );
+      await expect(page.getByTestId("context-status")).toHaveText(state);
+      await page.evaluate(() => {
+        const calls: string[] = [];
+        Object.assign(window, { audioSessionCalls: calls });
+        window.interruptionProbe.calls.length = 0;
+        let type = "auto";
+        Object.defineProperty(navigator, "audioSession", {
+          configurable: true,
+          value: {
+            get type() {
+              return type;
+            },
+            set type(value: string) {
+              calls.push(`type:${value}`);
+              type = value;
+            },
+          },
+        });
+      });
+      await page.getByRole("heading").click();
+      expect(await page.evaluate(() => window.audioSessionCalls)).toEqual(
+        state === "running" ? ["type:playback"] : []
+      );
+      expect(await resumeCalls(page)).toEqual([]);
+    });
+  }
+
   for (const explicit of [false, true]) {
     test(`resumes Safari interrupted contexts ${explicit ? "from the public resume control" : "on the next gesture"}`, async ({
       page,

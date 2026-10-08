@@ -34,10 +34,16 @@ export const AudioContextProvider = (props: AudioContextProviderProps) =>
 
 const GESTURE_EVENTS = ["pointerdown", "keydown", "touchend"] as const;
 
+type AudioSessionNavigator = Navigator & {
+  audioSession?: {
+    type: string;
+  };
+};
+
 export interface UseAudioContextResult {
   readonly context: AudioContext | null;
   readonly status: AudioContextStatus;
-  /** Resumes a suspended or interrupted context. Call it from a user gesture. */
+  /** Selects playback and resumes suspended or interrupted audio. Call from a user gesture. */
   resume: () => Promise<void>;
 }
 
@@ -90,12 +96,27 @@ export const useAudioContext = (): UseAudioContextResult => {
   );
 
   // Safari uses "interrupted" after backgrounding or losing audio hardware.
-  // Invoke native resume synchronously, before yielding the user gesture.
+  // A running context can still be silent in the default ambient session.
   const resume = async () => {
-    if (
-      context &&
-      (context.state === "suspended" || context.state === "interrupted")
-    ) {
+    if (!context || context.state === "closed") return;
+
+    // SAFETY: This is the optional Web Audio Session extension to Navigator.
+    const session = (
+      typeof navigator === "undefined"
+        ? undefined
+        : (navigator as AudioSessionNavigator)
+    )?.audioSession;
+
+    if (session?.type === "auto") {
+      try {
+        session.type = "playback";
+      } catch {
+        // AudioSession is optional; still attempt native context recovery.
+      }
+    }
+
+    // Invoke native resume synchronously, before yielding the user gesture.
+    if (context.state === "suspended" || context.state === "interrupted") {
       await context.resume();
     }
   };
