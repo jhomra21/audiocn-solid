@@ -50,6 +50,11 @@ test("the root release command delegates to the site", async () => {
   expect(scripts["build:web"]).toBe("bun run --cwd site build:release");
 });
 
+test("Cloudflare branch previews are enabled in the static Worker config", async () => {
+  const configuration = await readFile(join(root, "wrangler.jsonc"), "utf8");
+  expect(configuration).toMatch(/"previews"\s*:\s*\{\s*\}/u);
+});
+
 test("installation documents manual Solid setup, not React init", async () => {
   const instructions = await readFile(
     join(root, "site/content/docs/installation.mdx"),
