@@ -1,6 +1,9 @@
 import { DropdownMenu } from "@kobalte/core/dropdown-menu";
-import { createSignal } from "solid-js";
+import * as Toast from "@kobalte/core/toast";
+import { Portal } from "@solidjs/web";
+import { createUniqueId, onCleanup } from "solid-js";
 
+import { CheckCircleIcon } from "@/components/icons/phosphor";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CopyFeedback } from "@/site/components/docs/copy-feedback";
 import { DocsIcon } from "@/site/components/docs/phosphor-icons";
@@ -88,12 +91,46 @@ export interface PageActionsProps {
 }
 
 export const PageActions = (props: PageActionsProps) => {
-  const [message, setMessage] = createSignal("");
+  const regionId = createUniqueId();
+  const notifications = new Set<number>();
   let successMessage = "Copied";
+  onCleanup(() => {
+    for (const id of notifications) Toast.toaster.dismiss(id);
+  });
+
+  const notify = (message: string, error = false) => {
+    const id = Toast.toaster.show(
+      (toast) => {
+        onCleanup(() => notifications.delete(toast.toastId));
+
+        return (
+          <Toast.Root
+            toastId={toast.toastId}
+            class="bg-popover text-popover-foreground flex items-center gap-1.5 rounded-(--radius) border p-4 text-[13px] [overflow-wrap:anywhere] shadow-[0_4px_12px_rgb(0_0_0/0.1)] outline-none"
+            data-copy-notification={error ? "error" : "success"}
+          >
+            <span class="mr-1 -ml-[3px] flex size-4 shrink-0 items-center [&_svg]:-ml-px [&_svg]:size-4">
+              {error ? (
+                <DocsIcon name="XCircle" />
+              ) : (
+                <CheckCircleIcon aria-hidden="true" />
+              )}
+            </span>
+            <Toast.Title class="text-[13px] leading-[1.5] font-medium">
+              {message}
+            </Toast.Title>
+          </Toast.Root>
+        );
+      },
+      { region: regionId }
+    );
+
+    notifications.add(id);
+  };
 
   const [state, copy] = createCopyFeedback(() => fetchText(props.markdownUrl), {
-    onCopySuccess: () => setMessage(successMessage),
-    onCopyError: () => setMessage("Could not copy to clipboard"),
+    onCopySuccess: () => notify(successMessage),
+    onCopyError: () => notify("Could not copy to clipboard", true),
   });
 
   const run = async (success: string, read: () => string | Promise<string>) => {
@@ -228,16 +265,27 @@ export const PageActions = (props: PageActionsProps) => {
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
-      <span
-        role="status"
-        class={
-          message()
-            ? "bg-popover text-popover-foreground fixed right-4 bottom-4 z-100 rounded-lg border px-4 py-3 text-sm shadow-md"
-            : "sr-only"
-        }
-      >
-        {message()}
-      </span>
+      <Portal>
+        <Toast.Region
+          regionId={regionId}
+          aria-label="Notifications"
+          duration={4000}
+          limit={3}
+          pauseOnInteraction
+          pauseOnPageIdle
+          swipeDirection="right"
+          class="fixed right-6 bottom-6 z-[999999999] w-[356px] outline-none max-[600px]:right-4 max-[600px]:bottom-4 max-[600px]:w-[calc(100%-2rem)]"
+          style={{
+            "font-family":
+              "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji",
+          }}
+        >
+          <Toast.List
+            data-copy-notifications
+            class="m-0 list-none p-0 outline-none"
+          />
+        </Toast.Region>
+      </Portal>
     </div>
   );
 };

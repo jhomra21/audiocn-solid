@@ -1,3 +1,4 @@
+import { cva } from "class-variance-authority";
 import {
   Show,
   createContext,
@@ -176,6 +177,19 @@ export interface TabsListProps extends Omit<DivDOMProps, "onKeyDown"> {
   onKeyDown?: (event: KeyboardEvent) => void;
 }
 
+export const tabsListVariants = cva(
+  "group/tabs-list text-muted-foreground inline-flex w-fit items-center justify-center rounded-2xl p-[3px] group-data-[orientation=horizontal]/tabs:h-8 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col group-data-[orientation=vertical]/tabs:p-1 data-[variant=line]:rounded-none",
+  {
+    defaultVariants: { variant: "default" },
+    variants: {
+      variant: {
+        default: "bg-muted",
+        line: "gap-1 bg-transparent",
+      },
+    },
+  }
+);
+
 export const TabsList = (props: TabsListProps) => {
   const context = useTabs();
   const variant = () => props.variant ?? "default";
@@ -242,8 +256,7 @@ export const TabsList = (props: TabsListProps) => {
       data-slot="tabs-list"
       data-variant={variant()}
       class={cn(
-        "group/tabs-list text-muted-foreground inline-flex w-fit items-center justify-center rounded-2xl p-[3px] group-data-[orientation=horizontal]/tabs:h-8 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col group-data-[orientation=vertical]/tabs:p-1 data-[variant=line]:rounded-none",
-        props.variant === "line" ? "gap-1 bg-transparent" : "bg-muted",
+        tabsListVariants({ variant: variant() }),
         props.class,
         props.className
       )}

@@ -1,3 +1,4 @@
+import * as SelectPrimitive from "@kobalte/core/select";
 import { createSignal } from "solid-js";
 
 import { ClipIndicator } from "@/components/ui/clip-indicator";
@@ -5,6 +6,19 @@ import type {
   ClipIndicatorActions,
   ClipIndicatorClickEvent,
 } from "@/components/ui/clip-indicator";
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuCheckboxItem,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from "@/components/ui/context-menu";
 import { DbReadout } from "@/components/ui/db-readout";
 import { DbScale, DbScaleTick } from "@/components/ui/db-scale";
 import {
@@ -16,6 +30,16 @@ import {
   LevelMeterTrack,
   LevelMeterValue,
 } from "@/components/ui/level-meter";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+  SelectLabel,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+} from "@/components/ui/select";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { createFrameEmitter } from "@/lib/audio/frame-source";
 import type { MeterFrame } from "@/lib/audio/types";
@@ -79,6 +103,69 @@ const PreventedClip = () => {
       >
         Report
       </button>
+    </section>
+  );
+};
+
+export const SupportContractApp = () => {
+  const [checked, setChecked] = createSignal(false);
+  const [route, setRoute] = createSignal("mono");
+
+  const options = Array.from(
+    { length: 30 },
+    (_, index) => `Device ${index + 1}`
+  );
+
+  return (
+    <section class="grid gap-4 p-6" data-contract="support-compounds">
+      <ContextMenu>
+        <ContextMenuTrigger as="button" data-testid="support-menu-trigger">
+          Routing menu
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuCheckboxItem checked={checked()} onChange={setChecked}>
+            Monitor
+          </ContextMenuCheckboxItem>
+          <ContextMenuCheckboxItem disabled>
+            Unavailable
+          </ContextMenuCheckboxItem>
+          <ContextMenuItem>
+            Reset <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>Routing</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuRadioGroup value={route()} onValueChange={setRoute}>
+                <ContextMenuRadioItem value="mono">Mono</ContextMenuRadioItem>
+                <ContextMenuRadioItem value="stereo">
+                  Stereo
+                </ContextMenuRadioItem>
+              </ContextMenuRadioGroup>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        </ContextMenuContent>
+      </ContextMenu>
+      <Select
+        options={options}
+        defaultValue={options[0]}
+        itemComponent={(props) => (
+          <SelectItem item={props.item}>
+            <SelectPrimitive.ItemLabel>
+              {props.item.rawValue}
+            </SelectPrimitive.ItemLabel>
+          </SelectItem>
+        )}
+      >
+        <SelectTrigger aria-label="Support select">
+          <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectLabel>Devices</SelectLabel>
+          <SelectScrollUpButton />
+          <SelectPrimitive.Listbox class="max-h-40!" />
+          <SelectScrollDownButton />
+        </SelectContent>
+      </Select>
     </section>
   );
 };

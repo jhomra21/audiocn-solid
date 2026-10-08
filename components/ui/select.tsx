@@ -4,11 +4,15 @@ import type {
   SelectContentOptions,
   SelectTriggerCommonProps,
 } from "@kobalte/core/select";
-import { children, createSignal } from "solid-js";
+import { children, createSignal, onCleanup } from "solid-js";
 
 import { createCompatEffect } from "@/lib/solid/effect";
 import type { ButtonDOMProps, DivDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
+import { setRefValue } from "@/lib/solid/ref";
+import type { RefTarget } from "@/lib/solid/ref";
+import { mergeStyleVars } from "@/lib/solid/style";
+import type { StyleValue } from "@/lib/solid/style";
 import { cn } from "@/lib/utils";
 
 export const Select = SelectPrimitive.Root;
@@ -18,6 +22,163 @@ export const SelectItem = SelectPrimitive.Item;
 export const SelectGroup = SelectPrimitive.Section;
 
 export const SelectValue = SelectPrimitive.Value;
+
+export const SelectLabel = (
+  props: Parameters<typeof SelectPrimitive.Section>[0] & { className?: string }
+) => (
+  <SelectPrimitive.Section
+    data-slot="select-label"
+    class={cn(
+      "text-muted-foreground px-2 py-1 text-xs",
+      props.class,
+      props.className
+    )}
+    {...omitProps(props, ["class", "className"])}
+  />
+);
+
+export const SelectSeparator = (
+  props: DivDOMProps & { className?: string }
+) => (
+  <div
+    role="separator"
+    data-slot="select-separator"
+    class={cn(
+      "bg-border pointer-events-none -mx-1 my-1 h-px",
+      props.class,
+      props.className
+    )}
+    {...omitProps(props, ["class", "className"])}
+  />
+);
+
+type SelectScrollButtonProps = Omit<
+  DivDOMProps,
+  | "ref"
+  | "style"
+  | "onPointerEnter"
+  | "onPointerLeave"
+  | "onPointerDown"
+  | "onPointerUp"
+  | "onPointerCancel"
+> & {
+  className?: string;
+  ref?: RefTarget<HTMLDivElement>;
+  style?: StyleValue;
+};
+
+// Kobalte scrolls its listbox rather than the popup and has no arrow primitive.
+const SelectScrollButton = (
+  props: SelectScrollButtonProps & { direction: "up" | "down" }
+) => {
+  const select = SelectPrimitive.useSelectContext();
+  const [element, setElement] = createSignal<HTMLDivElement>();
+  const [visible, setVisible] = createSignal(false);
+  let listbox: HTMLElement | undefined;
+  let timer: ReturnType<typeof setInterval> | undefined;
+  const stop = () => clearInterval(timer);
+
+  const scroll = () =>
+    listbox?.scrollBy(0, props.direction === "up" ? -24 : 24);
+
+  const start = () => {
+    stop();
+    scroll();
+    timer = setInterval(scroll, 50);
+  };
+
+  onCleanup(stop);
+
+  createCompatEffect(
+    () => ({ element: element(), open: select.isOpen() }),
+    ({ element, open }) => {
+      if (!element || !open) return;
+      listbox =
+        element.parentElement?.querySelector<HTMLElement>('[role="listbox"]') ??
+        undefined;
+
+      if (!listbox) return;
+      const target = listbox;
+
+      const update = () => {
+        const remaining =
+          target.scrollHeight - target.clientHeight - target.scrollTop;
+
+        setVisible(
+          props.direction === "up" ? target.scrollTop > 1 : remaining > 1
+        );
+      };
+
+      const observer = new ResizeObserver(update);
+      observer.observe(target);
+      target.addEventListener("scroll", update);
+      update();
+
+      return () => {
+        stop();
+        observer.disconnect();
+        target.removeEventListener("scroll", update);
+        listbox = undefined;
+      };
+    }
+  );
+
+  return (
+    <div
+      aria-hidden="true"
+      data-slot={`select-scroll-${props.direction}-button`}
+      hidden={!visible()}
+      class={cn(
+        "bg-popover absolute z-10 w-full cursor-default items-center justify-center py-1 [&_svg]:size-4",
+        props.direction === "up" ? "top-0" : "bottom-0",
+        props.class,
+        props.className
+      )}
+      style={mergeStyleVars(props.style, {
+        display: visible() ? "flex" : "none",
+      })}
+      ref={(node) => {
+        setElement(node);
+        setRefValue(props.ref, node);
+      }}
+      onPointerEnter={start}
+      onPointerLeave={stop}
+      onPointerDown={(event: PointerEvent) => {
+        event.preventDefault();
+        start();
+      }}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      {...omitProps(props, [
+        "class",
+        "className",
+        "children",
+        "direction",
+        "ref",
+        "style",
+      ])}
+    >
+      <svg fill="currentColor" viewBox="0 0 256 256">
+        {/* Regular Phosphor Carets, MIT © Phosphor Icons. */}
+        <path
+          d={
+            props.direction === "up"
+              ? "M213.66,165.66a8,8,0,0,1-11.32,0L128,91.31,53.66,165.66a8,8,0,0,1-11.32-11.32l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,213.66,165.66Z"
+              : "M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"
+          }
+        />
+      </svg>
+    </div>
+  );
+};
+
+export const SelectScrollUpButton = (props: SelectScrollButtonProps) => (
+  <SelectScrollButton {...props} direction="up" />
+);
+
+export const SelectScrollDownButton = (props: SelectScrollButtonProps) => (
+  <SelectScrollButton {...props} direction="down" />
+);
 
 export interface SelectTriggerProps
   extends
@@ -132,8 +293,8 @@ export const SelectContent = (props: SelectContentProps) => {
           ref={(element: HTMLDivElement) => {
             setContent(element);
 
-            // Solid compiles writable DOM refs into callbacks; runtime callers
-            // can still supply the node form in its public JSX ref union.
+            // Preserve the public JSX ref union: Solid compiles writable node
+            // refs into callbacks, while direct runtime callers can pass a node.
             // oxlint-disable-next-line anti-slop/no-runtime-typeof
             if (typeof props.ref === "function") props.ref(element);
           }}

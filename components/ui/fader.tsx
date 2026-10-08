@@ -197,10 +197,13 @@ export const FaderTrack = (props: FaderTrackProps) => {
     >
       <SliderPrimitive.Track
         class={cn(
-          "bg-input/90 relative grow rounded-full",
+          // Kobalte owns pointer capture on Track, not the outer Control.
+          // Expand its pseudo-element to the same hit region without changing
+          // the track bounds used to map pointer positions to dB.
+          "bg-input/90 relative grow rounded-full before:absolute",
           horizontal()
-            ? "h-(--fader-track-size) w-full"
-            : "h-full w-(--fader-track-size)",
+            ? "h-(--fader-track-size) w-full before:-inset-x-[calc(var(--fader-thumb-size)/2)] before:inset-y-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2-0.375rem)] pointer-coarse:before:inset-y-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2-0.75rem)]"
+            : "h-full w-(--fader-track-size) before:inset-x-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2-0.375rem)] before:-inset-y-[calc(var(--fader-thumb-size)/2)] pointer-coarse:before:inset-x-[calc((var(--fader-track-size)-var(--fader-thumb-size))/2-0.75rem)]",
           props.class,
           props.className
         )}

@@ -3,6 +3,201 @@ import type { Locator } from "@playwright/test";
 
 const referenceURL = process.env.AUDIOCN_REACT_BASELINE;
 
+test("repeated AI notifications match React collapsed and hovered stack geometry", async ({
+  browser,
+  page,
+}, info) => {
+  test.skip(!referenceURL, "Requires the pinned React production renderer.");
+  const reference = await browser.newPage();
+  const captures = [];
+
+  for (const current of [reference, page]) {
+    await current.emulateMedia({ reducedMotion: "reduce" });
+    await current.addInitScript(() =>
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: { write: async () => {}, writeText: async () => {} },
+      })
+    );
+    await current.goto(
+      `${current === reference ? referenceURL : ""}/docs/components/bar-visualizer`
+    );
+    await current.evaluate(() => document.fonts.ready);
+    await current.clock.install();
+
+    for (let i = 0; i < 3; i += 1) {
+      await current
+        .getByRole("button", { name: "More actions for AI agents" })
+        .click();
+      await current
+        .getByRole("menuitem", { name: "Copy install command" })
+        .click();
+    }
+
+    const toasts = current.locator(
+      current === reference ? "[data-sonner-toast]" : "[data-copy-notification]"
+    );
+
+    await expect(toasts).toHaveCount(3);
+
+    const measure = () =>
+      toasts.evaluateAll((nodes) =>
+        nodes
+          .map((node) => {
+            const rect = node.getBoundingClientRect();
+
+            return {
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+              opacity: getComputedStyle(node.firstElementChild!).opacity,
+            };
+          })
+          .sort((a, b) => b.y - a.y)
+      );
+
+    const collapsed = await measure();
+
+    const front = await toasts.evaluateAll((nodes) => {
+      const rects = nodes
+        .map((node) => node.getBoundingClientRect())
+        .sort((a, b) => b.bottom - a.bottom);
+
+      return {
+        x: rects[0].x + rects[0].width / 2,
+        y: rects[0].y + rects[0].height / 2,
+      };
+    });
+
+    await current.mouse.move(front.x, front.y);
+    await current.clock.runFor(500);
+    const expanded = await measure();
+    captures.push({ collapsed, expanded });
+  }
+
+  expect(captures[1]).toEqual(captures[0]);
+  await info.attach("ai-toast-paired-stack.json", {
+    body: JSON.stringify(captures, null, 2),
+    contentType: "application/json",
+  });
+  await reference.close();
+});
+
+test("AI toast stable pixels and material match pinned React for success and error", async ({
+  browser,
+  page,
+}, info) => {
+  test.skip(!referenceURL, "Requires the pinned React production renderer.");
+  const reference = await browser.newPage();
+  const evidence = [];
+
+  for (const width of [390, 1280]) {
+    for (const theme of ["light", "dark"] as const) {
+      for (const result of ["success", "error"]) {
+        const captures = [];
+
+        for (const current of [reference, page]) {
+          await current.setViewportSize({ width, height: 844 });
+          await current.emulateMedia({
+            colorScheme: theme,
+            reducedMotion: "reduce",
+          });
+          await current.addInitScript(
+            ({ theme, result }) => {
+              localStorage.setItem("theme", theme);
+              Object.defineProperty(navigator, "clipboard", {
+                configurable: true,
+                value: {
+                  write: async () => {
+                    if (result === "error") throw new Error("Denied");
+                  },
+                  writeText: async () => {
+                    if (result === "error") throw new Error("Denied");
+                  },
+                },
+              });
+            },
+            { theme, result }
+          );
+          await current.goto(
+            `${current === reference ? referenceURL : ""}/docs/components/bar-visualizer`
+          );
+          await current.evaluate(() => document.fonts.ready);
+          await current
+            .getByRole("button", { name: "Copy prompt for AI", exact: true })
+            .click();
+
+          const toast = current.locator(
+            current === reference
+              ? "[data-sonner-toast]"
+              : "[data-copy-notification]"
+          );
+
+          await expect(toast).toHaveText(
+            result === "success"
+              ? "Prompt for Bar Visualizer copied"
+              : "Could not copy to clipboard"
+          );
+
+          const material = await toast.evaluate((node) => {
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+
+            return {
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+              style: Object.fromEntries(
+                [
+                  "font-family",
+                  "font-size",
+                  "line-height",
+                  "border-radius",
+                  "border-color",
+                  "background-color",
+                  "color",
+                  "gap",
+                  "padding",
+                ].map((name) => [name, style.getPropertyValue(name)])
+              ),
+            };
+          });
+
+          const icon = await glyph(toast.locator("svg"));
+          const screenshot = await toast.screenshot({ animations: "disabled" });
+          await info.attach(
+            `ai-toast-${width}-${theme}-${result}-${current === reference ? "react" : "solid"}.png`,
+            { body: screenshot, contentType: "image/png" }
+          );
+          captures.push({ material, icon, screenshot });
+        }
+
+        expect(captures[1].material).toEqual(captures[0].material);
+        expect(captures[1].icon).toEqual(captures[0].icon);
+        expect(
+          captures[1].screenshot.equals(captures[0].screenshot),
+          `${width}px ${theme} ${result} stable toast pixels`
+        ).toBe(true);
+        evidence.push({
+          width,
+          theme,
+          result,
+          material: captures[0].material,
+          icon: captures[0].icon,
+          pixelsEqual: true,
+        });
+      }
+    }
+  }
+
+  await info.attach("ai-toast-paired-states.json", {
+    body: JSON.stringify(evidence, null, 2),
+    contentType: "application/json",
+  });
+  await reference.close();
+});
+
 const glyph = (icon: Locator) =>
   icon.evaluate((svg) => {
     const style = getComputedStyle(svg);
