@@ -42,6 +42,14 @@ test("the site build generates the registry before Vite", async () => {
   );
 });
 
+test("the root release command delegates to the site", async () => {
+  const { scripts } = JSON.parse(
+    await readFile(join(root, "package.json"), "utf8")
+  );
+
+  expect(scripts["build:release"]).toBe("bun run --cwd site build:release");
+});
+
 test("installation documents manual Solid setup, not React init", async () => {
   const instructions = await readFile(
     join(root, "site/content/docs/installation.mdx"),

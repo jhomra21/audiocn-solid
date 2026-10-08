@@ -88,8 +88,8 @@ Build with the exact staging origin so canonical links, AI prompts, social metad
 
 ```sh
 VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
-  bun run --cwd site build:release
-bunx --bun wrangler@4.148.0 deploy
+  bun run build:release
+bunx wrangler deploy
 ```
 
 After deployment, verify the public site and both registries:
@@ -106,8 +106,8 @@ The hosted site check requires an HTTPS origin only (no path, query, fragment, o
 
 For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and `SKIP_DEPENDENCY_INSTALL=1`, then use:
 
-- Build command: `bun install --frozen-lockfile && bun run --cwd site build:release`
-- Deploy command: `bunx --bun wrangler@4.148.0 deploy`
+- Build command: `bun install --frozen-lockfile && bun run build:release`
+- Deploy command: `bunx wrangler deploy`
 - Build variable: `VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev`
 
 The Cloudflare Worker must be named `audiocn-solid` to match `wrangler.jsonc`. If this is the account's first Worker and the `workers.dev` subdomain is not known yet, create the Worker once, copy its assigned URL, set `VITE_AUDIOCN_SITE_URL`, and redeploy the same commit before running the hosted checks.

@@ -80,6 +80,8 @@ Follow the exact dashboard and command settings in the README.
 
 The Cloudflare Worker name must be `audiocn-solid` so it matches `wrangler.jsonc`. Build with the real assigned `workers.dev` origin in `VITE_AUDIOCN_SITE_URL`, then deploy `site/dist/client`.
 
+From the repository root, use `bun run build:release` to build the site and `bunx wrangler deploy` to deploy it. Wrangler is not pinned in this repository.
+
 After deployment, run:
 
 ```sh
