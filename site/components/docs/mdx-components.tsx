@@ -211,6 +211,8 @@ export const MdxP = (props: ComponentProps<"p">) => <p {...props} />;
 const COPY_BUTTON_CLASS =
   "hover:text-accent-foreground data-copied:text-accent-foreground focus-visible:ring-ring inline-flex items-center justify-center rounded-md p-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none [&_svg]:size-4";
 
+const INSTALL_COPY_BUTTON_CLASS = `${COPY_BUTTON_CLASS} [&_svg:not([class*='size-'])]:size-3.5`;
+
 interface PreProps extends ComponentProps<"pre"> {
   /** Set from a fence's `title="…"` by the shiki options in lib/docs/code-highlight. */
   "data-title"?: string;
@@ -727,7 +729,7 @@ const InstallTabs = (props: InstallCommandProps) => {
               : "Copy install command"
         }
         aria-live="polite"
-        class={`${COPY_BUTTON_CLASS} absolute top-2 right-2 size-6`}
+        class={`${INSTALL_COPY_BUTTON_CLASS} absolute top-2 right-2 size-6`}
         onClick={() => void copy()}
         type="button"
       >

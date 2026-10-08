@@ -4,8 +4,9 @@ import type {
   SelectContentOptions,
   SelectTriggerCommonProps,
 } from "@kobalte/core/select";
-import { children } from "solid-js";
+import { children, createSignal } from "solid-js";
 
+import { createCompatEffect } from "@/lib/solid/effect";
 import type { ButtonDOMProps, DivDOMProps } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
 import { cn } from "@/lib/utils";
@@ -78,19 +79,73 @@ export interface SelectContentProps
 }
 
 export const SelectContent = (props: SelectContentProps) => {
-  const rest = omitProps(props, ["class", "className"]);
+  const rest = omitProps(props, ["class", "className", "ref"]);
+  const [content, setContent] = createSignal<HTMLDivElement>();
+  const select = SelectPrimitive.useSelectContext();
+
+  createCompatEffect(
+    () => (select.isOpen() ? content() : undefined),
+    (element) => {
+      if (!element) return;
+
+      // Floating UI constrains the popup after Kobalte's initial option focus.
+      // Once that size settles, reveal the focused option in the listbox again.
+      const observer = new ResizeObserver(() => {
+        const focused = element.querySelector<HTMLElement>(
+          '[role="option"][data-highlighted]'
+        );
+
+        if (focused) {
+          const listbox = focused.closest<HTMLElement>('[role="listbox"]');
+
+          if (!listbox) return;
+          const itemRect = focused.getBoundingClientRect();
+          const listRect = listbox.getBoundingClientRect();
+
+          if (itemRect.top < listRect.top) {
+            listbox.scrollTop += itemRect.top - listRect.top;
+          } else if (itemRect.bottom > listRect.bottom) {
+            listbox.scrollTop += itemRect.bottom - listRect.bottom;
+          }
+        }
+      });
+
+      observer.observe(element);
+
+      return () => observer.disconnect();
+    }
+  );
 
   return (
     <SelectPrimitive.Portal>
-      <SelectPrimitive.Content
-        class={cn(
-          "bg-popover text-popover-foreground ring-foreground/5 z-50 min-w-(--kb-popper-anchor-width) overflow-hidden rounded-xl p-1 shadow-lg ring-1 outline-none",
-          props.class,
-          props.className
-        )}
-        data-slot="select-content"
-        {...rest}
-      />
+      {/* Keep even the initially unpositioned popper out of document scrolling.
+          Kobalte still owns option focus and scrolls the bounded content. */}
+      <div
+        style={{
+          position: "fixed",
+          inset: "0",
+          "pointer-events": "none",
+          "z-index": "50",
+        }}
+      >
+        <SelectPrimitive.Content
+          class={cn(
+            "bg-popover text-popover-foreground ring-foreground/5 pointer-events-auto z-50 min-w-(--kb-popper-anchor-width) overflow-hidden rounded-xl p-1 shadow-lg ring-1 outline-none [&_[role=listbox]]:max-h-[calc(var(--kb-popper-content-available-height)-0.5rem)] [&_[role=listbox]]:overflow-y-auto",
+            props.class,
+            props.className
+          )}
+          ref={(element: HTMLDivElement) => {
+            setContent(element);
+
+            // Solid compiles writable DOM refs into callbacks; runtime callers
+            // can still supply the node form in its public JSX ref union.
+            // oxlint-disable-next-line anti-slop/no-runtime-typeof
+            if (typeof props.ref === "function") props.ref(element);
+          }}
+          data-slot="select-content"
+          {...rest}
+        />
+      </div>
     </SelectPrimitive.Portal>
   );
 };
