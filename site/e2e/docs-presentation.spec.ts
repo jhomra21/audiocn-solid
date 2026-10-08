@@ -596,6 +596,10 @@ test("demo meters follow gain, mute, solo and the master mix", async ({
 
   for (const button of await mixer.locator('[data-slot="mute-toggle"]').all())
     await button.click();
+  // Both ports pause offscreen painters; observe the master before its pixels.
+  await mixer
+    .getByRole("meter", { name: "Master level", exact: true })
+    .scrollIntoViewIfNeeded();
   await expect
     .poll(() =>
       mixer

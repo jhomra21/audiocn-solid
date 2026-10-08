@@ -22,7 +22,13 @@ const playHaptic = (state: Exclude<CopyFeedbackState, "idle">) => {
   }
 };
 
-export const createCopyFeedback = (read: () => string | undefined) => {
+export const createCopyFeedback = (
+  read: () => string | Promise<string> | undefined,
+  options: {
+    onCopySuccess?: () => void;
+    onCopyError?: () => void;
+  } = {}
+) => {
   const [state, setState] = createSignal<CopyFeedbackState>("idle");
   let timer: ReturnType<typeof setTimeout> | undefined;
   let request = 0;
@@ -47,15 +53,17 @@ export const createCopyFeedback = (read: () => string | undefined) => {
     }
 
     playHaptic("error");
+    options.onCopyError?.();
     reset();
   };
 
-  const copy = async () => {
-    let text: string | undefined;
+  const copy = async (source = read) => {
+    let text: string | Promise<string> | undefined;
 
     try {
-      text = read();
+      text = source();
     } catch {
+      request += 1;
       requestPlaybackAudioSession();
       fail();
 
@@ -69,7 +77,26 @@ export const createCopyFeedback = (read: () => string | undefined) => {
     requestPlaybackAudioSession();
 
     try {
-      await navigator.clipboard.writeText(text);
+      // The clipboard source contract supports text or an asynchronous fetch.
+      // oxlint-disable-next-line anti-slop/no-runtime-typeof
+      if (typeof text === "string") {
+        await navigator.clipboard.writeText(text);
+      } else if (
+        typeof ClipboardItem !== "undefined" &&
+        // Safari's asynchronous clipboard writer is an optional capability.
+        // oxlint-disable-next-line anti-slop/no-runtime-typeof
+        typeof navigator.clipboard?.write === "function"
+      ) {
+        const blob = text.then(
+          (value) => new Blob([value], { type: "text/plain" })
+        );
+
+        await navigator.clipboard.write([
+          new ClipboardItem({ "text/plain": blob }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(await text);
+      }
     } catch {
       if (currentRequest !== request) return;
 
@@ -89,6 +116,7 @@ export const createCopyFeedback = (read: () => string | undefined) => {
     }
 
     playHaptic("done");
+    options.onCopySuccess?.();
     reset();
   };
 

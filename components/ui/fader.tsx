@@ -190,8 +190,8 @@ export const FaderTrack = (props: FaderTrackProps) => {
       class={cn(
         "relative flex min-h-0 min-w-0 items-center",
         horizontal()
-          ? "h-(--fader-thumb-size) w-full"
-          : "h-full w-(--fader-thumb-size) flex-col"
+          ? "h-(--fader-thumb-size) w-full px-[calc(var(--fader-thumb-size)/2)]"
+          : "h-full w-(--fader-thumb-size) flex-col py-[calc(var(--fader-thumb-size)/2)]"
       )}
       data-slot="fader-control"
     >

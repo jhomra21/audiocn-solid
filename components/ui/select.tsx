@@ -39,16 +39,11 @@ export const SelectTrigger = (props: SelectTriggerProps) => {
       <SelectPrimitive.Icon aria-hidden="true">
         <svg
           class="text-muted-foreground size-4 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+          fill="currentColor"
+          viewBox="0 0 256 256"
         >
-          <path
-            d="m6 9 6 6 6-6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+          {/* Regular Phosphor CaretDown, MIT © Phosphor Icons. */}
+          <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z" />
         </svg>
       </SelectPrimitive.Icon>
     </>
@@ -130,7 +125,7 @@ export const SelectContent = (props: SelectContentProps) => {
       >
         <SelectPrimitive.Content
           class={cn(
-            "bg-popover text-popover-foreground ring-foreground/5 pointer-events-auto z-50 min-w-(--kb-popper-anchor-width) overflow-hidden rounded-xl p-1 shadow-lg ring-1 outline-none [&_[role=listbox]]:max-h-[calc(var(--kb-popper-content-available-height)-0.5rem)] [&_[role=listbox]]:overflow-y-auto",
+            "bg-popover/70 text-popover-foreground ring-foreground/5 dark:ring-foreground/10 pointer-events-auto relative isolate z-50 min-w-(--kb-popper-anchor-width) overflow-hidden rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150 [&_[role=listbox]]:max-h-[calc(var(--kb-popper-content-available-height)-0.5rem)] [&_[role=listbox]]:overflow-y-auto",
             props.class,
             props.className
           )}

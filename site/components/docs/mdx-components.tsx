@@ -112,10 +112,10 @@ import {
   CheckIcon,
   ChevronDownIcon,
   ClipboardIcon,
-  CopyIcon,
   InfoIcon,
   LinkIcon,
 } from "@/site/components/docs/icons";
+import { DocsIcon } from "@/site/components/docs/phosphor-icons";
 import { NotYetPorted } from "@/site/components/home/not-yet-ported";
 import { createCopyFeedback } from "@/site/lib/docs/copy-feedback";
 
@@ -737,13 +737,11 @@ const InstallTabs = (props: InstallCommandProps) => {
           state={copyState}
           renderIcon={(state) =>
             state === "done" ? (
-              <CheckIcon />
+              <DocsIcon data-slot="done-icon" name="Check" />
             ) : state === "error" ? (
-              <CopyErrorIcon />
+              <DocsIcon data-slot="error-icon" name="XCircle" />
             ) : (
-              <span data-slot="idle-icon">
-                <CopyIcon />
-              </span>
+              <DocsIcon data-slot="idle-icon" name="Copy" />
             )
           }
         />

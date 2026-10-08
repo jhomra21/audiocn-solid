@@ -8,6 +8,7 @@ export default defineConfig({
   root: fileURLToPath(new URL("./app/solid2", import.meta.url)),
   plugins: [solid(), tailwindcss()],
   resolve: {
+    dedupe: ["solid-js", "@solidjs/web"],
     alias: {
       "@kobalte/core/primitives/create-dom-collection": fileURLToPath(
         new URL(

@@ -1340,7 +1340,7 @@ export const KnobCap = (props: KnobCapProps) => {
 
   const variant = () => props.variant ?? "default";
 
-  const id = `knob${createUniqueId().replaceAll(/[^\\w-]/gu, "")}`;
+  const id = `knob${createUniqueId().replaceAll(/[^\w-]/gu, "")}`;
 
   const angle = () => angleFor(context.position(), context.arc());
 
