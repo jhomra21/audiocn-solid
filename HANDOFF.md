@@ -26,14 +26,14 @@ Keep public components in `components/ui`, blocks in `components/blocks`, exampl
 
 The frozen dependency lanes are:
 
-- root Solid `1.9.15`
+- root Solid `1.9.15` (manifest range `^1.9.15`)
 - site Solid and web `2.0.0-rc.13`
 - Solid Vite plugin `3.0.0-next.47`
 - Kobalte `0.13.14` for Solid 1
 - Kobalte `2.0.0-alpha.2` for Solid 2
-- site Vite `8.3.2`
+- root Vite `7.3.6` and site Vite `8.3.2` (manifest ranges `^7.3.6` and `^8.0.0`)
 
-Solid 2 and Kobalte 2 remain prerelease dependencies.
+These are lockfile resolutions; use `bun install --frozen-lockfile` for reproducible validation. Solid 2 and Kobalte 2 remain prerelease dependencies.
 
 ## Local validation
 
@@ -45,19 +45,26 @@ bun run format:check
 bun run lint
 bun run check
 bun run test:unit
-bun run test:e2e
-
 cd site
 bun run typecheck
 bun run test:unit
 bun run build:release
 bunx playwright test --config playwright.home-routing.config.ts
 bunx playwright test --config playwright.release.config.ts
+cd ..
+
+bun run registry:validate-shadcn
+bun run registry:build
+bun run registry:test-install
+bun run registry:test-contracts
+bun run registry:test-release
 ```
+
+The CI workflow additionally runs both runtime browser suites and the isolated registry install suite. Run Solid 2 acceptance in an owned checkout/worktree: its package swap changes `node_modules` and must not race with root Solid 1 development or checks. Use the frozen install before applying the pinned Solid 2 package override; do not swap and restore packages in a shared working checkout.
 
 The production preview suite owns port `4180`. The isolated site runner owns port `4400`. The dedicated home-audio routing suite owns port `4398`.
 
-Run `bun run registry:test-contracts` for the registry contracts. Run `bun run registry:test-release` for a clean frozen release build. Run `bun run registry:spike:3` for all 65 isolated item installs under both runtimes.
+Run `bun run registry:test-contracts` after the real isolated installs above. Keep the generated consumer fixtures while rerunning contracts; reports pointing to deleted fixtures must be regenerated. Run `bun run registry:test-release` for a clean frozen release build. Run `bun run registry:spike:3` for those installs plus all installed-control and block acceptance checks.
 
 Live upstream presentation parity is separate from the staging release gate. To rerun it, provide a checkout or export of upstream `content/docs` at the pinned revision and run:
 
@@ -83,7 +90,7 @@ AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
   bun run registry:test-install
 ```
 
-The first command checks site routes, sitemap, robots, LLM resources, Markdown MIME headers, both registry inventories, the Mixer dependency, and HTTP 404 behavior. The second command creates fresh Solid 1 and Solid 2 consumers and installs every registry item through the public HTTPS endpoint before typechecking and building each install.
+The first command requires an HTTPS origin and checks all 57 sitemap routes and their canonical/social cards, all 55 Markdown endpoints and MIME headers, the search payload format and 55-document count, robots/LLM resources, both 65-item registry inventories and item identities, the Mixer dependency, the brand SVG, and HTTP 404 behavior. It permits one expected same-origin trailing-slash redirect for HTML routes only and bounds requests and response bodies to 10 seconds. This is an HTTP/static release check, not a browser-hydration check or proof of search document identities or every script/CSS asset. The second command creates fresh Solid 1 and Solid 2 consumers and installs every registry item through the public HTTPS endpoint before typechecking and building each install.
 
 ## shadcn Registry Directory
 
@@ -97,7 +104,7 @@ https://<worker-host>/r/solid1/{name}.json
 
 Solid 2 remains available through the explicit `/r/solid2/{name}.json` registry configured in the consumer's `components.json`.
 
-The README contains the exact `apps/v4/registry/directory.json` entry and validation steps for a shadcn/ui pull request.
+The README contains the exact `apps/v4/registry/directory.json` entry and validation steps for a shadcn/ui pull request. Staging is not publication: the hosted checks, final-commit CI, explicit release decision, and public directory submission remain separate gates. The unversioned registry URLs serve whichever source revision is currently deployed; downstream consumers own their copied source and review updates themselves.
 
 After shadcn merges that pull request, create a fresh Solid 1 app with no custom `@audiocn-solid` registry entry and verify that the directory resolves and installs at least `level-meter`, `mixer`, and `system-audio-mixer`. Typecheck, build, and run a browser smoke test against the installed components.
 

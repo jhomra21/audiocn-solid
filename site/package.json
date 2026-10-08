@@ -9,7 +9,7 @@
     "build:release": "bun run build && bun run scripts/check-release-routes.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test:unit": "bun test lib",
+    "test:unit": "bun test lib scripts/check-host.test.ts",
     "test:e2e": "playwright test",
     "test:routes": "playwright test e2e/routes.spec.ts",
     "parity": "playwright test e2e/parity/parity.spec.ts",

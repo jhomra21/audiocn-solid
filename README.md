@@ -38,7 +38,7 @@ The repository stays a single package until a subsystem has an independent runti
 Install and start the Solid 1 preview:
 
 ```sh
-bun install
+bun install --frozen-lockfile
 bun run dev
 ```
 
@@ -56,24 +56,25 @@ The browser suite checks the example gallery, live meter geometry and updates, f
 
 ## Solid 2 acceptance
 
-CI temporarily replaces the Solid 1 packages with the current Solid 2 prerelease and uses Solid 2's compiler and web runtime:
+The Solid 2 lane replaces the root project's installed Solid/Vite packages. Run it in an owned checkout or worktree, not in a checkout where another task or local dev server is using `node_modules`. This preserves the Solid 1 root install and avoids concurrent dependency races. The override below uses the same pinned prereleases as CI:
 
 ```sh
+git worktree add ../audiocn-solid-solid2 HEAD
+cd ../audiocn-solid-solid2
+bun install --frozen-lockfile
 bun add --no-save solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
 bunx tsc -p tsconfig.solid2.json --noEmit
 bunx playwright install chromium
 bun run test:e2e:solid2
 ```
 
-The Solid 2 screenshot is written to `test-results/solid2-artifacts/example-gallery.png`.
-
-Run `bun install` afterward to restore the repository's Solid 1 development dependencies.
+The worktree starts from committed `HEAD`, not uncommitted candidate edits. Validate the intended candidate revision there. The Solid 2 screenshot is written to `test-results/solid2-artifacts/example-gallery.png`. Remove the worktree only after preserving any needed artifacts and confirming it has no work you need; otherwise keep it for further testing. Do not use the root checkout for the Solid 2 package swap.
 
 ## Registry and site validation
 
 `bun run registry:validate-shadcn` runs the pinned shadcn CLI validator against the source registry. `bun run registry:spike:3` generates both registries, installs each of the 65 entries in its own fresh consumer project per runtime, typechecks every installed source file, builds each item, and exercises installed controls and blocks. Consumer setup executes the documented Solid bootstrap; item projects share Bun's download cache, never sources or `node_modules`. The report records all 130 file/dependency/license plans and excludes React packages. Reports and screenshots are written to `artifacts/`.
 
-Run `cd site && bun run typecheck && bun run build:release && bunx playwright test --config playwright.home-routing.config.ts && bunx playwright test --config playwright.release.config.ts` for production-site acceptance. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
+For a release candidate, run formatting, lint, root and site typechecks/builds/unit tests, then browser acceptance and registry release contracts. The CI workflow is the complete source-level gate; use a clean frozen install in an owned checkout before validating a candidate. For production-site acceptance, run `cd site && bun run typecheck && bun run test:unit && bun run build:release && bunx playwright test --config playwright.home-routing.config.ts && bunx playwright test --config playwright.release.config.ts`. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
 
 Every page has a committed 1200x630 social card in `site/public/og`, indexed by `site/lib/social-images.json`. `cd site && bun run og:build` regenerates them: it builds the site in `--mode social`, which adds the capture-only `/social-preview/:id` route, and captures each card in Chromium with a paused clock. `bun run og:build -- --verify` captures every card twice and fails on any byte difference. Edit `site/lib/social-catalog.ts` for card copy and `site/components/social/` for compositions. The build also refreshes the GitHub star count in `site/lib/github-stars.json` and keeps the committed count if GitHub is unreachable.
 
@@ -101,7 +102,7 @@ AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
   bun run registry:test-install
 ```
 
-The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
+The hosted site check requires an HTTPS origin only (no path, query, fragment, or credentials). It checks all 57 sitemap routes, each route's canonical and social card, all 55 Markdown endpoints, the search payload format and 55-document count, all 130 registry item identities, the brand SVG, robots/LLM resources, and 404 behavior. Only HTML routes may redirect once to the same-origin route plus a trailing slash, matching `auto-trailing-slash`; resource redirects fail. Each request and response body has a 10-second timeout. It verifies HTTP delivery and metadata, not browser hydration, search document identities, or every script/CSS asset. The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
 
 For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and `SKIP_DEPENDENCY_INSTALL=1`, then use:
 
@@ -137,11 +138,11 @@ Then open a pull request containing only the directory entry. After shadcn merge
 
 ## Source-registry release
 
-Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. `bun run registry:test-contracts` checks the release and isolated-install contracts.
+Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. Before `bun run registry:test-contracts`, run `bun run registry:build && bun run registry:test-install` to generate real isolated consumer fixtures and their report. Keep those temporary fixtures while rerunning the contracts; a stale report does not recreate deleted consumers.
 
 Consumers follow `site/content/docs/installation.mdx`: create a Solid Vite app, configure Tailwind and `components.json` manually, then use `shadcn@4.21.0 add @audiocn-solid/<name>` with the runtime-matched registry URL. The React-oriented shadcn initializer is not this port's bootstrap. Solid 1 is stable; Solid 2/Kobalte 2 remain the explicitly tested experimental lane.
 
-Before announcing a release, set `VITE_AUDIOCN_SITE_URL` to the real HTTPS origin, validate the final commit in remote CI, and tag that reviewed source revision. Build and deploy only `site/dist/client`; verify the actual host honors the generated Markdown `_headers`, returns `404.html` with status 404 for unknown URLs, and serves both registry JSON inventories. Test the documented bootstrap against that HTTPS origin in fresh consumer apps. The unversioned registry URLs represent the currently deployed source revision; consumers own copied code and must review later updates. No hosting/deployment or public release is implied by local acceptance.
+Before announcing a release, set `VITE_AUDIOCN_SITE_URL` to the real HTTPS origin, validate the final commit in remote CI, and tag that reviewed source revision. Build and deploy only `site/dist/client`; verify the actual host honors the generated Markdown `_headers`, returns `404.html` with status 404 for unknown URLs, and serves both registry JSON inventories. Test the documented bootstrap against that HTTPS origin in fresh consumer apps. The unversioned registry URLs represent the currently deployed source revision; consumers own copied code and must review later updates. Treat staging as a candidate, not a public release: publication/announcement follows the hosted checks and explicit release decision. No hosting/deployment or public release is implied by local acceptance.
 
 Parity checks keep exact presentation slots, example inventories, accessible control names, and layout measurements. Native ranges and ARIA sliders are compared as one interactive control, excluding hidden form duplicates. Solid-specific prose uses exact, route-scoped source adapters in `site/e2e/parity/content-adapters.json`; stale upstream text fails instead of silently expanding an exemption. Captures wait for synthesized audio and lazy tiles to finish loading.
 

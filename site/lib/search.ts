@@ -24,7 +24,9 @@ const isRawData = (value: unknown): value is RawData => {
   );
 };
 
-const isSearchIndexPayload = (value: unknown): value is SearchIndexPayload => {
+export const isSearchIndexPayload = (
+  value: unknown
+): value is SearchIndexPayload => {
   if (typeof value !== "object" || value === null) {
     return false;
   }

@@ -1,6 +1,7 @@
-const siteUrl = (
-  import.meta.env?.VITE_AUDIOCN_SITE_URL ?? "https://audiocn-solid.workers.dev"
-).replace(/\/+$/u, "");
+import { parseSiteOrigin } from "./site-url";
+
+const siteUrl =
+  import.meta.env?.VITE_AUDIOCN_SITE_URL ?? "https://audiocn-solid.workers.dev";
 
 export const siteConfig = {
   description:
@@ -9,5 +10,5 @@ export const siteConfig = {
   name: "audiocn Solid",
   registryNamespace: "@audiocn-solid",
   title: "audiocn Solid — Audio components for Solid",
-  url: siteUrl,
+  url: parseSiteOrigin(siteUrl),
 } as const;
