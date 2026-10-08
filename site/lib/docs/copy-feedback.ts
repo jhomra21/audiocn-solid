@@ -1,6 +1,8 @@
 import { createTiks } from "@rexa-developer/tiks";
 import { createSignal, onCleanup } from "solid-js";
 
+import { requestPlaybackAudioSession } from "@/hooks/use-audio-context";
+
 export type CopyFeedbackState = "idle" | "done" | "error";
 
 const COPIED_RESET_MS = 1500;
@@ -63,6 +65,7 @@ export const createCopyFeedback = (read: () => string | undefined) => {
 
     const currentRequest = ++request;
     clearTimeout(timer);
+    requestPlaybackAudioSession();
 
     try {
       await navigator.clipboard.writeText(text);

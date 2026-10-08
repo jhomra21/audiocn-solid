@@ -3,10 +3,54 @@ import { expect, test } from "@playwright/test";
 declare global {
   interface Window {
     __rejectFirstCopy: () => void;
+    __copyAudioEvents: string[];
     __tooltipTransitions: number;
     __viewTransitionCalls: number;
   }
 }
+
+test("requests playback before the first copy awaits the clipboard", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const events: string[] = [];
+
+    const audioSession = {
+      get type() {
+        return "auto";
+      },
+      set type(type: string) {
+        events.push(`session:${type}`);
+      },
+    };
+
+    Object.defineProperty(navigator, "audioSession", {
+      configurable: true,
+      value: audioSession,
+    });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          events.push("clipboard");
+          Object.defineProperty(window, "__copyAudioEvents", { value: events });
+        },
+      },
+    });
+  });
+  await page.goto("/");
+  await page.waitForFunction(() => window._$HY?.done);
+
+  await page.locator("[data-brand-assets-trigger]").first().focus();
+  await page.keyboard.press("Shift+F10");
+  await page.getByRole("menuitem", { name: "Copy logo as SVG" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Copied as SVG");
+  expect(await page.evaluate(() => window.__copyAudioEvents)).toEqual([
+    "session:playback",
+    "clipboard",
+  ]);
+});
 
 test("brand copy reports success and clipboard failure in a viewport toast", async ({
   page,

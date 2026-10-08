@@ -40,6 +40,24 @@ type AudioSessionNavigator = Navigator & {
   };
 };
 
+/** Requests playback routing when available, without affecting native recovery. */
+export const requestPlaybackAudioSession = () => {
+  // SAFETY: This is the optional Web Audio Session extension to Navigator.
+  const session = (
+    typeof navigator === "undefined"
+      ? undefined
+      : (navigator as AudioSessionNavigator)
+  )?.audioSession;
+
+  if (session?.type === "auto") {
+    try {
+      session.type = "playback";
+    } catch {
+      // AudioSession is optional; still attempt native context recovery.
+    }
+  }
+};
+
 export interface UseAudioContextResult {
   readonly context: AudioContext | null;
   readonly status: AudioContextStatus;
@@ -100,20 +118,7 @@ export const useAudioContext = (): UseAudioContextResult => {
   const resume = async () => {
     if (!context || context.state === "closed") return;
 
-    // SAFETY: This is the optional Web Audio Session extension to Navigator.
-    const session = (
-      typeof navigator === "undefined"
-        ? undefined
-        : (navigator as AudioSessionNavigator)
-    )?.audioSession;
-
-    if (session?.type === "auto") {
-      try {
-        session.type = "playback";
-      } catch {
-        // AudioSession is optional; still attempt native context recovery.
-      }
-    }
+    requestPlaybackAudioSession();
 
     // Invoke native resume synchronously, before yielding the user gesture.
     if (context.state === "suspended" || context.state === "interrupted") {
