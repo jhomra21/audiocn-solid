@@ -140,7 +140,7 @@ jobs:
         with:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile
-      - run: cd site && bunx playwright install --with-deps chromium
+      - run: cd site && bunx playwright install --with-deps chromium webkit
       - run: bun run site:spike:1
       - run: cd site && bun run spike:2
       - run: bun run site:spike:5
