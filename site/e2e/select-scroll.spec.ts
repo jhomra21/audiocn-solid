@@ -6,7 +6,11 @@ declare global {
   }
 }
 
-test.use({ ...devices["iPhone 13"], browserName: "webkit" });
+test.use({
+  ...devices["iPhone 13"],
+  browserName: "webkit",
+  launchOptions: {},
+});
 
 for (const path of ["/", "/docs/components/audio-device-select"]) {
   test(`select keeps its page anchor when opened at ${path}`, async ({

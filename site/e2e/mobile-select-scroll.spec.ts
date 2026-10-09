@@ -11,7 +11,9 @@ for (const browserName of ["webkit", "chromium"] as const) {
     playwright,
     baseURL,
   }, info) => {
-    const browser = await playwright[browserName].launch();
+    const browser = await playwright[browserName].launch({
+      args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+    });
 
     const context = await browser.newContext({
       ...playwright.devices["iPhone 13"],
