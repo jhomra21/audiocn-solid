@@ -273,6 +273,7 @@ const MobileSidebar = (props: { currentPath: string; onClose: () => void }) => {
           <button
             aria-expanded="true"
             aria-label="Close Sidebar"
+            autofocus
             class={`${ICON_BUTTON_CLASS} bg-secondary rounded-lg border`}
             onClick={props.onClose}
             ref={(node) => {
