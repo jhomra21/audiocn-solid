@@ -32,6 +32,24 @@ for (const browserName of ["webkit", "chromium"] as const) {
       await trigger.scrollIntoViewIfNeeded();
       await expect(trigger).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
+      await expect
+        .poll(
+          () =>
+            page.evaluate(
+              () =>
+                [
+                  ...document.querySelectorAll(
+                    '[data-slot="showcase-card"] [data-slot="skeleton"]'
+                  ),
+                ].filter((skeleton) => {
+                  const { bottom, top } = skeleton.getBoundingClientRect();
+
+                  return bottom >= -200 && top <= window.innerHeight + 200;
+                }).length
+            ),
+          { message: "nearby lazy showcase tiles finish loading" }
+        )
+        .toBe(0);
       await page.evaluate(() => window.scrollBy(0, -100));
 
       const cycles: unknown[] = [];
