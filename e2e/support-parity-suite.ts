@@ -3,6 +3,91 @@ import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
 export const runSupportParitySuite = (runtime: string) => {
+  for (const dark of [false, true]) {
+    test(`context menu descendant materials match upstream in ${dark ? "dark" : "light"} mode`, async ({
+      page,
+    }, info) => {
+      await page.goto("/support");
+
+      const colors = await page.evaluate((dark) => {
+        document.documentElement.classList.toggle("dark", dark);
+        const probe = document.createElement("div");
+        document.body.append(probe);
+        probe.style.backgroundColor =
+          "color-mix(in oklab, var(--foreground) 5%, transparent)";
+        const separator = getComputedStyle(probe).backgroundColor;
+        probe.style.backgroundColor =
+          "color-mix(in oklab, var(--foreground) 10%, transparent)";
+        const highlighted = getComputedStyle(probe).backgroundColor;
+        probe.style.color = "var(--accent-foreground)";
+        const text = getComputedStyle(probe).color;
+        probe.remove();
+
+        return { separator, highlighted, text };
+      }, dark);
+
+      await page.getByTestId("support-menu-trigger").click({ button: "right" });
+      const content = page.locator('[data-slot="context-menu-content"]');
+      await expect(
+        content.locator('[data-slot="context-menu-separator"]')
+      ).toHaveCSS("background-color", colors.separator);
+
+      const destructive = page.getByRole("menuitem", {
+        name: "Delete ⌘D",
+        exact: true,
+      });
+
+      await expect(destructive).toHaveCSS("color", colors.text);
+      await expect(
+        destructive.locator('[data-slot="context-menu-shortcut"]')
+      ).toHaveCSS("color", colors.text);
+      await destructive.focus();
+      await expect(destructive).toHaveCSS(
+        "background-color",
+        colors.highlighted
+      );
+      await page.getByRole("menuitem", { name: "Reset ⌘R" }).focus();
+      await expect(page.getByRole("menuitem", { name: "Reset ⌘R" })).toHaveCSS(
+        "background-color",
+        colors.highlighted
+      );
+      const sub = page.getByRole("menuitem", { name: "Routing" });
+      await sub.hover();
+      await sub.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(sub).toHaveAttribute("aria-expanded", "true");
+      await expect(sub).toHaveCSS("background-color", colors.highlighted);
+      const submenu = page.locator('[data-slot="context-menu-sub-content"]');
+      await expect(
+        submenu.locator('[data-slot="context-menu-separator"]')
+      ).toHaveCSS("background-color", colors.separator);
+
+      const deleteRoute = page.getByRole("menuitem", {
+        name: "Delete route ⌘D",
+      });
+
+      await expect(deleteRoute).toHaveCSS("color", colors.text);
+      await expect(
+        deleteRoute.locator('[data-slot="context-menu-shortcut"]')
+      ).toHaveCSS("color", colors.text);
+      await expect
+        .poll(() =>
+          submenu.evaluate((node) => node.contains(document.activeElement))
+        )
+        .toBe(true);
+      await deleteRoute.focus();
+      await expect(deleteRoute).toBeFocused();
+      await expect(deleteRoute).toHaveCSS(
+        "background-color",
+        colors.highlighted
+      );
+      await info.attach(`context-menu-materials-${runtime}-${dark}.png`, {
+        body: await page.screenshot(),
+        contentType: "image/png",
+      });
+    });
+  }
+
   test("context menu compound items toggle, skip disabled choices and navigate submenus", async ({
     page,
   }, info) => {

@@ -3,6 +3,32 @@ import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 export const runAudioDeviceSelectSuite = (runtime: string) => {
+  test("default device labels show Default exactly once", async ({
+    page,
+  }, info) => {
+    await page.goto("/audio-devices");
+    await page.getByRole("combobox", { name: "Default device labels" }).click();
+
+    const prefixed = page.getByRole("option", {
+      name: "Default - MacBook Pro Microphone",
+      exact: true,
+    });
+
+    const generic = page.getByRole("option", {
+      name: "MacBook Pro Microphone Default",
+      exact: true,
+    });
+
+    await expect(prefixed).toBeVisible();
+    await expect(prefixed.getByText("Default", { exact: true })).toHaveCount(0);
+    await expect(generic.getByText("Default", { exact: true })).toHaveCount(1);
+    expect((await prefixed.innerText()).match(/Default/g)).toHaveLength(1);
+    await info.attach(`default-device-labels-${runtime}.png`, {
+      body: await page.screenshot(),
+      contentType: "image/png",
+    });
+  });
+
   test("generic select preserves keyboard focus and stacked modal scroll locks", async ({
     page,
   }, info) => {

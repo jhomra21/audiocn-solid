@@ -58,6 +58,25 @@ export const AudioDevicesApp = () => {
         Disconnect studio
       </button>
       <output data-testid="selected-device">{selected() ?? "none"}</output>
+      <AudioDeviceSelect
+        devices={[
+          {
+            id: "default",
+            label: "Default - MacBook Pro Microphone",
+            isDefault: true,
+          },
+          {
+            id: "generic-default",
+            label: "MacBook Pro Microphone",
+            isDefault: true,
+          },
+        ]}
+      >
+        <AudioDeviceSelectTrigger aria-label="Default device labels">
+          <AudioDeviceSelectValue />
+        </AudioDeviceSelectTrigger>
+        <AudioDeviceSelectContent />
+      </AudioDeviceSelect>
       <section aria-label="Long device collection">
         <AudioDeviceSelect
           defaultValue="device-70"

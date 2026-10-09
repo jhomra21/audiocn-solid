@@ -152,7 +152,12 @@ export const AudioDeviceSelectItem = (props: AudioDeviceSelectItemProps) => {
           <span class="flex min-w-0 flex-col">
             <span class="flex items-center gap-2">
               <span class="truncate">{props.device?.label}</span>
-              <Show when={props.device?.isDefault}>
+              <Show
+                when={
+                  props.device?.isDefault &&
+                  !props.device.label.startsWith("Default")
+                }
+              >
                 <span class="text-muted-foreground text-xs">Default</span>
               </Show>
             </span>

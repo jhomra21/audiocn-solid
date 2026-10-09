@@ -186,7 +186,11 @@ const BlocksGallery = () => {
   return (
     <main class="mx-auto grid max-w-xl gap-6 p-6">
       <section data-testid="tabs-default">
-        <Tabs dir="rtl" ref={() => setTabRef("connected")}>
+        <Tabs
+          activationMode="automatic"
+          dir="rtl"
+          ref={() => setTabRef("connected")}
+        >
           <TabsList>
             <TabsTrigger value="disabled" disabled>
               Disabled

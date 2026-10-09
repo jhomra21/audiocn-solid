@@ -22,7 +22,16 @@ export const Popover = (props: PopoverRootProps) => (
   <PopoverPrimitive.Root {...props} />
 );
 
-export const PopoverTrigger = (props: ButtonProps) => {
+export interface PopoverTriggerClickEvent extends MouseEvent {
+  preventBaseUIHandler: () => void;
+  readonly baseUIHandlerPrevented: boolean;
+}
+
+export const PopoverTrigger = (
+  props: Omit<ButtonProps, "onClick"> & {
+    onClick?: (event: PopoverTriggerClickEvent) => void;
+  }
+) => {
   const context = PopoverPrimitive.usePopoverContext();
   const rest = omitProps(props, ["ref", "onClick"]);
 
@@ -41,8 +50,21 @@ export const PopoverTrigger = (props: ButtonProps) => {
         setRefValue(props.ref, node);
       }}
       onClick={(event) => {
-        props.onClick?.(event);
-        context.toggle();
+        let prevented = false;
+        // SAFETY: these additions are installed before calling the consumer.
+        const baseEvent = event as PopoverTriggerClickEvent;
+        Object.defineProperties(baseEvent, {
+          baseUIHandlerPrevented: { configurable: true, get: () => prevented },
+          preventBaseUIHandler: {
+            configurable: true,
+            value: () => {
+              prevented = true;
+            },
+          },
+        });
+        props.onClick?.(baseEvent);
+
+        if (!prevented) context.toggle();
       }}
     />
   );

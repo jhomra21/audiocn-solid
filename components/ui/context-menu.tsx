@@ -92,7 +92,7 @@ export const ContextMenuContent = (props: ContextMenuContentProps) => {
       <MenuPrimitive.Content
         data-slot="context-menu-content"
         class={cn(
-          "text-popover-foreground ring-foreground/5 dark:ring-foreground/10 bg-popover/70 relative z-50 max-h-(--kb-popper-content-available-height) min-w-36 origin-(--kb-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150",
+          "text-popover-foreground ring-foreground/5 dark:ring-foreground/10 bg-popover/70 **:data-[slot$=-item]:focus:bg-foreground/10 **:data-[slot$=-item]:data-highlighted:bg-foreground/10 **:data-[slot$=-separator]:bg-foreground/5 **:data-[slot$=-trigger]:focus:bg-foreground/10 **:data-[slot$=-trigger]:aria-expanded:bg-foreground/10! **:data-[variant=destructive]:focus:bg-foreground/10! **:data-[variant=destructive]:text-accent-foreground! **:data-[variant=destructive]:**:text-accent-foreground! relative z-50 max-h-(--kb-popper-content-available-height) min-w-36 origin-(--kb-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150",
           props.class,
           props.className
         )}
@@ -303,7 +303,7 @@ export const ContextMenuSubContent = (
     <MenuPrimitive.SubContent
       data-slot="context-menu-sub-content"
       class={cn(
-        "text-popover-foreground ring-foreground/5 dark:ring-foreground/10 bg-popover/70 relative z-50 max-h-(--kb-popper-content-available-height) min-w-36 overflow-x-hidden overflow-y-auto rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150",
+        "text-popover-foreground ring-foreground/5 dark:ring-foreground/10 bg-popover/70 **:data-[slot$=-item]:focus:bg-foreground/10 **:data-[slot$=-item]:data-highlighted:bg-foreground/10 **:data-[slot$=-separator]:bg-foreground/5 **:data-[slot$=-trigger]:focus:bg-foreground/10 **:data-[slot$=-trigger]:aria-expanded:bg-foreground/10! **:data-[variant=destructive]:focus:bg-foreground/10! **:data-[variant=destructive]:text-accent-foreground! **:data-[variant=destructive]:**:text-accent-foreground! relative z-50 max-h-(--kb-popper-content-available-height) min-w-36 overflow-x-hidden overflow-y-auto rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150",
         props.class,
         props.className
       )}

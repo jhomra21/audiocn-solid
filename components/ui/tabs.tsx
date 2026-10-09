@@ -105,7 +105,7 @@ export const Tabs = (props: TabsProps) => {
       return props.orientation ?? "horizontal";
     },
     get activationMode() {
-      return props.activationMode ?? "automatic";
+      return props.activationMode ?? "manual";
     },
     select(next) {
       if (context.disabled || next === context.value) return;

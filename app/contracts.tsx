@@ -12,6 +12,7 @@ import {
   ContextMenuContent,
   ContextMenuCheckboxItem,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuRadioGroup,
   ContextMenuRadioItem,
@@ -132,6 +133,10 @@ export const SupportContractApp = () => {
           <ContextMenuItem>
             Reset <ContextMenuShortcut>⌘R</ContextMenuShortcut>
           </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem variant="destructive">
+            Delete <ContextMenuShortcut>⌘D</ContextMenuShortcut>
+          </ContextMenuItem>
           <ContextMenuSub>
             <ContextMenuSubTrigger>Routing</ContextMenuSubTrigger>
             <ContextMenuSubContent>
@@ -141,6 +146,10 @@ export const SupportContractApp = () => {
                   Stereo
                 </ContextMenuRadioItem>
               </ContextMenuRadioGroup>
+              <ContextMenuSeparator />
+              <ContextMenuItem variant="destructive">
+                Delete route <ContextMenuShortcut>⌘D</ContextMenuShortcut>
+              </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
         </ContextMenuContent>
