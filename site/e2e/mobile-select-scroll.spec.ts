@@ -1,9 +1,55 @@
+import { writeFile } from "node:fs/promises";
+
 import { expect, test } from "@playwright/test";
 
 declare global {
   interface Window {
-    selectScrollSamples: number[];
+    selectScrollSamples: { scrollY: number; triggerTop: number }[];
+    selectPointerDown:
+      | (ReturnType<typeof selectSnapshot> & {
+          eventType: string;
+          pointerTarget: {
+            tagName: string;
+            role: string | null;
+            text: string | undefined;
+          } | null;
+        })
+      | null;
   }
+}
+
+function selectSnapshot(element: Element) {
+  const rect = element.getBoundingClientRect();
+  const visualViewport = window.visualViewport;
+
+  return {
+    scrollY,
+    trigger: {
+      top: rect.top,
+      bottom: rect.bottom,
+      documentTop: rect.top + scrollY,
+      height: rect.height,
+    },
+    documentHeight: document.documentElement.scrollHeight,
+    viewport: { width: innerWidth, height: innerHeight },
+    visualViewport: visualViewport
+      ? {
+          offsetTop: visualViewport.offsetTop,
+          pageTop: visualViewport.pageTop,
+          width: visualViewport.width,
+          height: visualViewport.height,
+        }
+      : null,
+    activeElement:
+      document.activeElement instanceof HTMLElement
+        ? {
+            tagName: document.activeElement.tagName,
+            role: document.activeElement.getAttribute("role"),
+            label: document.activeElement.getAttribute("aria-label"),
+            text: document.activeElement.textContent?.trim().slice(0, 120),
+          }
+        : null,
+  };
 }
 
 for (const browserName of ["webkit", "chromium"] as const) {
@@ -29,43 +75,96 @@ for (const browserName of ["webkit", "chromium"] as const) {
       await page.goto("/");
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       const trigger = page.getByRole("combobox", { name: "Output device" });
-      await trigger.scrollIntoViewIfNeeded();
-      await expect(trigger).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      await expect
-        .poll(
-          () =>
-            page.evaluate(
-              () =>
-                [
-                  ...document.querySelectorAll(
-                    '[data-slot="showcase-card"] [data-slot="skeleton"]'
-                  ),
-                ].filter((skeleton) => {
-                  const { bottom, top } = skeleton.getBoundingClientRect();
-
-                  return bottom >= -200 && top <= window.innerHeight + 200;
-                }).length
-            ),
-          { message: "nearby lazy showcase tiles finish loading" }
-        )
-        .toBe(0);
+      await trigger.evaluate((element) =>
+        element.scrollIntoView({
+          block: "center",
+          inline: "nearest",
+          behavior: "instant",
+        })
+      );
       await page.evaluate(() => window.scrollBy(0, -100));
+      await expect(trigger).toBeInViewport({ ratio: 1 });
 
       const cycles: unknown[] = [];
 
       for (let cycle = 0; cycle < 3; cycle++) {
-        const before = await trigger.evaluate((element) => ({
-          scrollY,
-          top: element.getBoundingClientRect().top,
-        }));
+        const before = await trigger.evaluate(selectSnapshot);
 
         expect(before.scrollY).toBeGreaterThan(1000);
         await page.evaluate(() => {
           window.selectScrollSamples = [];
+          window.selectPointerDown = null;
+
+          const trigger = document.querySelector(
+            '[role="combobox"][aria-label="Output device"]'
+          );
+
+          trigger?.addEventListener(
+            "pointerdown",
+            (event) => {
+              const element = event.currentTarget;
+
+              if (!(element instanceof Element)) return;
+
+              const rect = element.getBoundingClientRect();
+              const visualViewport = window.visualViewport;
+
+              window.selectPointerDown = {
+                scrollY,
+                trigger: {
+                  top: rect.top,
+                  bottom: rect.bottom,
+                  documentTop: rect.top + scrollY,
+                  height: rect.height,
+                },
+                documentHeight: document.documentElement.scrollHeight,
+                viewport: { width: innerWidth, height: innerHeight },
+                visualViewport: visualViewport
+                  ? {
+                      offsetTop: visualViewport.offsetTop,
+                      pageTop: visualViewport.pageTop,
+                      width: visualViewport.width,
+                      height: visualViewport.height,
+                    }
+                  : null,
+                activeElement:
+                  document.activeElement instanceof HTMLElement
+                    ? {
+                        tagName: document.activeElement.tagName,
+                        role: document.activeElement.getAttribute("role"),
+                        label:
+                          document.activeElement.getAttribute("aria-label"),
+                        text: document.activeElement.textContent
+                          ?.trim()
+                          .slice(0, 120),
+                      }
+                    : null,
+                eventType: event.type,
+                pointerTarget:
+                  event.target instanceof Element
+                    ? {
+                        tagName: event.target.tagName,
+                        role: event.target.getAttribute("role"),
+                        text: event.target.textContent?.trim(),
+                      }
+                    : null,
+              };
+            },
+            { capture: true, once: true }
+          );
 
           const record = () => {
-            window.selectScrollSamples.push(scrollY);
+            const rect = document
+              .querySelector('[role="combobox"][aria-label="Output device"]')
+              ?.getBoundingClientRect();
+
+            if (rect) {
+              window.selectScrollSamples.push({
+                scrollY,
+                triggerTop: rect.top,
+              });
+            }
 
             if (document.documentElement.hasAttribute("data-record-scroll"))
               requestAnimationFrame(record);
@@ -74,23 +173,38 @@ for (const browserName of ["webkit", "chromium"] as const) {
           document.documentElement.setAttribute("data-record-scroll", "");
           requestAnimationFrame(record);
         });
-        await trigger.tap();
+        await trigger.tap({ scroll: "none" });
         const listbox = page.getByRole("listbox");
         await expect(listbox).toBeVisible();
 
-        const opened = await trigger.evaluate((element) => ({
-          scrollY,
-          top: element.getBoundingClientRect().top,
-        }));
+        const opened = await trigger.evaluate(selectSnapshot);
+        const pointerDown = await page.evaluate(() => window.selectPointerDown);
 
+        const samples = await page.evaluate(() => {
+          return [...window.selectScrollSamples];
+        });
+
+        const opening = { before, pointerDown, opened, samples };
+        const artifactPath = info.outputPath(`opening-${cycle}.json`);
+
+        await writeFile(artifactPath, `${JSON.stringify(opening, null, 2)}\n`);
         await info.attach(`opening-${cycle}.json`, {
-          body: JSON.stringify({ before, opened }, null, 2),
+          path: artifactPath,
           contentType: "application/json",
         });
+
         expect(opened.scrollY).toBe(before.scrollY);
+        expect(opened.trigger.top).toBe(before.trigger.top);
+        expect(pointerDown).not.toBeNull();
+        expect(pointerDown!.scrollY).toBe(before.scrollY);
+        expect(pointerDown!.trigger.top).toBe(before.trigger.top);
+        expect(
+          samples.every((sample) => sample.scrollY === before.scrollY)
+        ).toBe(true);
         await expect(
           listbox.locator('[aria-selected="true"]')
         ).toBeInViewport();
+        await expect(listbox.locator('[aria-selected="true"]')).toBeFocused();
         const popup = await listbox.boundingBox();
         const anchor = await trigger.boundingBox();
         expect(popup).not.toBeNull();
@@ -123,33 +237,60 @@ for (const browserName of ["webkit", "chromium"] as const) {
 
         if (cycle < 2) await expect(trigger).toBeFocused();
 
+        const fullSamples = await page.evaluate(() => {
+          document.documentElement.removeAttribute("data-record-scroll");
+
+          return [...window.selectScrollSamples];
+        });
+
         const after = await trigger.evaluate((element) => ({
           scrollY,
           top: element.getBoundingClientRect().top,
         }));
 
-        const samples = await page.evaluate(() => {
-          document.documentElement.removeAttribute("data-record-scroll");
+        const finalCycle = {
+          before,
+          after,
+          samples: fullSamples,
+          popup,
+          anchor,
+        };
 
-          return window.selectScrollSamples;
-        });
+        cycles.push(finalCycle);
+        const cyclePath = info.outputPath(`scroll-cycle-${cycle}.json`);
 
-        cycles.push({ before, after, samples, popup, anchor });
+        await writeFile(cyclePath, `${JSON.stringify(finalCycle, null, 2)}\n`);
         await info.attach(`scroll-cycle-${cycle}.json`, {
-          body: JSON.stringify(cycles.at(-1), null, 2),
+          path: cyclePath,
           contentType: "application/json",
         });
         expect(after.scrollY).toBe(before.scrollY);
-        expect(after.top).toBe(before.top);
-        expect(samples.every((value) => value === before.scrollY)).toBe(true);
+        expect(after.top).toBe(before.trigger.top);
+        expect(
+          fullSamples.every((sample) => sample.scrollY === before.scrollY)
+        ).toBe(true);
+        expect(
+          fullSamples.every(
+            (sample) => sample.triggerTop === before.trigger.top
+          )
+        ).toBe(true);
       }
 
+      const finalArtifactPath = info.outputPath("mobile-select-scroll.json");
+
+      await writeFile(
+        finalArtifactPath,
+        `${JSON.stringify({ browserName, cycles, errors }, null, 2)}\n`
+      );
       await info.attach("mobile-select-scroll.json", {
-        body: JSON.stringify({ browserName, cycles, errors }, null, 2),
+        path: finalArtifactPath,
         contentType: "application/json",
       });
+      const screenshotPath = info.outputPath("mobile-select-scroll.png");
+
+      await writeFile(screenshotPath, await page.screenshot());
       await info.attach("mobile-select-scroll.png", {
-        body: await page.screenshot(),
+        path: screenshotPath,
         contentType: "image/png",
       });
       expect(errors).toEqual([]);
