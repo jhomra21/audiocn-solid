@@ -15,6 +15,17 @@ declare global {
           } | null;
         })
       | null;
+    selectOutsideEvents: {
+      type: string;
+      phase: "capture" | "post-dispatch";
+      timestamp: number;
+      defaultPrevented: boolean;
+      target: unknown;
+      pointerType: string | null;
+      coordinates: { x: number; y: number } | null;
+      state: unknown;
+    }[];
+    selectOutsideCleanup?: () => void;
   }
 }
 
@@ -230,7 +241,235 @@ for (const browserName of ["webkit", "chromium"] as const) {
         } else if (cycle === 1) {
           await page.keyboard.press("Escape");
         } else {
-          await page.touchscreen.tap(8, 600);
+          const outsideTapPath = info.outputPath("outside-tap.json");
+
+          const outsideTapBefore = await page.evaluate(
+            ({ popup, anchor }) => {
+              const ancestry = (element: Element | null) => {
+                const nodes = [];
+
+                for (
+                  let node: Element | null = element;
+                  node;
+                  node = node.parentElement
+                ) {
+                  const style = getComputedStyle(node);
+                  nodes.push({
+                    tagName: node.tagName,
+                    id: node.id || null,
+                    role: node.getAttribute("role"),
+                    label: node.getAttribute("aria-label"),
+                    pointerEvents: style.pointerEvents,
+                  });
+                }
+
+                return nodes;
+              };
+
+              const point = { x: 8, y: 600 };
+              const hit = document.elementFromPoint(point.x, point.y);
+
+              const inside = (bounds: typeof popup) =>
+                point.x >= bounds.x &&
+                point.x <= bounds.x + bounds.width &&
+                point.y >= bounds.y &&
+                point.y <= bounds.y + bounds.height;
+
+              const style = (element: Element) => {
+                const computed = getComputedStyle(element);
+
+                return {
+                  overflow: computed.overflow,
+                  overflowX: computed.overflowX,
+                  overflowY: computed.overflowY,
+                  touchAction: computed.touchAction,
+                  pointerEvents: computed.pointerEvents,
+                  position: computed.position,
+                };
+              };
+
+              window.selectOutsideEvents = [];
+
+              const eventTypes = [
+                "pointerdown",
+                "pointerup",
+                "pointercancel",
+                "touchstart",
+                "touchend",
+                "touchcancel",
+                "mousedown",
+                "mouseup",
+                "click",
+                "focusin",
+                "focusout",
+                "interactOutside.pointerDownOutside",
+                "interactOutside.focusOutside",
+              ];
+
+              const listeners: [string, EventListener][] = [];
+
+              const snapshot = () => {
+                const active = document.activeElement;
+
+                const combobox = document.querySelector(
+                  '[role="combobox"][aria-label="Output device"]'
+                );
+
+                const listbox = document.querySelector('[role="listbox"]');
+
+                return {
+                  timestamp: performance.now(),
+                  scrollY,
+                  activeElement:
+                    active instanceof Element
+                      ? {
+                          tagName: active.tagName,
+                          role: active.getAttribute("role"),
+                          label: active.getAttribute("aria-label"),
+                          id: active.id || null,
+                        }
+                      : null,
+                  selectExpanded: combobox?.getAttribute("aria-expanded"),
+                  listboxVisible:
+                    listbox instanceof HTMLElement &&
+                    listbox.getClientRects().length > 0,
+                };
+              };
+
+              const describeEventTarget = (target: EventTarget | null) =>
+                target instanceof Element
+                  ? {
+                      ancestry: ancestry(target),
+                      text: target.textContent?.trim().slice(0, 80),
+                    }
+                  : target instanceof Node
+                    ? { nodeName: target.nodeName }
+                    : null;
+
+              for (const type of eventTypes) {
+                const recordEvent = (
+                  event: Event,
+                  phase: "capture" | "post-dispatch"
+                ) => {
+                  if (window.selectOutsideEvents.length >= 40) return;
+
+                  const pointer = event instanceof PointerEvent ? event : null;
+                  const mouse = event instanceof MouseEvent ? event : null;
+                  const touch = event instanceof TouchEvent ? event : null;
+
+                  const touchPoint =
+                    touch?.changedTouches[0] ?? touch?.touches[0];
+
+                  window.selectOutsideEvents.push({
+                    type: event.type,
+                    phase,
+                    timestamp: performance.now(),
+                    defaultPrevented: event.defaultPrevented,
+                    target: describeEventTarget(event.target),
+                    pointerType: pointer?.pointerType ?? null,
+                    coordinates: mouse
+                      ? { x: mouse.clientX, y: mouse.clientY }
+                      : touchPoint
+                        ? {
+                            x: touchPoint.clientX,
+                            y: touchPoint.clientY,
+                          }
+                        : null,
+                    state: snapshot(),
+                  });
+                };
+
+                const listener: EventListener = (event) => {
+                  recordEvent(event, "capture");
+                  queueMicrotask(() => recordEvent(event, "post-dispatch"));
+                };
+
+                document.addEventListener(type, listener, true);
+                listeners.push([type, listener]);
+              }
+
+              window.selectOutsideCleanup = () => {
+                for (const [type, listener] of listeners)
+                  document.removeEventListener(type, listener, true);
+              };
+
+              return {
+                point,
+                popup,
+                anchor,
+                viewport: { width: innerWidth, height: innerHeight },
+                popupOutside: !inside(popup),
+                anchorOutside: !inside(anchor),
+                hitTarget: describeEventTarget(hit),
+                htmlStyle: style(document.documentElement),
+                bodyStyle: style(document.body),
+                initialState: snapshot(),
+              };
+            },
+            { popup: popup!, anchor: anchor! }
+          );
+
+          let outsideTapAfter: unknown;
+
+          try {
+            expect(outsideTapBefore.point).toEqual({ x: 8, y: 600 });
+            expect(outsideTapBefore.point.x).toBeLessThan(
+              outsideTapBefore.viewport.width
+            );
+            expect(outsideTapBefore.point.y).toBeLessThan(
+              outsideTapBefore.viewport.height
+            );
+            expect(outsideTapBefore.popupOutside).toBe(true);
+            expect(outsideTapBefore.anchorOutside).toBe(true);
+            await page.touchscreen.tap(8, 600);
+          } finally {
+            outsideTapAfter = await page.evaluate(() => {
+              window.selectOutsideCleanup?.();
+              const active = document.activeElement;
+
+              const combobox = document.querySelector(
+                '[role="combobox"][aria-label="Output device"]'
+              );
+
+              const listbox = document.querySelector('[role="listbox"]');
+
+              return {
+                timestamp: performance.now(),
+                scrollY,
+                activeElement:
+                  active instanceof Element
+                    ? {
+                        tagName: active.tagName,
+                        role: active.getAttribute("role"),
+                        label: active.getAttribute("aria-label"),
+                        id: active.id || null,
+                      }
+                    : null,
+                selectExpanded: combobox?.getAttribute("aria-expanded"),
+                listboxVisible:
+                  listbox instanceof HTMLElement &&
+                  listbox.getClientRects().length > 0,
+              };
+            });
+
+            const outsideTap = await page.evaluate(
+              ({ before, after }) => ({
+                ...before,
+                after,
+                events: window.selectOutsideEvents,
+              }),
+              { before: outsideTapBefore, after: outsideTapAfter }
+            );
+
+            await writeFile(
+              outsideTapPath,
+              `${JSON.stringify(outsideTap, null, 2)}\n`
+            );
+            await info.attach("outside-tap.json", {
+              path: outsideTapPath,
+              contentType: "application/json",
+            });
+          }
         }
 
         await expect(listbox).toBeHidden();
