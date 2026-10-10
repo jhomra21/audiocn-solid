@@ -17,9 +17,9 @@ declare global {
       | null;
     selectOutsideEvents: {
       type: string;
-      phase: "capture" | "post-dispatch";
       timestamp: number;
-      defaultPrevented: boolean;
+      event: Event;
+      captureDefaultPrevented: boolean;
       target: unknown;
       pointerType: string | null;
       coordinates: { x: number; y: number } | null;
@@ -275,19 +275,6 @@ for (const browserName of ["webkit", "chromium"] as const) {
                 point.y >= bounds.y &&
                 point.y <= bounds.y + bounds.height;
 
-              const style = (element: Element) => {
-                const computed = getComputedStyle(element);
-
-                return {
-                  overflow: computed.overflow,
-                  overflowX: computed.overflowX,
-                  overflowY: computed.overflowY,
-                  touchAction: computed.touchAction,
-                  pointerEvents: computed.pointerEvents,
-                  position: computed.position,
-                };
-              };
-
               window.selectOutsideEvents = [];
 
               const eventTypes = [
@@ -325,8 +312,6 @@ for (const browserName of ["webkit", "chromium"] as const) {
                       ? {
                           tagName: active.tagName,
                           role: active.getAttribute("role"),
-                          label: active.getAttribute("aria-label"),
-                          id: active.id || null,
                         }
                       : null,
                   selectExpanded: combobox?.getAttribute("aria-expanded"),
@@ -347,10 +332,7 @@ for (const browserName of ["webkit", "chromium"] as const) {
                     : null;
 
               for (const type of eventTypes) {
-                const recordEvent = (
-                  event: Event,
-                  phase: "capture" | "post-dispatch"
-                ) => {
+                const recordEvent = (event: Event) => {
                   if (window.selectOutsideEvents.length >= 40) return;
 
                   const pointer = event instanceof PointerEvent ? event : null;
@@ -362,9 +344,9 @@ for (const browserName of ["webkit", "chromium"] as const) {
 
                   window.selectOutsideEvents.push({
                     type: event.type,
-                    phase,
                     timestamp: performance.now(),
-                    defaultPrevented: event.defaultPrevented,
+                    event,
+                    captureDefaultPrevented: event.defaultPrevented,
                     target: describeEventTarget(event.target),
                     pointerType: pointer?.pointerType ?? null,
                     coordinates: mouse
@@ -379,10 +361,7 @@ for (const browserName of ["webkit", "chromium"] as const) {
                   });
                 };
 
-                const listener: EventListener = (event) => {
-                  recordEvent(event, "capture");
-                  queueMicrotask(() => recordEvent(event, "post-dispatch"));
-                };
+                const listener: EventListener = (event) => recordEvent(event);
 
                 document.addEventListener(type, listener, true);
                 listeners.push([type, listener]);
@@ -401,15 +380,11 @@ for (const browserName of ["webkit", "chromium"] as const) {
                 popupOutside: !inside(popup),
                 anchorOutside: !inside(anchor),
                 hitTarget: describeEventTarget(hit),
-                htmlStyle: style(document.documentElement),
-                bodyStyle: style(document.body),
                 initialState: snapshot(),
               };
             },
             { popup: popup!, anchor: anchor! }
           );
-
-          let outsideTapAfter: unknown;
 
           try {
             expect(outsideTapBefore.point).toEqual({ x: 8, y: 600 });
@@ -422,9 +397,9 @@ for (const browserName of ["webkit", "chromium"] as const) {
             expect(outsideTapBefore.popupOutside).toBe(true);
             expect(outsideTapBefore.anchorOutside).toBe(true);
             await page.touchscreen.tap(8, 600);
+            await expect(listbox).toBeHidden();
           } finally {
-            outsideTapAfter = await page.evaluate(() => {
-              window.selectOutsideCleanup?.();
+            const outsideTapAfter = await page.evaluate(() => {
               const active = document.activeElement;
 
               const combobox = document.querySelector(
@@ -433,7 +408,7 @@ for (const browserName of ["webkit", "chromium"] as const) {
 
               const listbox = document.querySelector('[role="listbox"]');
 
-              return {
+              const after = {
                 timestamp: performance.now(),
                 scrollY,
                 activeElement:
@@ -441,8 +416,6 @@ for (const browserName of ["webkit", "chromium"] as const) {
                     ? {
                         tagName: active.tagName,
                         role: active.getAttribute("role"),
-                        label: active.getAttribute("aria-label"),
-                        id: active.id || null,
                       }
                     : null,
                 selectExpanded: combobox?.getAttribute("aria-expanded"),
@@ -450,13 +423,27 @@ for (const browserName of ["webkit", "chromium"] as const) {
                   listbox instanceof HTMLElement &&
                   listbox.getClientRects().length > 0,
               };
+
+              try {
+                const events = window.selectOutsideEvents.map(
+                  ({ event, captureDefaultPrevented, ...record }) => ({
+                    ...record,
+                    captureDefaultPrevented,
+                    finalDefaultPrevented: event.defaultPrevented,
+                  })
+                );
+
+                return { after, events };
+              } finally {
+                window.selectOutsideCleanup?.();
+              }
             });
 
             const outsideTap = await page.evaluate(
               ({ before, after }) => ({
                 ...before,
                 after,
-                events: window.selectOutsideEvents,
+                events: after.events,
               }),
               { before: outsideTapBefore, after: outsideTapAfter }
             );
@@ -472,7 +459,7 @@ for (const browserName of ["webkit", "chromium"] as const) {
           }
         }
 
-        await expect(listbox).toBeHidden();
+        if (cycle !== 2) await expect(listbox).toBeHidden();
 
         if (cycle < 2) await expect(trigger).toBeFocused();
 
