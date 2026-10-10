@@ -237,7 +237,10 @@ export const runPopoverSuite = (runtime: string) => {
       playwright,
       baseURL,
     }, info) => {
-      const browser = await playwright[browserName].launch();
+      const browser = await playwright[browserName].launch({
+        args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+      });
+
       const page = await browser.newPage({ baseURL, hasTouch: true });
       const evidence: object[] = [];
 
@@ -385,7 +388,10 @@ export const runPopoverSuite = (runtime: string) => {
       playwright,
       baseURL,
     }, info) => {
-      const browser = await playwright[browserName].launch();
+      const browser = await playwright[browserName].launch({
+        args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+      });
+
       const page = await browser.newPage({ baseURL, hasTouch: true });
       const evidence: object[] = [];
 
@@ -533,7 +539,10 @@ export const runPopoverSuite = (runtime: string) => {
       playwright,
       baseURL,
     }, info) => {
-      const browser = await playwright[browserName].launch();
+      const browser = await playwright[browserName].launch({
+        args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+      });
+
       const page = await browser.newPage({ baseURL, hasTouch: true });
       const evidence: object[] = [];
 
@@ -603,7 +612,10 @@ export const runPopoverSuite = (runtime: string) => {
       playwright,
       baseURL,
     }, info) => {
-      const browser = await playwright[browserName].launch();
+      const browser = await playwright[browserName].launch({
+        args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+      });
+
       const page = await browser.newPage({ baseURL, hasTouch: true });
       const evidence: object[] = [];
 
@@ -643,7 +655,10 @@ export const runPopoverSuite = (runtime: string) => {
       playwright,
       baseURL,
     }, info) => {
-      const browser = await playwright[browserName].launch();
+      const browser = await playwright[browserName].launch({
+        args: browserName === "chromium" ? ["--disable-audio-output"] : [],
+      });
+
       const page = await browser.newPage({ baseURL, hasTouch: true });
       const evidence: object[] = [];
 
