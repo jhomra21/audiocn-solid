@@ -1,0 +1,219 @@
+diff --git a/dist/index.js b/dist/index.js
+index dd48858929c8c84f88ae683acc77b3b8834114b7..ac35046d74a35d7dc867efebe86fb7994aec7a76 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,6 +1,7 @@
+ /* @ts-self-types="./index.d.ts" */
+ import { createEffect, onCleanup } from "solid-js";
+ import { access, globalRegistry, isServer, noop } from "@solid-primitives/utils";
++import { makeTouchOutside } from "./touch-outside.js";
+ //#region src/index.ts
+ const getHideOutsideRegistry = () => globalRegistry("@solid-primitives/interaction:hide-outside", () => ({
+ 	refCountMap: /* @__PURE__ */ new WeakMap(),
+@@ -211,8 +212,8 @@ const isCtrlKey = (e) => e.ctrlKey || isMacPlatform() && e.metaKey;
+ */
+ function makeInteractOutside(el, options) {
+ 	if (isServer) return noop;
+-	let clickHandler = noop;
+ 	let ownerDoc = el.ownerDocument;
++	let touch;
+ 	const isEventOutside = (e) => {
+ 		if (!el.isConnected) return false;
+ 		const target = e.target;
+@@ -226,20 +227,23 @@ function makeInteractOutside(el, options) {
+ 			const target = e.target;
+ 			if (!target || !isEventOutside(e)) return;
+ 			target.addEventListener(POINTER_DOWN_OUTSIDE_EVENT, composeHandlers([options.onPointerDownOutside, options.onInteractOutside]), { once: true });
+-			target.dispatchEvent(new CustomEvent(POINTER_DOWN_OUTSIDE_EVENT, {
++			const outsideEvent = new CustomEvent(POINTER_DOWN_OUTSIDE_EVENT, {
+ 				bubbles: false,
+ 				cancelable: true,
+ 				detail: {
+ 					originalEvent: e,
+ 					isContextMenu: e.button === 2 || isCtrlKey(e) && e.button === 0
+ 				}
+-			}));
++			});
++			target.dispatchEvent(outsideEvent);
++			return !outsideEvent.defaultPrevented;
+ 		};
+ 		if (e.pointerType === "touch") {
+-			ownerDoc.removeEventListener("click", clickHandler);
+-			clickHandler = handler;
+-			ownerDoc.addEventListener("click", clickHandler, { once: true });
+-		} else handler();
++			touch.start(e, handler);
++		} else {
++			touch.clear();
++			handler();
++		}
+ 	};
+ 	const onFocusIn = (e) => {
+ 		const target = e.target;
+@@ -256,12 +260,13 @@ function makeInteractOutside(el, options) {
+ 	};
+ 	const pointerDownTimeoutId = window.setTimeout(() => {
+ 		ownerDoc = el.ownerDocument;
++		touch = makeTouchOutside(ownerDoc, isEventOutside, options.captureTouchOutside);
+ 		ownerDoc.addEventListener("pointerdown", onPointerDown, true);
+ 		ownerDoc.addEventListener("focusin", onFocusIn, true);
+ 	}, 0);
+ 	return () => {
+ 		window.clearTimeout(pointerDownTimeoutId);
+-		ownerDoc.removeEventListener("click", clickHandler);
++		touch?.clear();
+ 		ownerDoc.removeEventListener("pointerdown", onPointerDown, true);
+ 		ownerDoc.removeEventListener("focusin", onFocusIn, true);
+ 	};
+@@ -292,6 +297,7 @@ function interactOutside(options) {
+ 	let cleanup;
+ 	onCleanup(() => cleanup?.());
+ 	return (el) => {
++		cleanup?.();
+ 		cleanup = makeInteractOutside(el, options);
+ 	};
+ }
+diff --git a/node_modules/.bun/@solid-primitives+interaction@1.0.0-next.4+faea5d0e499ad21c/node_modules/@solid-primitives/interaction/dist/touch-outside.js b/dist/touch-outside.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..66a61af71b01850ab127f71784a006ab86ae5bc9
+--- /dev/null
++++ b/dist/touch-outside.js
+@@ -0,0 +1,138 @@
++// A touch is owned until completion, not until an unrelated document click.
++export function makeTouchOutside(ownerDoc, isOutside, captureGuard) {
++  let pending;
++  const clear = () => {
++    if (!pending) return;
++    for (const [type, listener] of pending.listeners)
++      ownerDoc.removeEventListener(type, listener, true);
++    for (const timer of pending.timers) clearTimeout(timer);
++    pending = undefined;
++  };
++  const start = (down, dispatch) => {
++    if (pending) {
++      const completed = pending.up;
++      clear();
++      if (!completed) return;
++    }
++    if (!down.isPrimary || !isOutside(down)) return;
++    const guard = captureGuard?.() ?? (() => true);
++    if (!guard()) return;
++    const gesture = pending = {
++      up: undefined, touchStart: undefined, touchEnd: undefined,
++      click: undefined, listeners: [], timers: [], started: performance.now()
++    };
++    const moved = (point) =>
++      Math.hypot(point.clientX - down.clientX, point.clientY - down.clientY) > 10;
++    const listen = (type, listener) => {
++      gesture.listeners.push([type, listener]);
++      ownerDoc.addEventListener(type, listener, { capture: true, passive: true });
++    };
++    const later = (callback, delay) => {
++      gesture.timers.push(setTimeout(callback, delay));
++    };
++    const valid = () => {
++      if (pending !== gesture || !gesture.up) return false;
++      if (gesture.touchStart && !gesture.touchEnd) return false;
++      if ([down, gesture.up, gesture.touchStart, gesture.touchEnd, gesture.click]
++        .some((event) => event?.defaultPrevented)) {
++        clear();
++        return false;
++      }
++      const hit = ownerDoc.elementFromPoint(gesture.up.clientX, gesture.up.clientY);
++      if (!guard() || !isOutside(down) || !gesture.upTarget ||
++        !isOutside({ target: gesture.upTarget }) || !hit || !isOutside({ target: hit })) {
++        clear();
++        return false;
++      }
++      return true;
++    };
++    const finish = (fallback) => {
++      if (!valid()) return;
++      const original = down.target.closest("button, a[href], input, select, textarea, label") ?? down.target;
++      clear();
++      const accepted = dispatch();
++      if (fallback && accepted) {
++        // This consumed gesture, rather than the disposed layer, owns this
++        // bounded guard. Preserve activation of the original control and children.
++        const remove = () => {
++          clearTimeout(timer);
++          ownerDoc.removeEventListener("click", swallow, true);
++          ownerDoc.removeEventListener("pointerdown", remove, true);
++        };
++        const swallow = (event) => {
++          if (!event.detail || moved(event)) return;
++          const hit = ownerDoc.elementFromPoint(event.clientX, event.clientY);
++          if (event.target instanceof ownerDoc.defaultView.Element &&
++            hit && event.target.contains(hit) && !original.contains(hit) &&
++            !gesture.upTarget.contains(hit)) {
++            event.preventDefault();
++            event.stopImmediatePropagation();
++          }
++          remove();
++        };
++        const timer = setTimeout(remove, 400);
++        ownerDoc.addEventListener("click", swallow, true);
++        ownerDoc.addEventListener("pointerdown", remove, true);
++      }
++    };
++    const complete = () => {
++      // A task observes prevention by target/bubble listeners after dispatch.
++      // Upstream waits ~350ms for compatibility clicks to avoid click-through.
++      later(() => {
++        if (!valid()) return;
++        if (gesture.click) finish(false);
++        else later(() => finish(true), 400);
++      }, 0);
++    };
++    listen("pointerdown", clear);
++    listen("pointercancel", clear);
++    listen("touchcancel", clear);
++    listen("scroll", clear);
++    listen("pointermove", (event) => {
++      if (event.pointerId === down.pointerId && moved(event)) clear();
++    });
++    listen("touchstart", (event) => {
++      const touch = event.changedTouches[0];
++      if (gesture.touchStart || event.touches.length !== 1 || !touch ||
++        touch.target !== down.target || moved(touch)) {
++        clear();
++        return;
++      }
++      gesture.touchStart = event;
++      gesture.touchId = touch.identifier;
++    });
++    listen("touchmove", (event) => {
++      const touch = [...event.touches].find((touch) => touch.identifier === gesture.touchId);
++      if (event.touches.length !== 1 || !touch || moved(touch)) clear();
++    });
++    listen("pointerup", (event) => {
++      if (event.pointerId !== down.pointerId) return;
++      if (moved(event) || performance.now() - gesture.started >= 500) {
++        clear();
++        return;
++      }
++      gesture.up = event;
++      gesture.upTarget = ownerDoc.elementFromPoint(event.clientX, event.clientY);
++      if (!gesture.touchStart) complete();
++    });
++    listen("touchend", (event) => {
++      const touch = [...event.changedTouches].find((touch) => touch.identifier === gesture.touchId);
++      if (!gesture.up || !touch || event.touches.length || moved(touch)) {
++        clear();
++        return;
++      }
++      gesture.touchEnd = event;
++      complete();
++    });
++    listen("click", (event) => {
++      if (!event.detail || moved(event) || !gesture.up) return;
++      gesture.click = event;
++      later(() => finish(false), 0);
++    });
++    // Reject a held pointer before a context menu or a later unrelated click.
++    later(() => {
++      if (!gesture.up || gesture.touchStart && !gesture.touchEnd) clear();
++    }, 500);
++  };
++  return { start, clear };
++}

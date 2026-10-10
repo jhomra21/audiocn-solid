@@ -1,0 +1,106 @@
+diff --git a/dist/dismissable-layer/DXLD03yU.js b/dist/dismissable-layer/DXLD03yU.js
+index fde40e74ee904abceeb2c1daa3ce86f8dd9e38c8..f8bb190ecef4aa0d31ba753a659b62cb56a97233 100644
+--- a/dist/dismissable-layer/DXLD03yU.js
++++ b/dist/dismissable-layer/DXLD03yU.js
+@@ -43,6 +43,14 @@ function DismissableLayer(props) {
+ 	};
+ 	const interactOutsideRef = interactOutside({
+ 		shouldExcludeElement,
++		captureTouchOutside: () => {
++			const top = layerStack.layers.at(-1);
++			const generation = layerStack.generation;
++			const eligible = ref$1() && !layerStack.isBelowPointerBlockingLayer(ref$1()) &&
++				(props.bypassTopMostLayerCheck || layerStack.isTopMostLayer(ref$1()));
++			return () => eligible && generation === layerStack.generation &&
++				top === layerStack.layers.at(-1);
++		},
+ 		onPointerDownOutside,
+ 		onFocusOutside
+ 	});
+diff --git a/dist/dismissable-layer/RyRdwdaj.jsx b/dist/dismissable-layer/RyRdwdaj.jsx
+index 725bd171d1c95781d497718917d1dc3ebd363276..364392157f06abff3a61800b59c5baf080d8ed12 100644
+--- a/dist/dismissable-layer/RyRdwdaj.jsx
++++ b/dist/dismissable-layer/RyRdwdaj.jsx
+@@ -41,6 +41,14 @@ function DismissableLayer(props) {
+ 	};
+ 	const interactOutsideRef = interactOutside({
+ 		shouldExcludeElement,
++		captureTouchOutside: () => {
++			const top = layerStack.layers.at(-1);
++			const generation = layerStack.generation;
++			const eligible = ref() && !layerStack.isBelowPointerBlockingLayer(ref()) &&
++				(props.bypassTopMostLayerCheck || layerStack.isTopMostLayer(ref()));
++			return () => eligible && generation === layerStack.generation &&
++				top === layerStack.layers.at(-1);
++		},
+ 		onPointerDownOutside,
+ 		onFocusOutside
+ 	});
+diff --git a/dist/layer-stack/DUp9FXTP.js b/dist/layer-stack/DUp9FXTP.js
+index 08198a31f573cb7f8df903e7d69f0bca58979a9b..1bad912f0957f5744f5b624896271730a4154025 100644
+--- a/dist/layer-stack/DUp9FXTP.js
++++ b/dist/layer-stack/DUp9FXTP.js
+@@ -3,6 +3,7 @@ const DATA_TOP_LAYER_ATTR = "data-kb-top-layer";
+ let originalBodyPointerEvents;
+ let hasDisabledBodyPointerEvents = false;
+ const layers = [];
++let generation = 0;
+ function indexOf(node) {
+ 	return layers.findIndex((layer) => layer.node === node);
+ }
+@@ -27,11 +28,13 @@ function isBelowPointerBlockingLayer(node) {
+ }
+ function addLayer(layer) {
+ 	layers.push(layer);
++	generation++;
+ }
+ function removeLayer(node) {
+ 	const index = indexOf(node);
+ 	if (index < 0) return;
+ 	layers.splice(index, 1);
++	generation++;
+ }
+ function assignPointerEventToLayers() {
+ 	for (const { node } of layers) node.style.pointerEvents = isBelowPointerBlockingLayer(node) ? "none" : "auto";
+@@ -60,6 +63,7 @@ function restoreBodyPointerEvents(node) {
+ }
+ const layerStack = {
+ 	layers,
++	get generation() { return generation; },
+ 	isTopMostLayer,
+ 	hasPointerBlockingLayer,
+ 	isBelowPointerBlockingLayer,
+diff --git a/dist/layer-stack/DUp9FXTP.jsx b/dist/layer-stack/DUp9FXTP.jsx
+index 08198a31f573cb7f8df903e7d69f0bca58979a9b..1bad912f0957f5744f5b624896271730a4154025 100644
+--- a/dist/layer-stack/DUp9FXTP.jsx
++++ b/dist/layer-stack/DUp9FXTP.jsx
+@@ -3,6 +3,7 @@ const DATA_TOP_LAYER_ATTR = "data-kb-top-layer";
+ let originalBodyPointerEvents;
+ let hasDisabledBodyPointerEvents = false;
+ const layers = [];
++let generation = 0;
+ function indexOf(node) {
+ 	return layers.findIndex((layer) => layer.node === node);
+ }
+@@ -27,11 +28,13 @@ function isBelowPointerBlockingLayer(node) {
+ }
+ function addLayer(layer) {
+ 	layers.push(layer);
++	generation++;
+ }
+ function removeLayer(node) {
+ 	const index = indexOf(node);
+ 	if (index < 0) return;
+ 	layers.splice(index, 1);
++	generation++;
+ }
+ function assignPointerEventToLayers() {
+ 	for (const { node } of layers) node.style.pointerEvents = isBelowPointerBlockingLayer(node) ? "none" : "auto";
+@@ -60,6 +63,7 @@ function restoreBodyPointerEvents(node) {
+ }
+ const layerStack = {
+ 	layers,
++	get generation() { return generation; },
+ 	isTopMostLayer,
+ 	hasPointerBlockingLayer,
+ 	isBelowPointerBlockingLayer,

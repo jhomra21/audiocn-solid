@@ -8,6 +8,12 @@ export default defineConfig({
   plugins: [solid(), tailwindcss()],
   resolve: {
     alias: {
+      "@kobalte/core/dismissable-layer": fileURLToPath(
+        new URL(
+          "./node_modules/@kobalte/core-solid1/dist/dismissable-layer/index.jsx",
+          import.meta.url
+        )
+      ),
       "@kobalte/core/primitives/create-dom-collection": fileURLToPath(
         new URL(
           "./node_modules/@kobalte/core-solid1/dist/primitives/create-dom-collection/index.jsx",

@@ -74,6 +74,11 @@
       },
     },
   },
+  "patchedDependencies": {
+    "@kobalte/core@0.13.14": "patches/@kobalte%2Fcore@0.13.14.patch",
+    "@solid-primitives/interaction@1.0.0-next.4": "patches/@solid-primitives%2Finteraction@1.0.0-next.4.patch",
+    "@kobalte/core@2.0.0-alpha.2": "patches/@kobalte%2Fcore@2.0.0-alpha.2.patch",
+  },
   "packages": {
     "@ampproject/remapping": ["@ampproject/remapping@2.3.0", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw=="],
 

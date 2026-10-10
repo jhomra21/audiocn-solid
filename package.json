@@ -68,5 +68,10 @@
   },
   "peerDependencies": {
     "solid-js": ">=1.9.15 <3"
+  },
+  "patchedDependencies": {
+    "@solid-primitives/interaction@1.0.0-next.4": "patches/@solid-primitives%2Finteraction@1.0.0-next.4.patch",
+    "@kobalte/core@0.13.14": "patches/@kobalte%2Fcore@0.13.14.patch",
+    "@kobalte/core@2.0.0-alpha.2": "patches/@kobalte%2Fcore@2.0.0-alpha.2.patch"
   }
 }
