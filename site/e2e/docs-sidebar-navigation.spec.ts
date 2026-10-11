@@ -203,3 +203,54 @@ test("search navigation reveals a distant active sidebar page", async ({
     await navigationViewport.evaluate((element) => element.scrollTop)
   ).toBe(before);
 });
+
+for (const modifier of ["Control", "Meta"] as const) {
+  test(`${modifier}-click does not suppress later sidebar reveal`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/docs");
+
+    const navigationViewport = page.locator(
+      "#nd-sidebar [data-docs-navigation-viewport]"
+    );
+
+    const modifiedLink = page.locator(
+      '#nd-sidebar [data-docs-navigation-viewport] a[href="/docs/components/sound-pad"]'
+    );
+
+    await navigationViewport.evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await modifiedLink.scrollIntoViewIfNeeded();
+    await modifiedLink.evaluate((element) => {
+      // SAFETY: This selector matches an anchor element.
+      (element as HTMLAnchorElement).target = "_blank";
+    });
+    page.on("popup", (popup) => void popup.close());
+
+    await modifiedLink.click({ modifiers: [modifier] });
+
+    await navigationViewport.evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await page.getByRole("button", { name: "Search ⌘ K", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Search documentation" });
+    await dialog.getByRole("searchbox").fill("soundPad");
+    await dialog
+      .locator('a[href="/docs/components/sound-pad"]')
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/docs\/components\/sound-pad$/);
+
+    const activeLink = page.locator(
+      '#nd-sidebar [data-docs-navigation-viewport] a[aria-current="page"]'
+    );
+
+    await expect(activeLink).toHaveAttribute(
+      "href",
+      "/docs/components/sound-pad"
+    );
+    await expect(activeLink).toBeInViewport();
+  });
+}

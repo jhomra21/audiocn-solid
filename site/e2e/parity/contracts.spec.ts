@@ -525,6 +525,27 @@ test("chrome snapshots keep roles, names, states, hrefs and group labels in orde
   ).toEqual(['header button "Installation Requirements"']);
 });
 
+test("the Solid port credit is an exact footer-only addition to upstream attribution", () => {
+  const original = [
+    'footer link "fortysevenfx" -> https://x.com/fortysevenfx',
+    'footer link "orcdev" -> https://x.com/orcdev',
+    'footer link "Contributors" -> /contributors',
+  ];
+
+  expect(adaptChrome(original)).toEqual([
+    'footer link "jhomra21" -> https://github.com/jhomra21',
+    ...original,
+  ]);
+
+  for (const changed of [
+    'header link "fortysevenfx" -> https://x.com/fortysevenfx',
+    'footer link "fortysevenfx" -> https://example.com',
+    'footer link "Another author" -> https://x.com/fortysevenfx',
+  ])
+    expect(adaptChrome([changed])).toEqual([changed]);
+  expect(adaptChrome(original)).not.toEqual(original);
+});
+
 test("removing or renaming a header or sidebar control remains an observable chrome difference", async ({
   page,
 }) => {

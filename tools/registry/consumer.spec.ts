@@ -36,7 +36,11 @@ test("every item has an independent consumer install, build and license proof", 
 
       for (const dependency of item.npmDependencies)
         expect(
-          installed.has(dependency.replace(/@[^@/]+$/u, "")),
+          installed.has(
+            dependency
+              .replace(/^(@kobalte\/core)@https?:.*$/u, "$1")
+              .replace(/@[^@/]+$/u, "")
+          ),
           item.name
         ).toBe(true);
       expect(fixtures.has(item.fixture)).toBe(false);

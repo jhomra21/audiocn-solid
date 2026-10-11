@@ -34,10 +34,34 @@ export const AudioContextProvider = (props: AudioContextProviderProps) =>
 
 const GESTURE_EVENTS = ["pointerdown", "keydown", "touchend"] as const;
 
+type AudioSessionNavigator = Navigator & {
+  audioSession?: {
+    type: string;
+  };
+};
+
+/** Requests playback routing when available, without affecting native recovery. */
+export const requestPlaybackAudioSession = () => {
+  try {
+    // SAFETY: This is the optional Web Audio Session extension to Navigator.
+    const session = (
+      typeof navigator === "undefined"
+        ? undefined
+        : (navigator as AudioSessionNavigator)
+    )?.audioSession;
+
+    if (session?.type === "auto") {
+      session.type = "playback";
+    }
+  } catch {
+    // AudioSession is optional; still attempt native context recovery.
+  }
+};
+
 export interface UseAudioContextResult {
   readonly context: AudioContext | null;
   readonly status: AudioContextStatus;
-  /** Resumes a suspended context. Call it from a user gesture. */
+  /** Selects playback and resumes suspended or interrupted audio. Call from a user gesture. */
   resume: () => Promise<void>;
 }
 
@@ -65,12 +89,8 @@ export const useAudioContext = (): UseAudioContextResult => {
       const readStatus = () => setStatus(current.state);
 
       const resumeOnGesture = async () => {
-        if (current.state !== "suspended") {
-          return;
-        }
-
         try {
-          await current.resume();
+          await resume();
         } catch {
           // The next gesture tries again.
         }
@@ -93,15 +113,24 @@ export const useAudioContext = (): UseAudioContextResult => {
     }
   );
 
+  // Safari uses "interrupted" after backgrounding or losing audio hardware.
+  // A running context can still be silent in the default ambient session.
+  const resume = async () => {
+    if (!context || context.state === "closed") return;
+
+    requestPlaybackAudioSession();
+
+    // Invoke native resume synchronously, before yielding the user gesture.
+    if (context.state === "suspended" || context.state === "interrupted") {
+      await context.resume();
+    }
+  };
+
   return {
     get context() {
       return context;
     },
-    async resume() {
-      if (context && context.state === "suspended") {
-        await context.resume();
-      }
-    },
+    resume,
     get status() {
       return status();
     },

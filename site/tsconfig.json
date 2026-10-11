@@ -18,6 +18,9 @@
       "@kobalte/core/dropdown-menu": [
         "../node_modules/@kobalte/core-solid2/dist/dropdown-menu/index.d.ts"
       ],
+      "@kobalte/core/toast": [
+        "../node_modules/@kobalte/core-solid2/dist/toast/index.d.ts"
+      ],
       "@kobalte/core/primitives/create-dom-collection": [
         "../node_modules/@kobalte/core-solid2/dist/primitives/create-dom-collection/index.d.ts"
       ],

@@ -183,7 +183,7 @@ export const SiteHeader = () => {
         <Show when={menuMounted()}>
           <div
             aria-hidden={menuOpen() ? undefined : "true"}
-            class="site-menu"
+            class="site-menu bg-background"
             data-open={menuOpen() ? "true" : "false"}
             id="site-menu"
             inert={!menuOpen()}

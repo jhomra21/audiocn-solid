@@ -74,8 +74,8 @@ for (const { runtime, name } of cases) {
     if (name === "fader") {
       expect(advertised).toContain(
         runtime === "solid1"
-          ? "@kobalte/core@0.13.14"
-          : "@kobalte/core@2.0.0-alpha.2"
+          ? "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-audiocn-e0e3bf095f05c7e61230a251b79181c6d834d408/kobalte-core-0.13.14-audiocn.0.e0e3bf09.tgz"
+          : "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz"
       );
     }
 

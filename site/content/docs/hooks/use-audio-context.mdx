@@ -5,6 +5,10 @@ description: One shared AudioContext that resumes on the first user gesture, plu
 
 Browsers only let audio start after the user interacts with the page. Every audiocn Web Audio hook shares one `AudioContext`, and this hook resumes it on the first click, tap or key press.
 
+On browsers that expose `navigator.audioSession` (including Safari on iOS 16.4 and later), the first gesture or `resume()` call changes its default `auto` type to `playback`, even if the context is already running. This requests playback routing so Web Audio can play with iPhone Silent Mode enabled. Browsers without this API, or those that reject the setting, keep their native behavior and may still require Silent Mode to be off.
+
+The setting affects all audio on the page and can pause other playback on the device or change microphone routing. audiocn leaves explicitly selected types, including `ambient` and `play-and-record`, unchanged. Apps that need mixing or microphone capture should select their own session type before interacting with audio controls.
+
 ```npm
 npx shadcn@latest add @audiocn-solid/use-audio-context
 ```
@@ -43,7 +47,7 @@ const context = new AudioContext({ sampleRate: 48_000 });
     ],
     [
       "status",
-      '"suspended" | "running" | "closed" | "unsupported"',
+      '"suspended" | "running" | "interrupted" | "closed" | "unsupported"',
       null,
       "The context state.",
     ],
@@ -51,7 +55,7 @@ const context = new AudioContext({ sampleRate: 48_000 });
       "resume",
       "() => Promise<void>",
       null,
-      "Resume a suspended context. Call it from a user gesture.",
+      "Select playback from the default audio session type and resume a suspended or interrupted context. Call it from a user gesture.",
     ],
   ]}
 />

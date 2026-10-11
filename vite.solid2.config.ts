@@ -6,8 +6,33 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   root: fileURLToPath(new URL("./app/solid2", import.meta.url)),
-  plugins: [solid(), tailwindcss()],
+  plugins: [
+    solid(),
+    tailwindcss(),
+    {
+      // The layer has no public entry. Expose its bundled implementation only
+      // to the acceptance harness, not to library or registry consumers.
+      name: "touch-layer-harness",
+      resolveId(id) {
+        if (id === "@kobalte/core/dismissable-layer")
+          return "\0touch-layer-harness";
+      },
+      load(id) {
+        if (id !== "\0touch-layer-harness") return;
+
+        const layer = fileURLToPath(
+          new URL(
+            "./node_modules/@kobalte/core-solid2/dist/dismissable-layer/CebVaFST.js",
+            import.meta.url
+          )
+        );
+
+        return `export { t as DismissableLayer } from ${JSON.stringify(layer)};`;
+      },
+    },
+  ],
   resolve: {
+    dedupe: ["solid-js", "@solidjs/web"],
     alias: {
       "@kobalte/core/primitives/create-dom-collection": fileURLToPath(
         new URL(

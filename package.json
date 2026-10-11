@@ -46,8 +46,8 @@
     "@fontsource-variable/dm-sans": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@fontsource-variable/outfit": "^5.3.0",
-    "@kobalte/core-solid1": "npm:@kobalte/core@0.13.14",
-    "@kobalte/core-solid2": "npm:@kobalte/core@2.0.0-alpha.2",
+    "@kobalte/core-solid1": "https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-audiocn-e0e3bf095f05c7e61230a251b79181c6d834d408/kobalte-core-0.13.14-audiocn.0.e0e3bf09.tgz",
+    "@kobalte/core-solid2": "https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "solid-js": "^1.9.15"

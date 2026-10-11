@@ -13,6 +13,7 @@ import { runPlaybackSuite } from "./playback-suite";
 import { runPopoverSuite } from "./popover-suite";
 import { runSliderReviewEdges } from "./slider-review-edges";
 import { runSoundPadSuite } from "./sound-pad-suite";
+import { runSupportParitySuite } from "./support-parity-suite";
 import { runVisualizersSuite } from "./visualizers-suite";
 import { runWaveformSuite } from "./waveform-suite";
 import { runWebAudioMixerSuite } from "./web-audio-mixer-suite";
@@ -28,6 +29,8 @@ runSliderReviewEdges("solid-2");
 runAudioDeviceSelectSuite("solid-2");
 
 runSoundPadSuite("solid-2");
+
+runSupportParitySuite("solid-2");
 
 runWaveformSuite("solid-2");
 

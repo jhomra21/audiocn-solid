@@ -22,6 +22,56 @@
   position: absolute;
 }
 
+/* Match Sonner's three-card stack while Kobalte owns timers and dismissal. */
+[data-copy-notifications] {
+  display: grid;
+  gap: 14px;
+}
+
+[data-copy-notifications] > li {
+  grid-area: 1 / 1;
+  align-self: end;
+  width: 100%;
+  transition: transform 400ms;
+}
+
+[data-copy-notifications] > li:last-child {
+  z-index: 3;
+}
+
+[data-copy-notifications] > li:nth-last-child(2) {
+  z-index: 2;
+  transform: translateY(-14px) scale(0.95);
+}
+
+[data-copy-notifications] > li:nth-last-child(3) {
+  z-index: 1;
+  transform: translateY(-28px) scale(0.9);
+}
+
+[data-copy-notifications] > li:not(:last-child) > * {
+  opacity: 0;
+}
+
+[data-copy-notifications]:is(:hover, :focus-within) {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-copy-notifications]:is(:hover, :focus-within) > li {
+  transform: none;
+}
+
+[data-copy-notifications]:is(:hover, :focus-within) > li > * {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-copy-notifications] > li {
+    transition: none;
+  }
+}
+
 .site-menu {
   position: absolute;
   inset: 100% 0 auto;

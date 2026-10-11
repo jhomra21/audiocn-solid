@@ -10,6 +10,49 @@ const MARKDOWN = "# Add Bar Visualizer from audiocn to this project\n";
 
 const SOURCE = "export const BarVisualizer = () => null;";
 
+test("AI notifications use the upstream material, pause on hover and expire", async ({
+  page,
+}, info) => {
+  await page.route(`**${MARKDOWN_URL}`, (route) =>
+    route.fulfill({ body: MARKDOWN })
+  );
+  await page.goto(PAGE);
+  await page.clock.install();
+  await page
+    .getByRole("button", { name: "Copy prompt for AI", exact: true })
+    .click();
+  const toast = page.getByRole("status");
+  await expect(toast).toHaveText("Prompt for Bar Visualizer copied");
+  await expect(toast.locator("svg")).toHaveAttribute("viewBox", "0 0 256 256");
+
+  const material = await toast.evaluate((node) => {
+    const style = getComputedStyle(node);
+
+    return {
+      width: node.getBoundingClientRect().width,
+      padding: style.padding,
+      fontSize: style.fontSize,
+      borderRadius: style.borderRadius,
+    };
+  });
+
+  expect(material).toMatchObject({
+    width: 356,
+    padding: "16px",
+    fontSize: "13px",
+  });
+  await toast.hover();
+  await page.clock.runFor(4500);
+  await expect(toast).toBeVisible();
+  await page.mouse.move(0, 0);
+  await page.clock.runFor(4500);
+  await expect(toast).toHaveCount(0);
+  await info.attach("ai-toast-material-lifecycle.json", {
+    body: JSON.stringify(material),
+    contentType: "application/json",
+  });
+});
+
 test.beforeEach(async ({ context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 });

@@ -26,14 +26,16 @@ Keep public components in `components/ui`, blocks in `components/blocks`, exampl
 
 The frozen dependency lanes are:
 
-- root Solid `1.9.15` (manifest range `^1.9.15`)
-- site Solid and web `2.0.0-rc.13`
+- root Solid `1.9.17` (manifest range `^1.9.15`)
+- site Solid and web `2.0.0-rc.14`
 - Solid Vite plugin `3.0.0-next.47`
-- Kobalte `0.13.14` for Solid 1
-- Kobalte `2.0.0-alpha.2` for Solid 2
+- AudioCN fork Kobalte `0.13.14-audiocn.0.e0e3bf09` for Solid 1
+- bundled AudioCN fork Kobalte `2.0.0-alpha.2-audiocn.2.b394be55` for Solid 2
 - root Vite `7.3.6` and site Vite `8.3.2` (manifest ranges `^7.3.6` and `^8.0.0`)
 
 These are lockfile resolutions; use `bun install --frozen-lockfile` for reproducible validation. Solid 2 and Kobalte 2 remain prerelease dependencies.
+
+The Kobalte packages resolve directly from public, immutable GitHub release archives; there are no local Bun patches. The Solid 2 Kobalte asset bundles the required helper packages and is pinned to the `2.0.0-rc.14` Solid peers. See `patches/README.md` for fork provenance and archive SHA-256 values.
 
 ## Local validation
 

@@ -7,10 +7,12 @@ audiocn Solid is a [shadcn registry](https://ui.shadcn.com/docs/registry). You a
 
 ## Requirements
 
-- Solid 1.9.15 or later. Solid 2.0.0-rc.13 is an experimental lane, tested with Kobalte 2.0.0-alpha.2.
+- Solid 1.9.15 or later. Solid 2.0.0-rc.14 is an experimental lane, tested with the AudioCN-patched Kobalte prerelease.
 - Tailwind CSS v4.
 - A project set up with shadcn and a `components.json`. audiocn Solid components use the standard shadcn tokens (`background`, `muted`, `primary`, `ring`...) and the `cn` helper from `@/lib/utils`.
 - Interactive primitives use Kobalte. The runtime-specific registry installs the matching Kobalte line for you.
+
+The Kobalte dependencies are prerelease archives from AudioCN-owned forks, not upstream releases or upstream-endorsed packages. Their provenance and checksums are documented in the AudioCN repository's third-party notices.
 
 <Steps>
 
@@ -37,7 +39,7 @@ The experimental Solid 2 setup:
 
 ```bash title="Solid 2 dependencies"
 bun remove vite-plugin-solid
-bun add solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13
+bun add solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14
 bun add -d vite@8.3.2 @solidjs/vite-plugin@3.0.0-next.47
 ```
 

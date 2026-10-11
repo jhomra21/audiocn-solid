@@ -79,6 +79,7 @@ export const AudioDeviceSelectTrigger = (props: SelectTriggerProps) => {
       class={cn("w-full min-w-0", props.class, props.className)}
       data-loading={settings.loading ? "" : undefined}
       data-missing={settings.missing ? "" : undefined}
+      data-placeholder={settings.selected ? undefined : ""}
       data-permission={settings.permission}
       data-slot="audio-device-select-trigger"
       {...rest}
@@ -106,7 +107,7 @@ export const AudioDeviceSelectValue = (props: AudioDeviceSelectValueProps) => {
     <span
       id={id()}
       data-placeholder-shown={settings.selected ? undefined : ""}
-      class={cn("truncate", props.class, props.className)}
+      class={cn("flex flex-1 truncate text-left", props.class, props.className)}
       data-slot="audio-device-select-value"
       {...rest}
     >
@@ -139,14 +140,14 @@ export const AudioDeviceSelectItem = (props: AudioDeviceSelectItemProps) => {
     <SelectPrimitive.Item
       item={props.item}
       class={cn(
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-default items-start rounded-lg px-2 py-1.5 text-sm outline-none data-disabled:opacity-50",
+        "focus:bg-foreground/10 data-highlighted:bg-foreground/10 relative flex min-h-7 w-full cursor-default items-start gap-2 rounded-xl py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         props.class,
         props.className
       )}
       data-slot="audio-device-select-item"
       {...rest}
     >
-      <SelectPrimitive.ItemLabel>
+      <SelectPrimitive.ItemLabel class="flex flex-1 shrink-0 gap-2 whitespace-nowrap">
         {props.children ?? (
           <span class="flex min-w-0 flex-col">
             <span class="flex items-center gap-2">
@@ -168,8 +169,11 @@ export const AudioDeviceSelectItem = (props: AudioDeviceSelectItemProps) => {
           </span>
         )}
       </SelectPrimitive.ItemLabel>
-      <SelectPrimitive.ItemIndicator class="ml-auto pl-2">
-        ✓
+      <SelectPrimitive.ItemIndicator class="pointer-events-none absolute right-2 flex size-4 items-center justify-center">
+        <svg aria-hidden="true" fill="currentColor" viewBox="0 0 256 256">
+          {/* Regular Phosphor Check, MIT © Phosphor Icons. */}
+          <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" />
+        </svg>
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );

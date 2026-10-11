@@ -8,8 +8,8 @@ import {
   GearSixIcon,
   MicrophoneIcon,
   MusicNotesIcon,
-  PauseFillIcon,
-  PlayFillIcon,
+  PauseIcon,
+  PlayIcon,
   SkipForwardIcon,
   SquaresFourIcon,
   WaveformIcon,
@@ -301,7 +301,7 @@ const MusicChannel = (
           size="icon-xs"
           variant="ghost"
         >
-          {props.player.playing ? <PauseFillIcon /> : <PlayFillIcon />}
+          {props.player.playing ? <PauseIcon /> : <PlayIcon />}
         </Button>
         <Button
           aria-label="Next track"

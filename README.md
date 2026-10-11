@@ -62,7 +62,7 @@ The Solid 2 lane replaces the root project's installed Solid/Vite packages. Run 
 git worktree add ../audiocn-solid-solid2 HEAD
 cd ../audiocn-solid-solid2
 bun install --frozen-lockfile
-bun add --no-save solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
+bun add --no-save solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
 bunx tsc -p tsconfig.solid2.json --noEmit
 bunx playwright install chromium
 bun run test:e2e:solid2
@@ -79,6 +79,8 @@ For a release candidate, run formatting, lint, root and site typechecks/builds/u
 Every page has a committed 1200x630 social card in `site/public/og`, indexed by `site/lib/social-images.json`. `cd site && bun run og:build` regenerates them: it builds the site in `--mode social`, which adds the capture-only `/social-preview/:id` route, and captures each card in Chromium with a paused clock. `bun run og:build -- --verify` captures every card twice and fails on any byte difference. Edit `site/lib/social-catalog.ts` for card copy and `site/components/social/` for compositions. The build also refreshes the GitHub star count in `site/lib/github-stars.json` and keeps the committed count if GitHub is unreachable.
 
 The generated registries live at `site/public/r/solid1` and `site/public/r/solid2`. Consumers install component sources and their declared dependencies, not the site or its examples.
+
+The Kobalte runtime dependencies are immutable prerelease archives from AudioCN-owned forks, not upstream releases or upstream-endorsed packages. See `patches/README.md` for exact source commits, release links and archive checksums.
 
 ## Cloudflare staging
 
@@ -168,6 +170,14 @@ The upstream implementation is the behavior reference. Framework-neutral audio c
 Solid 1 and Solid 2 have different effect and context-provider contracts. The small helpers in `lib/solid/effect.ts` and `lib/solid/context.ts` contain those differences so the component implementations stay shared.
 
 See `AGENTS.md` for the engineering rules and reference codebases.
+
+### Mobile playback routing
+
+The shared Web Audio hooks and standalone knob click sounds request `navigator.audioSession.type = "playback"` from a user gesture when the current type is `auto`. Suspended and Safari-interrupted contexts resume in that same gesture. The site's audible copy feedback requests playback before awaiting the clipboard, including source-read failures. Plain `useAudioPlayer` media elements retain their native playback behavior; media routed through an analyser or mixer also uses the shared context.
+
+This is an intentional Safari compatibility improvement over upstream. The optional session API affects the whole page; explicitly selected categories such as `ambient` and `play-and-record` are preserved. Unsupported or rejecting browsers retain native behavior, and older iOS versions may still require Silent Mode off. Passive meters, visualizers, synthetic frame sources, and offline demo rendering do not produce speaker audio. Microphone and screen capture still need browser support and permission; playback routing does not enable unsupported iOS screen capture.
+
+Browser acceptance checks gesture timing, category selection, native playback, and interrupted-context recovery. Desktop WebKit and emulated category APIs do not prove iPhone ringer or speaker behavior. Physical iPhone verification must cover the desired surfaces with Silent Mode on and off and audible media volume; the user's successful phone observation is not an all-surface certification.
 
 ## License
 
