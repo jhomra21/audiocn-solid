@@ -121,6 +121,12 @@ export default defineConfig(({ mode }) => {
             import.meta.url
           )
         ),
+        "@kobalte/core/toast": fileURLToPath(
+          new URL(
+            "../node_modules/@kobalte/core-solid2/dist/toast/index.jsx",
+            import.meta.url
+          )
+        ),
         "@": fileURLToPath(new URL("..", import.meta.url)),
       },
       dedupe: ["solid-js", "@solidjs/web"],

@@ -86,7 +86,7 @@ export const useSound = (
   src: MaybeAccessor<string | AudioBuffer | null>,
   options: MaybeAccessor<UseSoundOptions> = {}
 ): SoundController => {
-  const { context } = useAudioContext();
+  const { context, resume } = useAudioContext();
   const read = () => readMaybeAccessor(options);
   const [result, setResult] = createSignal<LoadResult | null>(null);
   const [playing, setPlaying] = createSignal(false);
@@ -168,7 +168,7 @@ export const useSound = (
 
     if (!(context && buffer && output) || disposed) return;
 
-    if (context.state === "suspended") void context.resume().catch(() => {});
+    void resume().catch(() => {});
 
     if (read().interrupt ?? true) stop();
     else {

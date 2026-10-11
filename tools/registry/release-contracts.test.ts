@@ -55,6 +55,41 @@ test("Cloudflare branch previews are enabled in the static Worker config", async
   expect(configuration).toMatch(/"previews"\s*:\s*\{\s*\}/u);
 });
 
+test("generated registry indexes agree with their payload dependencies in both runtimes", async () => {
+  for (const runtime of ["solid1", "solid2"]) {
+    const directory = join(root, "site/public/r", runtime);
+
+    const index = JSON.parse(
+      await readFile(join(directory, "registry.json"), "utf8")
+    );
+
+    for (const item of index.items) {
+      const payload = JSON.parse(
+        await readFile(join(directory, `${item.name}.json`), "utf8")
+      );
+
+      expect(item.dependencies ?? [], `${runtime}/${item.name}`).toEqual(
+        payload.dependencies ?? []
+      );
+    }
+  }
+});
+
+test("Solid 1 index pins the Solid 1 Kobalte fork, not the registry version", async () => {
+  const index = JSON.parse(
+    await readFile(join(root, "site/public/r/solid1/registry.json"), "utf8")
+  );
+
+  for (const item of index.items) {
+    for (const dependency of item.dependencies ?? []) {
+      if (dependency.startsWith("@kobalte/core@"))
+        expect(dependency, item.name).toStartWith(
+          "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-"
+        );
+    }
+  }
+});
+
 test("installation documents manual Solid setup, not React init", async () => {
   const instructions = await readFile(
     join(root, "site/content/docs/installation.mdx"),

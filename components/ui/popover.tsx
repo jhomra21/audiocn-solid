@@ -14,6 +14,7 @@ import type {
   ParagraphDOMProps,
 } from "@/lib/solid/jsx-types";
 import { omitProps } from "@/lib/solid/props";
+import { setRefValue } from "@/lib/solid/ref";
 import { cn } from "@/lib/utils";
 
 /** Kobalte owns placement on the root: use `placement`, `gutter`, and `shift`. */
@@ -21,13 +22,53 @@ export const Popover = (props: PopoverRootProps) => (
   <PopoverPrimitive.Root {...props} />
 );
 
-export const PopoverTrigger = (props: ButtonProps) => (
-  <PopoverPrimitive.Trigger
-    as={Button}
-    data-slot="popover-trigger"
-    {...props}
-  />
-);
+export interface PopoverTriggerClickEvent extends MouseEvent {
+  preventBaseUIHandler: () => void;
+  readonly baseUIHandlerPrevented: boolean;
+}
+
+export const PopoverTrigger = (
+  props: Omit<ButtonProps, "onClick"> & {
+    onClick?: (event: PopoverTriggerClickEvent) => void;
+  }
+) => {
+  const context = PopoverPrimitive.usePopoverContext();
+  const rest = omitProps(props, ["ref", "onClick"]);
+
+  // Kobalte's trigger cancels pointerdown, suppressing native touch clicks in
+  // WebKit. Keep native button activation; Kobalte still owns open state/focus.
+  return (
+    <Button
+      aria-haspopup="dialog"
+      aria-expanded={context.isOpen() ? "true" : "false"}
+      aria-controls={context.isOpen() ? context.contentId() : undefined}
+      data-slot="popover-trigger"
+      {...context.dataset()}
+      {...rest}
+      ref={(node) => {
+        if (node) context.setTriggerRef(node);
+        setRefValue(props.ref, node);
+      }}
+      onClick={(event) => {
+        let prevented = false;
+        // SAFETY: these additions are installed before calling the consumer.
+        const baseEvent = event as PopoverTriggerClickEvent;
+        Object.defineProperties(baseEvent, {
+          baseUIHandlerPrevented: { configurable: true, get: () => prevented },
+          preventBaseUIHandler: {
+            configurable: true,
+            value: () => {
+              prevented = true;
+            },
+          },
+        });
+        props.onClick?.(baseEvent);
+
+        if (!prevented) context.toggle();
+      }}
+    />
+  );
+};
 
 export interface PopoverContentProps
   extends Omit<DivDOMProps, "id" | "style">, PopoverContentOptions {

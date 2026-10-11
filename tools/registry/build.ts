@@ -7,6 +7,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const output = join(root, "site/public/r");
 
+const SOLID1_KOBALTE =
+  "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-audiocn-e0e3bf095f05c7e61230a251b79181c6d834d408/kobalte-core-0.13.14-audiocn.0.e0e3bf09.tgz";
+
+const SOLID2_KOBALTE =
+  "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz";
+
 const registry = JSON.parse(
   await readFile(join(root, "registry.json"), "utf8")
 );
@@ -29,19 +35,18 @@ const run = (args: string[]) => {
 
 const solid2Dependencies = (dependencies: string[] = []): string[] => {
   const resolved = dependencies.map((dependency) => {
-    if (dependency.startsWith("solid-js@")) return "solid-js@^2.0.0-rc.13";
+    if (dependency.startsWith("solid-js@")) return "solid-js@2.0.0-rc.14";
 
     if (dependency.startsWith("@solidjs/web@"))
-      return "@solidjs/web@^2.0.0-rc.13";
+      return "@solidjs/web@2.0.0-rc.14";
 
-    if (dependency.startsWith("@kobalte/core@"))
-      return "@kobalte/core@2.0.0-alpha.2";
+    if (dependency.startsWith("@kobalte/core@")) return SOLID2_KOBALTE;
 
     return dependency;
   });
 
   if (!resolved.some((dependency) => dependency.startsWith("@solidjs/web@")))
-    resolved.push("@solidjs/web@^2.0.0-rc.13");
+    resolved.push("@solidjs/web@2.0.0-rc.14");
 
   return resolved;
 };
@@ -49,6 +54,22 @@ const solid2Dependencies = (dependencies: string[] = []): string[] => {
 run(["registry", "validate", "registry.json"]);
 
 run(["build", "registry.json", "--output", join(output, "solid1")]);
+
+for (const item of registry.items) {
+  item.dependencies = (item.dependencies ?? []).map((dependency: string) =>
+    dependency.startsWith("@kobalte/core@") ? SOLID1_KOBALTE : dependency
+  );
+
+  const payloadPath = join(output, "solid1", `${item.name}.json`);
+  const payload = JSON.parse(await readFile(payloadPath, "utf8"));
+  payload.dependencies = item.dependencies;
+  await writeFile(payloadPath, `${JSON.stringify(payload, null, 2)}\n`);
+}
+
+await writeFile(
+  join(output, "solid1/registry.json"),
+  `${JSON.stringify(registry, null, 2)}\n`
+);
 
 // Derive runtime-specific payloads, never replace checked-in source while a
 // concurrent typecheck/Vite build might read it.

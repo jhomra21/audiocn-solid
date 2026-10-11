@@ -166,6 +166,13 @@ export const runBlocksSuite = (runtime: string) => {
     await page.keyboard.press("ArrowLeft");
     await expect(
       mixer.getByRole("tab", { name: "Rows", exact: true })
+    ).toBeFocused();
+    await expect(
+      mixer.getByRole("tab", { name: "Console", exact: true })
+    ).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Enter");
+    await expect(
+      mixer.getByRole("tab", { name: "Rows", exact: true })
     ).toHaveAttribute("aria-selected", "true");
 
     const volume = mixer.getByRole("slider", {

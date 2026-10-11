@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageMeta } from "@/site/components/docs/page-meta";
+import { DocsIcon } from "@/site/components/docs/phosphor-icons";
 import { SiteFooter } from "@/site/components/docs/site-footer";
 import { SiteHeader } from "@/site/components/docs/site-header";
 import { getContributorStats } from "@/site/lib/contributors";
@@ -140,14 +141,19 @@ export default function ContributorsPage() {
                             </Badge>
                           </span>
                         </span>
-                        <span
+                        <DocsIcon
+                          name="ArrowSquareOut"
                           aria-hidden="true"
-                          class="text-muted-foreground shrink-0"
-                        >
-                          ↗
-                        </span>
+                          height="1em"
+                          width="1em"
+                          class="text-muted-foreground group-hover:text-foreground shrink-0 transition-colors"
+                        />
                         <span class="sr-only">
-                          {contributor.login} on GitHub
+                          {contributor.login} on GitHub,{" "}
+                          {format.format(contributor.contributions)}{" "}
+                          {contributor.contributions === 1
+                            ? "commit"
+                            : "commits"}
                         </span>
                       </a>
                     </li>

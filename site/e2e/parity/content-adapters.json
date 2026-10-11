@@ -1,6 +1,46 @@
 [
   {
     "route": "/docs/installation",
+    "reason": "site/lib/docs/ai-prompt.ts takeExamples emits links rather than embedding every example; installation.mdx documents that existing Solid agent-document contract accurately.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Every component, hook and block page has a Copy prompt for AI button. It copies a single document with the install steps, the usage, every example and the full API, written for an agent to follow."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Every component, hook and block page has a Copy prompt for AI button. It copies one document with the install steps, usage, API reference, and links to the page examples."
+      }
+    ]
+  },
+  {
+    "route": "/docs/hooks/use-audio-context",
+    "reason": "The user-requested Safari audio-session recovery in hooks/use-audio-context.tsx adds playback routing and preserves explicit session types. use-audio-context.mdx documents the Silent Mode benefit and page-wide capture/playback tradeoffs absent from pinned React.",
+    "upstream": [
+      {
+        "tag": "p",
+        "text": "Browsers only let audio start after the user interacts with the page. Every audiocn Web Audio hook shares one AudioContext, and this hook resumes it on the first click, tap or key press."
+      }
+    ],
+    "local": [
+      {
+        "tag": "p",
+        "text": "Browsers only let audio start after the user interacts with the page. Every audiocn Web Audio hook shares one AudioContext, and this hook resumes it on the first click, tap or key press."
+      },
+      {
+        "tag": "p",
+        "text": "On browsers that expose navigator.audioSession (including Safari on iOS 16.4 and later), the first gesture or resume() call changes its default auto type to playback, even if the context is already running. This requests playback routing so Web Audio can play with iPhone Silent Mode enabled. Browsers without this API, or those that reject the setting, keep their native behavior and may still require Silent Mode to be off."
+      },
+      {
+        "tag": "p",
+        "text": "The setting affects all audio on the page and can pause other playback on the device or change microphone routing. audiocn leaves explicitly selected types, including ambient and play-and-record, unchanged. Apps that need mixing or microphone capture should select their own session type before interacting with audio controls."
+      }
+    ]
+  },
+  {
+    "route": "/docs/installation",
     "reason": "Installation describes the separate Solid registry namespace.",
     "upstream": [
       {
@@ -43,7 +83,7 @@
     "local": [
       {
         "tag": "li",
-        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.13 is an experimental lane, tested with Kobalte 2.0.0-alpha.2."
+        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.14 is an experimental lane, tested with the AudioCN-patched Kobalte prerelease."
       },
       {
         "tag": "li",

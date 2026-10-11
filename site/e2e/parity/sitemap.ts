@@ -16,8 +16,12 @@ export const sitemapRoutes = (xml: string): string[] =>
 export const readLocalSitemap = async (): Promise<string> =>
   readFile(join(import.meta.dirname, "../../dist/client/sitemap.xml"), "utf8");
 
-export const readUpstreamSitemap = async (): Promise<string> => {
-  const response = await fetch(UPSTREAM_SITEMAP);
+export const readUpstreamSitemap = async (
+  referenceURL?: string
+): Promise<string> => {
+  const response = await fetch(
+    referenceURL ? new URL("/sitemap.xml", referenceURL) : UPSTREAM_SITEMAP
+  );
 
   if (!response.ok)
     throw new Error(`Upstream sitemap returned ${response.status}`);

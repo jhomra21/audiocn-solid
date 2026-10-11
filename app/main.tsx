@@ -4,7 +4,7 @@ import { AudioDevicesApp } from "@/app/audio-devices";
 import { AudioHooksApp } from "@/app/audio-hooks";
 import { AudioPlayerApp } from "@/app/audio-player";
 import { BlocksApp } from "@/app/blocks";
-import { ContractApp } from "@/app/contracts";
+import { ContractApp, SupportContractApp } from "@/app/contracts";
 import { ControlsApp } from "@/app/controls";
 import { DemoRoutingApp } from "@/app/demo-routing";
 import { App } from "@/app/gallery";
@@ -63,6 +63,8 @@ render(
       <HooksLabApp />
     ) : location.pathname === "/contracts" ? (
       <ContractApp />
+    ) : location.pathname === "/support" ? (
+      <SupportContractApp />
     ) : (
       <App runtime="solid-1" />
     ),

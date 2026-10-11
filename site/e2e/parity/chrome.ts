@@ -261,17 +261,22 @@ export const normalizeChrome = (items: ChromeItem[]): ChromeItem[] =>
 
 /**
  * Upstream's chrome as our site must render it: the brand carries the Solid
- * port's name and the star link points at our repository.
+ * port's name, the star link points at our repository, and the footer adds
+ * the port author without replacing either upstream author.
  */
 export const adaptChrome = (items: ChromeItem[]): ChromeItem[] =>
-  normalizeChrome(items).map((item) =>
-    item
+  normalizeChrome(items).flatMap((item) => {
+    const adapted = item
       .replace(/^(\w+ link )"audiocn"( -> \/)$/, `$1"${siteConfig.name}"$2`)
       .replace(
         ` -> ${UPSTREAM_REPOSITORY}`,
         ` -> https://github.com/${siteConfig.githubRepo}`
-      )
-  );
+      );
+
+    return item === 'footer link "fortysevenfx" -> https://x.com/fortysevenfx'
+      ? ['footer link "jhomra21" -> https://github.com/jhomra21', adapted]
+      : [adapted];
+  });
 
 const mapSteps = (
   steps: CollapsedSidebar,

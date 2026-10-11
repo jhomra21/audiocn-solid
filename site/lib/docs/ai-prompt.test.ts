@@ -191,7 +191,7 @@ describe("buildAiPrompt", () => {
 
     expect(plain).not.toContain("Feed it audio");
     expect(plain).toContain("This writes `hooks/use-reduced-motion.ts`");
-    expect(plain).toContain("solid-js@^2.0.0-rc.13");
+    expect(plain).toContain("solid-js@2.0.0-rc.14");
     expect(plain).not.toContain("React 19");
   });
 

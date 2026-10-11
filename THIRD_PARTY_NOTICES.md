@@ -28,6 +28,8 @@ SOFTWARE.
 
 `site/components/docs/brand-assets-menu.tsx` adapts [Brand Assets Menu](https://chanhdai.com/components/brand-assets-menu) by Chánh Đại to audiocn's existing components, icons and clipboard feedback. `site/components/docs/github-stars.tsx` adapts [GitHub Stars](https://chanhdai.com/components/github-stars) by the same author.
 
+The Solid 1 and Solid 2 runtime dependencies use immutable prerelease archives from AudioCN-owned Kobalte forks. These are not upstream-endorsed releases. The Solid 1 archive is MIT licensed. The bundled Solid 2 archive includes the Apache-2.0 license text and MIT attribution notices for its bundled Kobalte utility and Solid Primitives code. Exact source commits, public release links, package versions, and archive hashes are recorded in `patches/README.md`.
+
 ```text
 MIT License
 

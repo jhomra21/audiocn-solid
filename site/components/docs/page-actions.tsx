@@ -1,9 +1,13 @@
 import { DropdownMenu } from "@kobalte/core/dropdown-menu";
-import { Show, createSignal, onCleanup } from "solid-js";
+import * as Toast from "@kobalte/core/toast";
+import { Portal } from "@solidjs/web";
+import { createUniqueId, onCleanup } from "solid-js";
 
+import { CheckCircleIcon } from "@/components/icons/phosphor";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { CheckIcon } from "@/site/components/docs/icons";
+import { CopyFeedback } from "@/site/components/docs/copy-feedback";
 import { DocsIcon } from "@/site/components/docs/phosphor-icons";
+import { createCopyFeedback } from "@/site/lib/docs/copy-feedback";
 
 const documents = new Map<string, Promise<string>>();
 
@@ -51,29 +55,6 @@ const fetchRegistrySource = async (url: string) => {
   return payload.files[0]!.content;
 };
 
-/** Start the async clipboard write in the user gesture (Safari also requires it). */
-const writeClipboard = async (text: string | Promise<string>) => {
-  if (
-    isString(text) ||
-    !("ClipboardItem" in window) ||
-    !navigator.clipboard?.write
-  ) {
-    await navigator.clipboard.writeText(await text);
-  } else {
-    const blob = text.then(
-      (value) => new Blob([value], { type: "text/plain" })
-    );
-
-    await navigator.clipboard.write([
-      new ClipboardItem({ "text/plain": blob }),
-    ]);
-  }
-};
-
-const isString = (
-  value: string | Promise<string> | (() => Promise<string>)
-): value is string => typeof value === "string";
-
 const commandForManager = (command: string) => {
   let manager = "pnpm";
 
@@ -98,7 +79,7 @@ const chatUrl = (base: string, params: Record<string, string>) =>
   `${base}?${new URLSearchParams(params).toString()}`;
 
 const ITEM_CLASS =
-  "data-highlighted:bg-accent data-highlighted:text-accent-foreground flex cursor-default select-none items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none [&_svg]:size-4";
+  "focus:bg-foreground/10 data-highlighted:bg-foreground/10 flex min-h-7 cursor-default select-none items-center gap-2 rounded-xl px-2 py-1.5 text-sm outline-hidden [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4";
 
 export interface PageActionsProps {
   title: string;
@@ -110,27 +91,51 @@ export interface PageActionsProps {
 }
 
 export const PageActions = (props: PageActionsProps) => {
-  const [state, setState] = createSignal<"idle" | "done" | "error">("idle");
-  const [message, setMessage] = createSignal("");
-  let reset: ReturnType<typeof setTimeout> | undefined;
-  onCleanup(() => clearTimeout(reset));
+  const regionId = createUniqueId();
+  const notifications = new Set<number>();
+  let successMessage = "Copied";
+  onCleanup(() => {
+    for (const id of notifications) Toast.toaster.dismiss(id);
+  });
 
-  const run = async (
-    success: string,
-    read: string | (() => Promise<string>)
-  ) => {
-    clearTimeout(reset);
+  const notify = (message: string, error = false) => {
+    const id = Toast.toaster.show(
+      (toast) => {
+        onCleanup(() => notifications.delete(toast.toastId));
 
-    try {
-      await writeClipboard(isString(read) ? read : read());
-      setState("done");
-      setMessage(success);
-    } catch {
-      setState("error");
-      setMessage("Could not copy to clipboard");
-    }
+        return (
+          <Toast.Root
+            toastId={toast.toastId}
+            class="bg-popover text-popover-foreground flex items-center gap-1.5 rounded-(--radius) border p-4 text-[13px] [overflow-wrap:anywhere] shadow-[0_4px_12px_rgb(0_0_0/0.1)] outline-none"
+            data-copy-notification={error ? "error" : "success"}
+          >
+            <span class="mr-1 -ml-[3px] flex size-4 shrink-0 items-center [&_svg]:-ml-px [&_svg]:size-4">
+              {error ? (
+                <DocsIcon name="XCircle" />
+              ) : (
+                <CheckCircleIcon aria-hidden="true" />
+              )}
+            </span>
+            <Toast.Title class="text-[13px] leading-[1.5] font-medium">
+              {message}
+            </Toast.Title>
+          </Toast.Root>
+        );
+      },
+      { region: regionId }
+    );
 
-    reset = setTimeout(() => setState("idle"), 1500);
+    notifications.add(id);
+  };
+
+  const [state, copy] = createCopyFeedback(() => fetchText(props.markdownUrl), {
+    onCopySuccess: () => notify(successMessage),
+    onCopyError: () => notify("Could not copy to clipboard", true),
+  });
+
+  const run = async (success: string, read: () => string | Promise<string>) => {
+    successMessage = success;
+    await copy(read);
   };
 
   const copyPrompt = () =>
@@ -152,29 +157,21 @@ export const PageActions = (props: PageActionsProps) => {
         onMouseEnter={prefetch}
         type="button"
       >
-        <Show
-          when={state() !== "idle"}
-          fallback={<DocsIcon class="size-4" name="Sparkle" />}
-        >
-          <Show
-            when={state() === "done"}
-            fallback={
-              <svg
-                aria-hidden="true"
-                data-slot="error-icon"
-                class="size-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="m9 9 6 6m-6 0 6-6" />
-              </svg>
-            }
-          >
-            <CheckIcon data-slot="done-icon" class="size-4" />
-          </Show>
-        </Show>
+        <CopyFeedback
+          state={state}
+          renderIcon={(current) => (
+            <DocsIcon
+              data-slot={current === "idle" ? undefined : `${current}-icon`}
+              name={
+                current === "done"
+                  ? "Check"
+                  : current === "error"
+                    ? "XCircle"
+                    : "Sparkle"
+              }
+            />
+          )}
+        />
         Copy prompt for AI
       </Button>
       <DropdownMenu placement="bottom-start">
@@ -186,7 +183,7 @@ export const PageActions = (props: PageActionsProps) => {
           <DocsIcon name="CaretDown" />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content class="bg-popover text-popover-foreground z-100 w-64 rounded-lg border p-1 shadow-md outline-none">
+          <DropdownMenu.Content class="bg-popover/70 text-popover-foreground ring-foreground/5 dark:ring-foreground/10 relative isolate z-100 w-64 overflow-hidden rounded-2xl p-1 shadow-lg ring-1 outline-none before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150">
             <DropdownMenu.Item class={ITEM_CLASS} onSelect={copyPrompt}>
               <DocsIcon name="Sparkle" />
               Copy prompt for AI
@@ -194,8 +191,7 @@ export const PageActions = (props: PageActionsProps) => {
             <DropdownMenu.Item
               class={ITEM_CLASS}
               onSelect={() =>
-                void run(
-                  "Install command copied",
+                void run("Install command copied", () =>
                   commandForManager(props.installCommand)
                 )
               }
@@ -269,16 +265,27 @@ export const PageActions = (props: PageActionsProps) => {
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
-      <span
-        role="status"
-        class={
-          message()
-            ? "bg-popover text-popover-foreground fixed right-4 bottom-4 z-100 rounded-lg border px-4 py-3 text-sm shadow-md"
-            : "sr-only"
-        }
-      >
-        {message()}
-      </span>
+      <Portal>
+        <Toast.Region
+          regionId={regionId}
+          aria-label="Notifications"
+          duration={4000}
+          limit={3}
+          pauseOnInteraction
+          pauseOnPageIdle
+          swipeDirection="right"
+          class="fixed right-6 bottom-6 z-[999999999] w-[356px] outline-none max-[600px]:right-4 max-[600px]:bottom-4 max-[600px]:w-[calc(100%-2rem)]"
+          style={{
+            "font-family":
+              "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji",
+          }}
+        >
+          <Toast.List
+            data-copy-notifications
+            class="m-0 list-none p-0 outline-none"
+          />
+        </Toast.Region>
+      </Portal>
     </div>
   );
 };

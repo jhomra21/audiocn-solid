@@ -39,6 +39,100 @@ const dialBounds = async (dial: Locator) => {
 export const runControlsSuite = (runtime: string) => {
   const dragEvidence: unknown[] = [];
 
+  for (const state of ["suspended", "running", "interrupted"] as const) {
+    for (const sessionType of ["auto", "play-and-record"] as const) {
+      test(`standalone knob click routes ${sessionType} audio and recovers ${state} contexts`, async ({
+        page,
+      }, info) => {
+        await page.addInitScript(
+          ({ state, sessionType }) => {
+            const events: { event: string; active: boolean }[] = [];
+            let type: string = sessionType;
+            Object.defineProperty(navigator, "audioSession", {
+              configurable: true,
+              value: {
+                get type() {
+                  return type;
+                },
+                set type(next: string) {
+                  events.push({
+                    event: `session:${next}`,
+                    active: navigator.userActivation.isActive,
+                  });
+                  type = next;
+                },
+              },
+            });
+            const NativeContext = window.AudioContext;
+            window.AudioContext = class extends NativeContext {
+              constructor(options?: AudioContextOptions) {
+                super(options);
+                // Real native context underneath; emulate only Safari's exposed state.
+                Object.defineProperty(this, "state", {
+                  configurable: true,
+                  value: state,
+                });
+                const resume = this.resume.bind(this);
+                this.resume = () => {
+                  events.push({
+                    event: `resume:${this.state}`,
+                    active: navigator.userActivation.isActive,
+                  });
+                  Reflect.deleteProperty(this, "state");
+
+                  return resume();
+                };
+
+                const createSource = this.createBufferSource.bind(this);
+                this.createBufferSource = () => {
+                  const source = createSource();
+                  const start = source.start.bind(source);
+                  source.start = () => {
+                    events.push({
+                      event: `start:${type}`,
+                      active: navigator.userActivation.isActive,
+                    });
+                    document.documentElement.dataset.knobAudioEvents =
+                      JSON.stringify(events);
+                    start();
+                  };
+
+                  return source;
+                };
+              }
+            };
+          },
+          { state, sessionType }
+        );
+        await page.goto("/controls");
+        const dial = section(page, "knob-click").getByRole("slider");
+        await dial.press("ArrowUp");
+        await dial.press("ArrowUp");
+
+        const events = JSON.parse(
+          (await page.locator("html").getAttribute("data-knob-audio-events"))!
+        );
+
+        expect(events).toEqual([
+          ...(sessionType === "auto"
+            ? [{ event: "session:playback", active: true }]
+            : []),
+          ...(state !== "running"
+            ? [{ event: `resume:${state}`, active: true }]
+            : []),
+          {
+            event: `start:${sessionType === "auto" ? "playback" : sessionType}`,
+            active: true,
+          },
+        ]);
+        await info.attach("standalone-knob-native-calls", {
+          body: JSON.stringify({ state, sessionType, events }),
+          contentType: "application/json",
+        });
+      });
+    }
+  }
+
   test.describe("control contracts", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/controls");

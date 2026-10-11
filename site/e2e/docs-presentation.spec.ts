@@ -467,6 +467,14 @@ test("install commands support keyboard package selection, persistence and copyi
   await expect(
     next.getByRole("tab", { name: "pnpm", exact: true })
   ).toBeFocused();
+  await expect(
+    next.getByRole("tab", { name: "bun", exact: true })
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(next.getByRole("tabpanel")).toContainText("bunx");
+  await page.keyboard.press("Enter");
+  await expect(
+    next.getByRole("tab", { name: "pnpm", exact: true })
+  ).toHaveAttribute("aria-selected", "true");
   await expect(next.getByRole("tabpanel")).toContainText("pnpm dlx");
   await page.screenshot({ path: "artifacts/docs-install-tabs.png" });
 });
@@ -596,6 +604,10 @@ test("demo meters follow gain, mute, solo and the master mix", async ({
 
   for (const button of await mixer.locator('[data-slot="mute-toggle"]').all())
     await button.click();
+  // Both ports pause offscreen painters; observe the master before its pixels.
+  await mixer
+    .getByRole("meter", { name: "Master level", exact: true })
+    .scrollIntoViewIfNeeded();
   await expect
     .poll(() =>
       mixer

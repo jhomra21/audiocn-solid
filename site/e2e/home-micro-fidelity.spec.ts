@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+
 import { expect, test } from "@playwright/test";
 import type { Locator } from "@playwright/test";
 
@@ -495,6 +497,64 @@ test("mobile menu closes across the desktop breakpoint without hidden focus", as
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(page.locator(".site-desktop-search")).not.toBeFocused();
 });
+
+for (const theme of ["light", "dark"] as const) {
+  test(`mobile home menu covers the hero with an opaque ${theme} surface`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ height: 844, width: 390 });
+    await page.goto("/");
+    await page.waitForFunction(() => window._$HY?.done);
+
+    await page.getByRole("button", { name: "Toggle Menu" }).click();
+    const menu = page.locator("#site-menu");
+    await expect(menu).toHaveAttribute("data-open", "true");
+    await expect(menu).toHaveCSS("opacity", "1");
+    await expect(menu.getByRole("link", { name: "Docs" })).toBeVisible();
+
+    if (theme === "dark") {
+      await menu.getByTestId("appearance-toggle").click();
+      await expect(page.locator("html")).toHaveClass(/dark/);
+    }
+
+    const background = await menu.evaluate((element) => {
+      const color = getComputedStyle(element).backgroundColor;
+
+      const alpha = Number(
+        color.match(/rgba?\([^/]+[,/]\s*([\d.]+)\s*\)$/)?.[1] ?? 1
+      );
+
+      return { alpha, color };
+    });
+
+    const screenshot = await page.screenshot();
+    const browserName = page.context().browser()?.browserType().name();
+    const artifactName = `mobile-menu-${browserName}-${theme}-390`;
+
+    const artifactDirectory = new URL(
+      "../../artifacts/mobile-menu-surface/",
+      import.meta.url
+    );
+
+    await mkdir(artifactDirectory, { recursive: true });
+    await Promise.all([
+      writeFile(
+        new URL(`${artifactName}-surface.json`, artifactDirectory),
+        `${JSON.stringify(background, null, 2)}\n`
+      ),
+      writeFile(new URL(`${artifactName}.png`, artifactDirectory), screenshot),
+    ]);
+    await testInfo.attach(`${artifactName}-surface.json`, {
+      body: `${JSON.stringify(background, null, 2)}\n`,
+      contentType: "application/json",
+    });
+    await testInfo.attach(`${artifactName}.png`, {
+      body: screenshot,
+      contentType: "image/png",
+    });
+    expect(background.alpha).toBe(1);
+  });
+}
 
 test("tablet menu does not duplicate primary navigation", async ({ page }) => {
   await page.setViewportSize({ height: 900, width: 768 });

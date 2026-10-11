@@ -103,6 +103,11 @@ const contributorsRoute = "/contributors";
 
 const publicRoutes = [...routes, contributorsRoute];
 
+const referenceURL =
+  process.env.AUDIOCN_REACT_BASELINE ?? "https://www.audiocn.dev";
+
+const selectedRoutes = process.env.AUDIOCN_PARITY_ROUTES?.split(",");
+
 const artifactDirectory = join(import.meta.dirname, "../../artifacts/parity");
 
 const expectedExamples = async (root: string, route: string) => {
@@ -126,9 +131,72 @@ const capturePage = async (
   path: string,
   mobile: boolean
 ) => {
+  const started = performance.now();
+
+  const stage = (name: string) =>
+    console.info(
+      JSON.stringify({
+        route: new URL(url).pathname,
+        origin: new URL(url).origin,
+        stage: name,
+        elapsedMs: Math.round(performance.now() - started),
+      })
+    );
+
   try {
-    const response = await page.goto(url, { waitUntil: "networkidle" });
+    stage("navigation");
+    const response = await page.goto(url, { waitUntil: "load" });
+    await page.waitForFunction(() => !window._$HY || window._$HY.done);
+    await expect(
+      page
+        .locator("footer")
+        .getByRole("link", { name: "Contributors", exact: true })
+    ).toBeVisible();
+    stage("fonts");
     await page.evaluate(() => document.fonts.ready);
+
+    if (new URL(url).pathname.startsWith("/docs")) {
+      // Both owners discover frame-source channel counts when a preview enters
+      // the viewport. Solid's TOC also mounts after hydration, adding 40px on mobile.
+      if (mobile && (await page.locator(".prose h2").count()))
+        await expect(
+          page
+            .locator("header button")
+            .filter({ has: page.getByRole("progressbar") })
+        ).toBeVisible();
+
+      for (const preview of await page
+        .locator('[data-slot="component-preview"]')
+        .all()) {
+        await preview.scrollIntoViewIfNeeded();
+        await page.evaluate(
+          () =>
+            new Promise<void>((resolve) =>
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => resolve())
+              )
+            )
+        );
+      }
+
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+
+    if (new URL(url).pathname === "/docs/components/sound-pad")
+      await expect(
+        page
+          .locator('[data-slot="component-preview"]')
+          .nth(1)
+          .getByRole("button")
+      ).toHaveCount(8);
+
+    if (new URL(url).pathname === "/docs/blocks/soundboard")
+      await expect(page.locator('[data-slot="soundboard"]')).toBeVisible();
+
+    if (new URL(url).pathname === "/docs/blocks/mic-setup")
+      await expect(
+        page.locator('[data-slot="audio-device-select-trigger"]')
+      ).not.toHaveAttribute("data-loading", "");
 
     if (new URL(url).pathname === "/docs/components/waveform") {
       const demo = page.locator('[data-slot="component-preview"]').first();
@@ -172,9 +240,12 @@ const capturePage = async (
       await page.evaluate(() => window.scrollTo(0, 0));
     }
 
+    stage("metrics");
     const metrics = await inspectPage(page);
+    stage("screenshot");
     await page.screenshot({ fullPage: true, path });
 
+    stage("head-and-chrome");
     const head = await inspectHead(page);
     const chrome = await inspectChrome(page);
     const brandMenu = await inspectBrandMenu(page);
@@ -186,6 +257,8 @@ const capturePage = async (
         ? await inspectCollapsedSidebar(page)
         : null;
 
+    stage("complete");
+
     return {
       brandMenu,
       chrome,
@@ -196,42 +269,50 @@ const capturePage = async (
       status: response?.status() ?? 0,
     };
   } catch (error) {
+    stage(`failed: ${String(error)}`);
+
     return { error: String(error) };
   }
 };
 
-test("compare upstream and local page structure", async ({ page, baseURL }) => {
-  test.setTimeout(1_800_000);
+for (const route of publicRoutes.filter(
+  (route) => !selectedRoutes || selectedRoutes.includes(route)
+)) {
+  test(`compare upstream and local page structure: ${route}`, async ({
+    page,
+    baseURL,
+  }) => {
+    test.setTimeout(60_000);
 
-  await mkdir(artifactDirectory, { recursive: true });
-  await page.emulateMedia({ colorScheme: "light" });
-  page.setDefaultNavigationTimeout(30_000);
+    await mkdir(artifactDirectory, { recursive: true });
+    await page.emulateMedia({ colorScheme: "light" });
+    page.setDefaultNavigationTimeout(15_000);
+    page.setDefaultTimeout(5_000);
 
-  const summary = [];
-  const routeInventory = await readPrerenderedRoutes();
+    const summary = [];
+    const routeInventory = await readPrerenderedRoutes();
 
-  const gaps = routeInventory.flatMap(({ route, page, items }) =>
-    page || items.length ? [{ route, page, items }] : []
-  );
+    const gaps = routeInventory.flatMap(({ route, page, items }) =>
+      page || items.length ? [{ route, page, items }] : []
+    );
 
-  await writeFile(
-    join(artifactDirectory, "gaps.json"),
-    JSON.stringify(
-      {
-        gaps,
-        outsideComparisonScope: routeInventory
-          .filter(
-            ({ route }) =>
-              !publicRoutes.some((supported) => supported === route)
-          )
-          .map(({ route, page, items }) => ({ route, page, items })),
-      },
-      null,
-      2
-    )
-  );
+    await writeFile(
+      join(artifactDirectory, "gaps.json"),
+      JSON.stringify(
+        {
+          gaps,
+          outsideComparisonScope: routeInventory
+            .filter(
+              ({ route }) =>
+                !publicRoutes.some((supported) => supported === route)
+            )
+            .map(({ route, page, items }) => ({ route, page, items })),
+        },
+        null,
+        2
+      )
+    );
 
-  for (const route of publicRoutes) {
     const contentScope = route !== contributorsRoute;
     const slug = route === "/" ? "home" : route.slice(1).replaceAll("/", "-");
 
@@ -260,7 +341,7 @@ test("compare upstream and local page structure", async ({ page, baseURL }) => {
 
       const upstreamCapture = await capturePage(
         page,
-        `https://www.audiocn.dev${route}`,
+        `${referenceURL}${route}`,
         join(artifactDirectory, `${slug}-upstream-${viewport.name}.png`),
         viewport.width < 640
       );
@@ -375,7 +456,11 @@ test("compare upstream and local page structure", async ({ page, baseURL }) => {
           width: 1200,
         })
       ) {
-        differences.push({ field: "ogImage", local: ogImage, upstream: null });
+        differences.push({
+          field: "ogImage",
+          local: ogImage,
+          upstream: null,
+        });
       }
 
       for (const [field, upstreamItems, localItems] of [
@@ -486,28 +571,31 @@ test("compare upstream and local page structure", async ({ page, baseURL }) => {
         0
       ),
     });
-  }
 
-  await writeFile(
-    join(artifactDirectory, "summary.json"),
-    `${JSON.stringify(summary, null, 2)}\n`
-  );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${route === "/" ? "home" : route.slice(1).replaceAll("/", "-")}-summary.json`
+      ),
+      `${JSON.stringify(summary, null, 2)}\n`
+    );
 
-  expect
-    .soft(
-      gaps,
-      "Known unported pages, examples and tiles remain parity gaps; see gaps.json"
-    )
-    .toEqual([]);
+    expect
+      .soft(
+        gaps,
+        "Known unported pages, examples and tiles remain parity gaps; see gaps.json"
+      )
+      .toEqual([]);
 
-  expect(
-    summary.filter(({ unallowed }) => unallowed > 0),
-    "unallowlisted upstream/local structure differences"
-  ).toEqual([]);
-});
+    expect(
+      summary.filter(({ unallowed }) => unallowed > 0),
+      "unallowlisted upstream/local structure differences"
+    ).toEqual([]);
+  });
+}
 
 test("compare upstream and local page structure: public route inventory", async () => {
-  const upstream = sitemapRoutes(await readUpstreamSitemap());
+  const upstream = sitemapRoutes(await readUpstreamSitemap(referenceURL));
   const local = sitemapRoutes(await readLocalSitemap());
 
   expect(
@@ -533,10 +621,7 @@ test("compare upstream and local page structure: not-found state", async ({
 
   const missing = "/parity-route-that-does-not-exist";
 
-  const upstream = await inspectNotFound(
-    page,
-    `https://www.audiocn.dev${missing}`
-  );
+  const upstream = await inspectNotFound(page, `${referenceURL}${missing}`);
 
   const local = await inspectNotFound(page, new URL(missing, baseURL).href);
 
