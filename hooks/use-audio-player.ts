@@ -166,8 +166,12 @@ export const useAudioPlayer = (
     }
   );
   createCompatEffect(
-    () => ({ src: read().src, crossOrigin: read().crossOrigin }),
-    ({ src, crossOrigin }) => {
+    () => ({
+      autoPlay: read().autoPlay,
+      crossOrigin: read().crossOrigin,
+      src: read().src,
+    }),
+    ({ autoPlay, src, crossOrigin }) => {
       if (!element) return;
       const origin = crossOrigin ?? null;
       const changed = element.crossOrigin !== origin;
@@ -188,7 +192,7 @@ export const useAudioPlayer = (
         element.load();
       }
 
-      if (read().autoPlay && element.paused && element.currentTime === 0)
+      if (autoPlay && element.paused && element.currentTime === 0)
         void tryPlay(element);
     }
   );

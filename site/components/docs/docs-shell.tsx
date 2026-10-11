@@ -66,11 +66,28 @@ const NAV_SEPARATOR_CLASS =
 
 let sidebarScrollTop: number | undefined;
 
-const revealCurrentLink = (viewport: HTMLDivElement) => {
+let sidebarNavigationIntent: { from: string; to: string } | undefined;
+
+const revealCurrentLink = (
+  viewport: HTMLDivElement,
+  currentPath: () => string
+) => {
   onSettled(() => {
+    const path = currentPath();
+
     if (sidebarScrollTop !== undefined) {
       viewport.scrollTop = sidebarScrollTop;
     }
+
+    if (sidebarNavigationIntent?.to === path) {
+      sidebarNavigationIntent = undefined;
+
+      return;
+    }
+
+    if (sidebarNavigationIntent?.from === path) return;
+
+    sidebarNavigationIntent = undefined;
 
     const current = viewport.querySelector("[aria-current=page]");
 
@@ -144,7 +161,7 @@ const SidebarCollapseTrigger = (props: {
 
 const DocsNavigation = (props: {
   currentPath: string;
-  onNavigate?: () => void;
+  onNavigate?: (href: string, event: MouseEvent) => void;
 }) => (
   <nav aria-label="Documentation" class="flex flex-col gap-0.5">
     <div class="mb-4 flex flex-col gap-0.5">
@@ -156,7 +173,7 @@ const DocsNavigation = (props: {
               props.currentPath.startsWith(link.href) ? "true" : undefined
             }
             href={link.href}
-            onClick={props.onNavigate}
+            onClick={(event) => props.onNavigate?.(link.href, event)}
           >
             {link.label}
           </a>
@@ -183,7 +200,9 @@ const DocsNavigation = (props: {
                         aria-current={current() ? "page" : undefined}
                         class={NAV_LINK_CLASS}
                         href={item.href}
-                        onClick={props.onNavigate}
+                        onClick={(event) =>
+                          props.onNavigate?.(item.href, event)
+                        }
                       >
                         {item.label}
                       </a>
@@ -375,20 +394,12 @@ export const DocsShell = (props: DocsShellProps) => {
     Math.max(1, headings().length);
 
   let sidebar: HTMLElement | undefined;
+  let navigationViewport: HTMLDivElement | undefined;
   let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 
   onCleanup(() => {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    const viewport = document.querySelector<HTMLDivElement>(
-      "#nd-sidebar [data-docs-navigation-viewport]"
-    );
-
-    if (viewport) {
-      sidebarScrollTop = viewport.scrollTop;
-    }
+    if (!sidebarNavigationIntent && navigationViewport)
+      sidebarScrollTop = navigationViewport.scrollTop;
   });
 
   onCleanup(() => clearTimeout(leaveTimer));
@@ -580,9 +591,55 @@ export const DocsShell = (props: DocsShellProps) => {
             <div
               class="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto overscroll-contain mask-[linear-gradient(to_bottom,transparent,white_12px,white_calc(100%-12px),transparent)] p-4"
               data-docs-navigation-viewport
-              ref={revealCurrentLink}
+              onScroll={(event) => {
+                if (sidebarNavigationIntent) {
+                  if (sidebarNavigationIntent.from === props.currentPath)
+                    return;
+
+                  if (
+                    sidebarNavigationIntent.to === props.currentPath &&
+                    event.currentTarget.scrollTop === sidebarScrollTop
+                  )
+                    return;
+
+                  sidebarNavigationIntent = undefined;
+                }
+
+                sidebarScrollTop = event.currentTarget.scrollTop;
+              }}
+              ref={(element) => {
+                navigationViewport = element;
+                revealCurrentLink(element, () => props.currentPath);
+              }}
             >
-              <DocsNavigation currentPath={props.currentPath} />
+              <DocsNavigation
+                currentPath={props.currentPath}
+                onNavigate={(href, event) => {
+                  // SAFETY: onNavigate is only attached to anchor elements.
+                  const link = event.currentTarget as HTMLAnchorElement;
+
+                  if (
+                    event.defaultPrevented ||
+                    event.button !== 0 ||
+                    event.metaKey ||
+                    event.ctrlKey ||
+                    event.shiftKey ||
+                    event.altKey ||
+                    link.target !== "" ||
+                    link.hasAttribute("download") ||
+                    href === props.currentPath
+                  )
+                    return;
+
+                  sidebarNavigationIntent = {
+                    from: props.currentPath,
+                    to: href,
+                  };
+
+                  if (navigationViewport)
+                    sidebarScrollTop = navigationViewport.scrollTop;
+                }}
+              />
             </div>
             <div class="flex flex-col p-4 pt-2">
               <div class="text-muted-foreground bg-secondary/50 flex items-center rounded-lg border p-0.5 pe-0">
