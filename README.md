@@ -1,188 +1,220 @@
-# audiocn-solid
+<div align="center">
 
-A Solid port of [audiocn/ui](https://github.com/audiocn/ui). The goal is the same component behavior and styling without a React runtime.
+<a href="https://audiocn-solid.jhonra121.workers.dev">
+  <img src="site/public/og/home-14a5416dabae.png" alt="audiocn: a Solid audio mixer with meters, faders, knobs and a waveform." width="100%" />
+</a>
 
-The current port includes:
+<p><strong>Audio components for Solid, built the shadcn way.</strong><br />
+Level meters, visualizers, faders, knobs, channel strips, a complete mixer, players and sound pads.<br />
+Copy, paste, make them yours.</p>
+<p>A Solid port of <a href="https://github.com/audiocn/ui">audiocn/ui</a>.</p>
 
-- the framework-neutral audio core used by meters and visualizers;
-- all upstream meters, visualizers, waveform, mixer controls, audio player, track list, sound pads, and device selection;
-- audio capture, gain, levels, frame subscriptions, playback, sound, waveform data, and Web Audio mixer hooks;
-- Music Player, Soundboard, Mic Setup, System Audio Settings, Quick Audio Popover, and System Audio Mixer blocks;
-- supporting native Solid primitives and runtime-matched Kobalte overlays and sliders;
-- 65 registry entries for each runtime, 55 documentation pages, and a static Solid 2 site;
-- the upstream palette, dark mode, color themes, DM Sans, Outfit, and Geist Mono.
+<p>
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/components"><img src="https://shieldcn.dev/badge/components-23.svg?logo=lu:AudioLines&amp;mode=light&amp;valueColor=10b981" alt="23 components" /></a>
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks"><img src="https://shieldcn.dev/badge/blocks-6.svg?logo=lu:LayoutDashboard&amp;mode=light&amp;valueColor=10b981" alt="6 blocks" /></a>
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-analyser"><img src="https://shieldcn.dev/badge/hooks-18.svg?logo=lu:Webhook&amp;mode=light&amp;valueColor=10b981" alt="18 hooks" /></a>
+  <a href="./license.md"><img src="https://shieldcn.dev/badge/license-MIT.svg?logo=lu:Scale&amp;mode=light&amp;valueColor=10b981" alt="MIT license" /></a>
+</p>
 
-The same component source runs under Solid 1 and Solid 2. CI typechecks both versions and runs the same browser acceptance suite against both runtimes.
+<p>
+  <a href="https://www.solidjs.com"><img src="https://shieldcn.dev/badge/Solid-1%20%2B%202.svg?logo=solid&amp;variant=secondary&amp;mode=dark" alt="Solid 1 and Solid 2" /></a>
+  <a href="https://ui.shadcn.com/docs/registry"><img src="https://shieldcn.dev/badge/shadcn%2Fui-registry.svg?logo=shadcnui&amp;variant=secondary&amp;mode=dark" alt="shadcn/ui registry" /></a>
+  <a href="https://tailwindcss.com"><img src="https://shieldcn.dev/badge/Tailwind%20CSS-v4.svg?logo=tailwindcss&amp;variant=secondary&amp;mode=dark" alt="Tailwind CSS v4" /></a>
+  <a href="https://developer.mozilla.org/docs/Web/API/Web_Audio_API"><img src="https://shieldcn.dev/badge/Web%20Audio-API.svg?logo=lu:AudioWaveform&amp;variant=secondary&amp;mode=dark" alt="Web Audio API" /></a>
+</p>
 
-## Repository layout
+<p>
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs"><strong>Docs</strong></a> ·
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/installation"><strong>Installation</strong></a> ·
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/components"><strong>Components</strong></a> ·
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks"><strong>Blocks</strong></a> ·
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/concepts/theming"><strong>Theming</strong></a>
+</p>
 
-The port mirrors upstream audiocn where that structure maps cleanly to Solid:
+</div>
 
-- `components/ui/`: public component implementations;
-- `components/blocks/`: composed audio interfaces;
-- `components/examples/`: upstream-parity examples used by the gallery;
-- `components/docs/`: docs-preview presentation only;
-- `hooks/`: Solid/Web Audio lifecycle integrations;
-- `lib/audio/`: framework-neutral audio math, timing, frame, and meter logic;
-- `lib/solid/`: Solid-specific prop, ref, lifecycle, and Solid 1/2 compatibility helpers;
-- `app/`: local preview and acceptance harness, not library code;
-- `e2e/`: shared browser acceptance for both Solid runtimes;
-- `test/`: non-browser contracts such as public type-surface checks;
-- `tools/`: repository tooling that is not shipped with the library.
-- `site/`: static Solid 2 documentation, search, and examples, excluded from consumer installs.
+## Why audiocn
 
-The repository stays a single package until a subsystem has an independent runtime or distribution boundary. This keeps the source close to audiocn without introducing monorepo structure before it is useful.
+- **You own the code.** audiocn is not a runtime component package. The shadcn CLI copies source into your project, where you can change anything.
+- **Themed by shadcn.** Styled with Tailwind CSS and the standard shadcn CSS variables. Your theme styles the components.
+- **Meters and visualizers** draw on animation frames using canvas or DOM updates.
+- **Bring your own audio.** Components receive levels and values; they never open a microphone themselves. Use the included Web Audio hooks, or feed them from another engine.
+- **Real units.** Mixer components speak decibels, the way audio engineers do.
+- **Accessible.** Keyboard control, ARIA roles and reduced-motion support are built in.
 
-## Development
+## Components
 
-Install and start the Solid 1 preview:
+<table>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/mixer"><img src="site/public/og/mixer-51f748ca9f67.png" alt="Mixer: channel strips, shared metering and keyboard navigation." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/level-meter"><img src="site/public/og/level-meter-5a0d4ae19443.png" alt="Level Meter: peak and RMS, stereo channels, peak hold and clip detection." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/knob"><img src="site/public/og/knob-5208933ad2d3.png" alt="Knob: rotary controls for gain, pan and frequency." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/waveform"><img src="site/public/og/waveform-765f8287128f.png" alt="Waveform: a clip with a playhead, seeking, regions and markers." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/electric-waveform"><img src="site/public/og/electric-waveform-2936bc92a662.png" alt="Electric Waveform: a bright core with branching arcs." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/electric-bar-visualizer"><img src="site/public/og/components-electric-bar-visualizer-c5fe116d9ce1.png" alt="Electric Bar Visualizer: frequency bands drawn as electric filaments." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/spectrum"><img src="site/public/og/components-spectrum-55bf80ac9d51.png" alt="Spectrum: a frequency analyser with axes, grid and peak hold." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/smooth-waveform"><img src="site/public/og/components-smooth-waveform-8c93ccfafa17.png" alt="Smooth Waveform: a clean line that follows the sound." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/audio-player"><img src="site/public/og/components-audio-player-5328fa31b40c.png" alt="Audio Player: transport, seeking, time, volume, rate and loop." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/components/sound-pad"><img src="site/public/og/components-sound-pad-354561ef7f59.png" alt="Sound Pad: trigger pads with modes, hotkeys, progress and accent colours." /></a></td>
+  </tr>
+</table>
 
-```sh
-bun install --frozen-lockfile
-bun run dev
-```
+<details>
+<summary><strong>All 23 components</strong></summary>
 
-The root preview is an acceptance harness. Run `cd site && bun run dev` for the documentation site.
+<br />
 
-Run the normal checks and browser acceptance:
+**Meters and visualizers**
 
-```sh
-bun run check
-bunx playwright install chromium
-bun run test:e2e
-```
+| Component | What it does |
+| --- | --- |
+| [Level Meter](https://audiocn-solid.jhonra121.workers.dev/docs/components/level-meter) | Peak and RMS meter with zones, peak hold, a scale, readout and clip light |
+| [dB Scale](https://audiocn-solid.jhonra121.workers.dev/docs/components/db-scale) | Tick marks and labels for decibel ranges |
+| [dB Readout](https://audiocn-solid.jhonra121.workers.dev/docs/components/db-readout) | Numeric level label that updates at a readable rate |
+| [Clip Indicator](https://audiocn-solid.jhonra121.workers.dev/docs/components/clip-indicator) | Latched clip light with a count and reset |
+| [Bar Visualizer](https://audiocn-solid.jhonra121.workers.dev/docs/components/bar-visualizer) | Frequency-band bars with idle, loading and mirrored modes |
+| [Electric Bar Visualizer](https://audiocn-solid.jhonra121.workers.dev/docs/components/electric-bar-visualizer) | Crackling frequency bars with arcs and sparks |
+| [Electric Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/electric-waveform) | Glowing waveform with a bright core, forks and sparks |
+| [Smooth Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/smooth-waveform) | Flowing waveform or oscilloscope trace |
+| [Live Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/live-waveform) | Canvas waveform of a live signal |
+| [Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/waveform) | Clip waveform with playhead, seeking, regions and markers |
+| [Spectrum](https://audiocn-solid.jhonra121.workers.dev/docs/components/spectrum) | Frequency analyser with axes, grid and peak hold |
 
-The browser suite checks the example gallery, live meter geometry and updates, fonts and theme tokens, latching clips, console warnings, component prop contracts, reduced-motion startup, and source/value switching. It writes a repeatable screenshot to `test-results/artifacts/example-gallery.png`.
+**Controls**
 
-## Solid 2 acceptance
+| Component | What it does |
+| --- | --- |
+| [Fader](https://audiocn-solid.jhonra121.workers.dev/docs/components/fader) | Decibel volume fader with tapers, detents, scale and reset |
+| [Parameter Slider](https://audiocn-solid.jhonra121.workers.dev/docs/components/parameter-slider) | Labelled slider with numeric input, unit, marks and reset |
+| [Knob](https://audiocn-solid.jhonra121.workers.dev/docs/components/knob) | Rotary control for dense layouts |
+| [Pan Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/pan-control) | Left-right balance with centre detent |
+| [Channel Toggle](https://audiocn-solid.jhonra121.workers.dev/docs/components/channel-toggle) | Mute, solo and monitor buttons |
+| [Volume Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/volume-control) | Volume slider with mute button |
+| [Audio Device Select](https://audiocn-solid.jhonra121.workers.dev/docs/components/audio-device-select) | Microphone, speaker or source picker |
 
-The Solid 2 lane replaces the root project's installed Solid/Vite packages. Run it in an owned checkout or worktree, not in a checkout where another task or local dev server is using `node_modules`. This preserves the Solid 1 root install and avoids concurrent dependency races. The override below uses the same pinned prereleases as CI:
+**Mixer**
 
-```sh
-git worktree add ../audiocn-solid-solid2 HEAD
-cd ../audiocn-solid-solid2
-bun install --frozen-lockfile
-bun add --no-save solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
-bunx tsc -p tsconfig.solid2.json --noEmit
-bunx playwright install chromium
-bun run test:e2e:solid2
-```
+| Component | What it does |
+| --- | --- |
+| [Channel Strip](https://audiocn-solid.jhonra121.workers.dev/docs/components/channel-strip) | Mixer channel composed from the parts you need |
+| [Mixer](https://audiocn-solid.jhonra121.workers.dev/docs/components/mixer) | Channel strips with shared meter settings and keyboard navigation |
 
-The worktree starts from committed `HEAD`, not uncommitted candidate edits. Validate the intended candidate revision there. The Solid 2 screenshot is written to `test-results/solid2-artifacts/example-gallery.png`. Remove the worktree only after preserving any needed artifacts and confirming it has no work you need; otherwise keep it for further testing. Do not use the root checkout for the Solid 2 package swap.
+**Sounds and music**
 
-## Registry and site validation
+| Component | What it does |
+| --- | --- |
+| [Audio Player](https://audiocn-solid.jhonra121.workers.dev/docs/components/audio-player) | Composable player with transport, seeking, volume, rate and loop |
+| [Track List](https://audiocn-solid.jhonra121.workers.dev/docs/components/track-list) | Tracks with active and playing states and arrow-key navigation |
+| [Sound Pad](https://audiocn-solid.jhonra121.workers.dev/docs/components/sound-pad) | Trigger pad with modes, hotkey and playback progress |
 
-`bun run registry:validate-shadcn` runs the pinned shadcn CLI validator against the source registry. `bun run registry:spike:3` generates both registries, installs each of the 65 entries in its own fresh consumer project per runtime, typechecks every installed source file, builds each item, and exercises installed controls and blocks. Consumer setup executes the documented Solid bootstrap; item projects share Bun's download cache, never sources or `node_modules`. The report records all 130 file/dependency/license plans and excludes React packages. Reports and screenshots are written to `artifacts/`.
+</details>
 
-For a release candidate, run formatting, lint, root and site typechecks/builds/unit tests, then browser acceptance and registry release contracts. The CI workflow is the complete source-level gate; use a clean frozen install in an owned checkout before validating a candidate. For production-site acceptance, run `cd site && bun run typecheck && bun run test:unit && bun run build:release && bunx playwright test --config playwright.home-routing.config.ts && bunx playwright test --config playwright.release.config.ts`. The release guard rejects missing pages, examples, and caught SSR failures. `bun run parity` separately compares every public route (the 57 pages in upstream's sitemap) with the live upstream site at desktop and mobile sizes, plus the shared not-found state; a successful release build alone does not establish upstream parity.
+## Blocks
 
-Every page has a committed 1200x630 social card in `site/public/og`, indexed by `site/lib/social-images.json`. `cd site && bun run og:build` regenerates them: it builds the site in `--mode social`, which adds the capture-only `/social-preview/:id` route, and captures each card in Chromium with a paused clock. `bun run og:build -- --verify` captures every card twice and fails on any byte difference. Edit `site/lib/social-catalog.ts` for card copy and `site/components/social/` for compositions. The build also refreshes the GitHub star count in `site/lib/github-stars.json` and keeps the committed count if GitHub is unreachable.
+Blocks combine components into complete audio features.
 
-The generated registries live at `site/public/r/solid1` and `site/public/r/solid2`. Consumers install component sources and their declared dependencies, not the site or its examples.
+<table>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/system-audio-mixer"><img src="site/public/og/blocks-system-audio-mixer-d74e5e2f8a52.png" alt="System Audio Mixer: microphone, system audio, music, sound pads and master controls." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/music-player"><img src="site/public/og/blocks-music-player-200b8dbbecc7.png" alt="Music Player: playlist, waveform seek bar, shuffle, repeat and ducking." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/soundboard"><img src="site/public/og/blocks-soundboard-1acd117f32b4.png" alt="Soundboard: sound pads with hotkeys, modes, volume and drag-and-drop." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/mic-setup"><img src="site/public/og/blocks-mic-setup-d9c2769ce50f.png" alt="Microphone Setup: device selector, live preview, meter and gain." /></a></td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/quick-audio-popover"><img src="site/public/og/blocks-quick-audio-popover-b7e4032b961f.png" alt="Quick Audio Popover: microphone and system audio controls." /></a></td>
+    <td width="50%"><a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks/system-audio-settings"><img src="site/public/og/blocks-system-audio-settings-a5dbdd89433a.png" alt="System Audio Settings: capture, volume and a meter." /></a></td>
+  </tr>
+</table>
 
-The Kobalte runtime dependencies are immutable prerelease archives from AudioCN-owned forks, not upstream releases or upstream-endorsed packages. See `patches/README.md` for exact source commits, release links and archive checksums.
+## Hooks
 
-## Cloudflare staging
+Web Audio hooks provide levels and playback state to components. You can also provide data from another audio engine.
 
-The site deploys as static Worker assets. `wrangler.jsonc` serves `site/dist/client` and uses the generated `404.html` for unknown routes.
+| Hook | What it does |
+| --- | --- |
+| [`useMicrophone`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-microphone) | Open a microphone as a `MediaStream` |
+| [`useSystemAudio`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-system-audio) | Capture system or tab audio through the browser's share picker |
+| [`useAudioAnalyser`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-analyser) | Meter and visualize streams, media elements or `AudioNode`s |
+| [`useWebAudioMixer`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-web-audio-mixer) | Bind mixer state to a Web Audio graph |
+| [`useMixer`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-mixer) | Gain, mute, solo, pan and monitor state |
+| [`useAudioPlayer`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-player) | Playback state for an owned audio element |
+| [`useSound`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-sound) | Low-latency playback of short decoded sounds |
+| [`useWaveformData`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-waveform-data) | Decode an audio file into cached waveform peaks |
+| [`useAudioDevices`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-devices) | Audio devices with permission state and live updates |
+| [`useDemoSignal`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-demo-signal) | Synthetic signals for previews, prototypes and tests |
 
-Build with the exact staging origin so canonical links, AI prompts, social metadata, and registry URLs point at the deployed host:
+Plus `useAudioContext`, `useAudioConfig`, `useFrameSource`, `useLevel`, `useClipHold`, `useGainNode`, `useVisibility` and `useReducedMotion`.
 
-```sh
-VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
-  bun run build:web
-bunx wrangler deploy
-```
+## Quick start
 
-After deployment, verify the public site and both registries:
+audiocn Solid is a [shadcn registry](https://ui.shadcn.com/docs/registry). Start with Solid 1.9.15 or later in the 1.x line, Tailwind CSS v4 and a `components.json`. Use the [installation guide](https://audiocn-solid.jhonra121.workers.dev/docs/installation) for setup; the React-oriented shadcn initializer is not the right bootstrap.
 
-```sh
-AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev \
-  bun run --cwd site host:check
-
-AUDIOCN_REGISTRY_ORIGIN=https://audiocn-solid.<workers-subdomain>.workers.dev \
-  bun run registry:test-install
-```
-
-The hosted site check requires an HTTPS origin only (no path, query, fragment, or credentials). It checks all 57 sitemap routes, each route's canonical and social card, all 55 Markdown endpoints, the search payload format and 55-document count, all 130 registry item identities, the brand SVG, robots/LLM resources, and 404 behavior. Only HTML routes may redirect once to the same-origin route plus a trailing slash, matching `auto-trailing-slash`; resource redirects fail. Each request and response body has a 10-second timeout. It verifies HTTP delivery and metadata, not browser hydration, search document identities, or every script/CSS asset. The hosted registry check creates fresh Solid 1 and Solid 2 consumer projects. It installs every registry item through the public HTTPS endpoint, then typechecks and builds each install. Do not submit the registry directory entry until both commands pass against the deployed Worker.
-
-For Workers Builds, import this repository from the Cloudflare dashboard and keep the repository root as the build root. For staging, point the production branch at `feat/solid2-site-spikes`. Set `BUN_VERSION=1.4.2` and leave automatic dependency installation enabled (do not set `SKIP_DEPENDENCY_INSTALL`), then use:
-
-- Build command: `bun run build:web`
-- Deploy command: `bunx wrangler deploy`
-- Build variable: `VITE_AUDIOCN_SITE_URL=https://audiocn-solid.<workers-subdomain>.workers.dev`
-
-The Cloudflare Worker must be named `audiocn-solid` to match `wrangler.jsonc`. If this is the account's first Worker and the `workers.dev` subdomain is not known yet, create the Worker once, copy its assigned URL, set `VITE_AUDIOCN_SITE_URL`, and redeploy the same commit before running the hosted checks.
-
-## shadcn Registry Directory submission
-
-Submit the stable Solid 1 registry to shadcn's public Registry Directory only after the deployed Worker passes both hosted checks above. The directory accepts one URL template per namespace, so `@audiocn-solid` points to Solid 1. Solid 2 users keep the explicit `/r/solid2/` registry URL in `components.json`.
-
-Fork `shadcn-ui/ui`, add this entry to `apps/v4/registry/directory.json`, replacing the example hostname with the verified Worker URL:
+**1. Add the registry** for your Solid runtime to `components.json`:
 
 ```json
 {
-  "name": "@audiocn-solid",
-  "homepage": "https://audiocn-solid.<workers-subdomain>.workers.dev",
-  "url": "https://audiocn-solid.<workers-subdomain>.workers.dev/r/solid1/{name}.json",
-  "description": "Audio components for Solid, distributed as source through shadcn.",
-  "logo": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' fill='none' stroke='var(--foreground)' stroke-linecap='round'><path d='M38.4 102.9a43.5 43.5 0 1 1 51.2 0' stroke-width='8.6'/><path d='m63.3 70 20.5-23.8' stroke-width='8'/></svg>"
+  "registries": {
+    "@audiocn-solid": "https://audiocn-solid.jhonra121.workers.dev/r/solid1/{name}.json"
+  }
 }
 ```
 
-From the shadcn repository, run its registry validation command:
+For the experimental Solid 2 registry, use `/r/solid2/{name}.json`. It targets `solid-js` and `@solidjs/web` 2.0.0-rc.14.
 
-```sh
-pnpm validate:registries
+**2. Add components.** The CLI copies each component with its audio core, compatibility helpers, theme tokens and hooks.
+
+```bash
+bunx --bun shadcn@4.21.0 add @audiocn-solid/level-meter
+bunx --bun shadcn@4.21.0 add @audiocn-solid/system-audio-mixer
 ```
 
-Then open a pull request containing only the directory entry. After shadcn merges it, verify that the public directory resolves the namespace before testing a fresh consumer with `shadcn add @audiocn-solid/<item>`.
+**3. Use them.**
 
-## Source-registry release
+```tsx
+import { LevelMeter } from "@/components/ui/level-meter";
 
-Follow upstream AudioCN's distribution model: keep the development/site packages private and ship a hosted shadcn source registry, not an npm component bundle. `cd site && bun run build:release` generates both runtime registries before Vite, including their compatibility files and consumer license notice; no prior registry cache is required. `bun run registry:test-release` proves this command from an owned clean checkout of the current source and checks the built payloads. Before `bun run registry:test-contracts`, run `bun run registry:build && bun run registry:test-install` to generate real isolated consumer fixtures and their report. Keep those temporary fixtures while rerunning the contracts; a stale report does not recreate deleted consumers.
+export const MicLevel = (props: { peakDb: number }) => (
+  <LevelMeter aria-label="Microphone level" peakDb={props.peakDb} />
+);
+```
 
-Consumers follow `site/content/docs/installation.mdx`: create a Solid Vite app, configure Tailwind and `components.json` manually, then use `shadcn@4.21.0 add @audiocn-solid/<name>` with the runtime-matched registry URL. The React-oriented shadcn initializer is not this port's bootstrap. Solid 1 is stable; Solid 2/Kobalte 2 remain the explicitly tested experimental lane.
+The component API is shared between Solid 1 and Solid 2. The Solid 1 registry is stable. The Solid 2 registry is experimental and uses prerelease dependencies. The two registries use different JSX transforms, so configure the matching runtime before adding components. See the [installation guide](https://audiocn-solid.jhonra121.workers.dev/docs/installation) for setup details.
 
-Before announcing a release, set `VITE_AUDIOCN_SITE_URL` to the real HTTPS origin, validate the final commit in remote CI, and tag that reviewed source revision. Build and deploy only `site/dist/client`; verify the actual host honors the generated Markdown `_headers`, returns `404.html` with status 404 for unknown URLs, and serves both registry JSON inventories. Test the documented bootstrap against that HTTPS origin in fresh consumer apps. The unversioned registry URLs represent the currently deployed source revision; consumers own copied code and must review later updates. Treat staging as a candidate, not a public release: publication/announcement follows the hosted checks and explicit release decision. No hosting/deployment or public release is implied by local acceptance.
+## Develop
 
-Parity checks keep exact presentation slots, example inventories, accessible control names, and layout measurements. Native ranges and ARIA sliders are compared as one interactive control, excluding hidden form duplicates. Solid-specific prose uses exact, route-scoped source adapters in `site/e2e/parity/content-adapters.json`; stale upstream text fails instead of silently expanding an exemption. Captures wait for synthesized audio and lazy tiles to finish loading.
+This repository contains the Solid component source, two source registries and a static Solid 2 documentation site.
 
-Beyond each route's main content, parity also compares:
+| Path | What it is |
+| --- | --- |
+| `components/ui/` | Public components |
+| `components/blocks/` | Composed audio features |
+| `hooks/` | Solid and Web Audio integrations |
+| `lib/audio/` | Framework-neutral audio core |
+| `components/examples/` | Gallery examples |
+| `site/content/docs/` | Documentation pages |
+| `site/public/r/solid1/` and `site/public/r/solid2/` | Generated runtime registries |
 
-- **Head:** title, description, robots, canonical, every `og:*` and `twitter:*` tag, and the `icon` and `apple-touch-icon` links, as a sorted set of exact values. `site/e2e/parity/head.ts` rewrites only the site origin and name, `for React` wording, per-build image hashes and icon fingerprints. Any other wording difference needs an exact, route-scoped entry in `head-adapters.json`, which throws once upstream stops sending that text. Each page's declared `og:image` must load from our server as a 1200x630 PNG.
-- **Chrome:** the accessibility-tree inventory (role, accessible name, state, normalized href, order) of the header, docs sidebar and its controls, and footer, plus the brand context menu, and, at mobile width, the opened home menu and docs drawer. On desktop docs routes it also collapses the sidebar and records the collapsed, edge-peek and re-expanded states: the sidebar's `data-collapsed`/`data-hovered`/`inert` state and offset, the floating panel, every `aria-controls="nd-sidebar"` trigger's label, `aria-expanded` and inertness, and where focus lands. Star counts and the mobile contents progress value are live data and compare by wording only.
-- **Route inventory:** the routes in `dist/client/sitemap.xml` must equal upstream's `sitemap.xml` and the compared route list, so a missing or extra public page fails.
-- **Not found:** an unknown URL's status, title, heading, robots tag and action links. `not-found-adapters.json` records only the preview status difference: `vite preview` answers 200 where Next answers 404. The shipped `404.html` inherits the root title and is asserted in `page-states.spec.ts` and the strict static-host acceptance.
+```bash
+bun install --frozen-lockfile
+bun run dev                         # Solid 1 preview
+bun run --cwd site dev              # documentation site
+bun run check                       # root typecheck and build
+bunx playwright install chromium webkit
+bun run test:e2e                    # Solid 1 browser acceptance
+```
 
-`site/e2e/parity/contracts.spec.ts` corrupts each dimension (head tags, icons, og images, nav and sidebar links, the stars control, mobile menus, the collapsed sidebar, sitemap routes, the not-found heading) and fails unless the harness notices.
-
-## Prerelease compatibility
-
-Solid 2 and Kobalte 2 are prereleases. Select, Popover, and Context Menu use Kobalte's public APIs; Context Menu defers collection unregister writes during disposal. Tabs are native Solid because Kobalte's current Solid 2 tabs lose event bindings during production hydration. Native tabs support controlled selection, keyboard navigation, disabled items, and linked panels.
-
-`lib/solid/kobalte-slider.ts` adapts Kobalte's slider context to the shared native slider implementation. This is a version-sensitive seam, validated by the pinned two-runtime browser and fresh-install tests, not a guarantee for arbitrary future Kobalte prereleases.
-
-## Porting policy
-
-The upstream implementation is the behavior reference. Framework-neutral audio code stays framework-neutral. React lifecycle and state are translated at the framework boundary.
-
-Solid 1 and Solid 2 have different effect and context-provider contracts. The small helpers in `lib/solid/effect.ts` and `lib/solid/context.ts` contain those differences so the component implementations stay shared.
-
-See `AGENTS.md` for the engineering rules and reference codebases.
-
-### Mobile playback routing
-
-The shared Web Audio hooks and standalone knob click sounds request `navigator.audioSession.type = "playback"` from a user gesture when the current type is `auto`. Suspended and Safari-interrupted contexts resume in that same gesture. The site's audible copy feedback requests playback before awaiting the clipboard, including source-read failures. Plain `useAudioPlayer` media elements retain their native playback behavior; media routed through an analyser or mixer also uses the shared context.
-
-This is an intentional Safari compatibility improvement over upstream. The optional session API affects the whole page; explicitly selected categories such as `ambient` and `play-and-record` are preserved. Unsupported or rejecting browsers retain native behavior, and older iOS versions may still require Silent Mode off. Passive meters, visualizers, synthetic frame sources, and offline demo rendering do not produce speaker audio. Microphone and screen capture still need browser support and permission; playback routing does not enable unsupported iOS screen capture.
-
-Browser acceptance checks gesture timing, category selection, native playback, and interrupted-context recovery. Desktop WebKit and emulated category APIs do not prove iPhone ringer or speaker behavior. Physical iPhone verification must cover the desired surfaces with Silent Mode on and off and audible media volume; the user's successful phone observation is not an all-surface certification.
+The root preview is for acceptance testing; library code does not depend on it. See [DEVELOPMENT.md](./DEVELOPMENT.md) for Solid 2 testing in a separate checkout, registry checks and deployment instructions.
 
 ## License
 
-MIT. Portions are adapted from audiocn/ui; see `license.md`. The Warcraft clip used by the docs is a site-only, non-MIT asset and is not included in consumer registry items.
-
-Every independently installable registry item includes `lib/audiocn-license.txt`, retaining the upstream MIT and applicable Phosphor notices without copying site assets. Keep it with redistributed source.
-
-The site brand-assets menu retains the upstream third-party notices in `THIRD_PARTY_NOTICES.md`, including the Outfit wordmark's SIL Open Font License.
+[MIT](./license.md). Portions are adapted from [audiocn/ui](https://github.com/audiocn/ui). The Warcraft audio clip used in the documentation is site-only, is not covered by the MIT license and is not installed with registry items.
