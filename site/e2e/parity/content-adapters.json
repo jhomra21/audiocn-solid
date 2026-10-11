@@ -83,7 +83,7 @@
     "local": [
       {
         "tag": "li",
-        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.13 is an experimental lane, tested with Kobalte 2.0.0-alpha.2."
+        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.14 is an experimental lane, tested with the AudioCN-patched Kobalte prerelease."
       },
       {
         "tag": "li",

@@ -55,7 +55,7 @@ jobs:
         with:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile
-      - run: bun add --no-save solid-js@2.0.0-rc.13 @solidjs/web@2.0.0-rc.13 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
+      - run: bun add --no-save solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
       - run: bunx tsc -p tsconfig.solid2.json --noEmit
       - run: bunx playwright install --with-deps chromium webkit
       - run: bunx playwright test --config playwright.solid2.config.ts

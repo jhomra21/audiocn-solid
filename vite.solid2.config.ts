@@ -10,8 +10,8 @@ export default defineConfig({
     solid(),
     tailwindcss(),
     {
-      // The alpha layer has no public entry. Expose its existing implementation
-      // only to the acceptance harness, not to library or registry consumers.
+      // The layer has no public entry. Expose its bundled implementation only
+      // to the acceptance harness, not to library or registry consumers.
       name: "touch-layer-harness",
       resolveId(id) {
         if (id === "@kobalte/core/dismissable-layer")
@@ -22,7 +22,7 @@ export default defineConfig({
 
         const layer = fileURLToPath(
           new URL(
-            "./node_modules/@kobalte/core-solid2/dist/dismissable-layer/RyRdwdaj.jsx",
+            "./node_modules/@kobalte/core-solid2/dist/dismissable-layer/CebVaFST.js",
             import.meta.url
           )
         );

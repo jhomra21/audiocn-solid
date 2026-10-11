@@ -93,9 +93,10 @@ const packageJsonFor = (runtime: RuntimeName): string => {
             typecheck: "tsc --noEmit",
           },
           dependencies: {
-            "@kobalte/core": "2.0.0-alpha.2",
-            "@solidjs/web": "2.0.0-rc.13",
-            "solid-js": "2.0.0-rc.13",
+            "@kobalte/core":
+              "https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz",
+            "@solidjs/web": "2.0.0-rc.14",
+            "solid-js": "2.0.0-rc.14",
           },
           devDependencies: {
             "@solidjs/vite-plugin": "3.0.0-next.47",
@@ -291,7 +292,8 @@ const report: Spike4Report = {
   },
   versions: {
     solid1: "@kobalte/core@0.13.14 + solid-js@1.9.15",
-    solid2: "@kobalte/core@2.0.0-alpha.2 + solid-js/@solidjs/web@2.0.0-rc.13",
+    solid2:
+      "@kobalte/core@2.0.0-alpha.2-audiocn.2.b394be55 + solid-js/@solidjs/web@2.0.0-rc.14",
   },
   apiDifferences: [
     {

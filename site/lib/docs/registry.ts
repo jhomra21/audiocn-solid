@@ -3,6 +3,12 @@ import { siteConfig } from "../site";
 
 const NAMESPACE = `${siteConfig.registryNamespace}/`;
 
+const SOLID1_KOBALTE =
+  "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-audiocn-e0e3bf095f05c7e61230a251b79181c6d834d408/kobalte-core-0.13.14-audiocn.0.e0e3bf09.tgz";
+
+const SOLID2_KOBALTE =
+  "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz";
+
 export interface RegistryFile {
   path: string;
   type: string;
@@ -41,22 +47,24 @@ const runtimeDependencies = (
   dependencies: string[] | undefined,
   runtime: RegistryRuntime
 ): string[] => {
-  if (runtime === "solid1") return dependencies ?? [];
+  if (runtime === "solid1")
+    return (dependencies ?? []).map((dependency) =>
+      dependency.startsWith("@kobalte/core@") ? SOLID1_KOBALTE : dependency
+    );
 
   const resolved = (dependencies ?? []).map((dependency) => {
-    if (dependency.startsWith("solid-js@")) return "solid-js@^2.0.0-rc.13";
+    if (dependency.startsWith("solid-js@")) return "solid-js@2.0.0-rc.14";
 
     if (dependency.startsWith("@solidjs/web@"))
-      return "@solidjs/web@^2.0.0-rc.13";
+      return "@solidjs/web@2.0.0-rc.14";
 
-    if (dependency.startsWith("@kobalte/core@"))
-      return "@kobalte/core@2.0.0-alpha.2";
+    if (dependency.startsWith("@kobalte/core@")) return SOLID2_KOBALTE;
 
     return dependency;
   });
 
   if (!resolved.some((dependency) => dependency.startsWith("@solidjs/web@")))
-    resolved.push("@solidjs/web@^2.0.0-rc.13");
+    resolved.push("@solidjs/web@2.0.0-rc.14");
 
   return resolved;
 };
