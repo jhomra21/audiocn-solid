@@ -15,11 +15,27 @@ npx shadcn@latest add @audiocn-solid/knob
 ## Usage
 
 ```tsx
-import { Knob, KnobLabel, KnobValue } from "@/components/ui/knob";
+import { Knob, KnobDial } from "@/components/ui/knob";
+import { createClickSound } from "@/lib/audio/click";
 ```
 
 ```tsx
 <Knob min={-24} max={24} origin={0} value={gain} onValueChange={setGain} />
+```
+
+Customize the optional detent tick by passing a `ClickSound`:
+
+```tsx
+const softTick = createClickSound({
+  tone: { hz: 900, decayMs: 2, gain: 0.8 },
+  noise: { decayMs: 0.5, gain: 0.1 },
+  lengthMs: 8,
+  volume: 0.2,
+});
+
+<Knob clickSound={softTick}>
+  <KnobDial />
+</Knob>;
 ```
 
 Drag the dial up to increase the value and down to decrease it. Set `dragDirection="circular"` to turn it by circling around the dial, clockwise to increase and anticlockwise to decrease.
@@ -158,9 +174,9 @@ The dial is a focusable slider with `aria-valuetext` from `format`, named by `Kn
     ["allowWheel", "boolean", "false", null],
     [
       "clickSound",
-      "boolean",
+      "boolean | ClickSound",
       "false",
-      "Plays a soft tick on each graduation: KnobScale's long ticks, or every largeStep without a scale. At most every 30 ms, through the shared AudioContext.",
+      "Plays a soft tick on each graduation: KnobScale's long ticks, or every largeStep without a scale. Pass createClickSound() to customize it.",
     ],
     ["format", "(value: number) => string", "String", null],
     [

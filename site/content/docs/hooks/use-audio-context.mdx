@@ -25,12 +25,14 @@ if (status === "suspended") {
 
 ## Your own context
 
-Wrap your app in `AudioContextProvider` to make every hook use a context you created, for example one with a specific sample rate.
+Wrap your app in `AudioContextProvider` to make every hook use a context you created, for example one with a specific sample rate. `destination` routes Knob click sounds through a node in your audio graph instead of the speakers.
 
 ```tsx
 const context = new AudioContext({ sampleRate: 48_000 });
+const effectsBus = context.createGain();
+effectsBus.connect(context.destination);
 
-<AudioContextProvider context={context}>
+<AudioContextProvider context={context} destination={effectsBus}>
   <App />
 </AudioContextProvider>;
 ```

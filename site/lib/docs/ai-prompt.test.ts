@@ -106,7 +106,7 @@ describe("buildAiPrompt", () => {
 
   it("lists what the CLI writes alongside the component", () => {
     expect(prompt).toContain("This writes `components/ui/bar-visualizer.tsx`");
-    expect(prompt).toContain("`@audiocn-solid/core` (23 files)");
+    expect(prompt).toContain("`@audiocn-solid/core` (24 files)");
     expect(prompt).toContain("`@audiocn-solid/use-frame-source`");
     expect(prompt).toContain("`--meter-ok`");
     expect(prompt).toContain("each with a matching `-foreground` token");

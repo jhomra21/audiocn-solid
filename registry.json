@@ -63,6 +63,10 @@
           "type": "registry:lib"
         },
         {
+          "path": "lib/audio/click.ts",
+          "type": "registry:lib"
+        },
+        {
           "path": "lib/solid/accessor.ts",
           "type": "registry:lib"
         },
