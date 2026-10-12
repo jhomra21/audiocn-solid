@@ -13,8 +13,11 @@ import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import {
   getSharedAudioContext,
-  requestPlaybackAudioSession,
+  resumeAudioContext,
+  useProvidedAudioContext,
 } from "@/hooks/use-audio-context";
+import type { ClickSound } from "@/lib/audio/click";
+import { createClickSound } from "@/lib/audio/click";
 import { clamp } from "@/lib/audio/decibels";
 import { linearTaper, logTaper } from "@/lib/audio/taper";
 import type { Taper } from "@/lib/audio/types";
@@ -97,18 +100,7 @@ const CAP_LINE = {
 
 const TICK_EPSILON = 1e-9;
 
-const CLICK_INTERVAL_MS = 30;
-
-const CLICK_SECONDS = 0.006;
-
-const CLICK_VOLUME = 0.12;
-
-const CLICK_PITCH_SPREAD = 0.04;
-
-const CLICK_PARTS = [
-  { decay: 0.0004, gain: 0.6, hz: 0 },
-  { decay: 0.0012, gain: 0.4, hz: 4200 },
-] as const;
+const DEFAULT_KNOB_CLICK = createClickSound();
 
 const DETENT_EPSILON = 1e-9;
 
@@ -378,93 +370,6 @@ const reachesMultiple = (
     : Math.ceil(start) > Math.ceil(end);
 };
 
-const clickBuffers = new WeakMap<BaseAudioContext, AudioBuffer>();
-
-let lastClickAt = Number.NEGATIVE_INFINITY;
-
-const clickBuffer = (context: BaseAudioContext): AudioBuffer => {
-  const cached = clickBuffers.get(context);
-
-  if (cached) {
-    return cached;
-  }
-
-  const { sampleRate } = context;
-
-  const buffer = context.createBuffer(
-    1,
-    Math.ceil(CLICK_SECONDS * sampleRate),
-    sampleRate
-  );
-
-  const samples = buffer.getChannelData(0);
-
-  for (let index = 0; index < samples.length; index += 1) {
-    const time = index / sampleRate;
-    let sample = 0;
-
-    for (const part of CLICK_PARTS) {
-      const wave =
-        part.hz === 0
-          ? Math.random() * 2 - 1
-          : Math.sin(2 * Math.PI * part.hz * time);
-
-      sample += part.gain * wave * Math.exp(-time / part.decay);
-    }
-
-    samples[index] = sample;
-  }
-
-  clickBuffers.set(context, buffer);
-
-  return buffer;
-};
-
-const resumeContext = async (context: AudioContext): Promise<void> => {
-  requestPlaybackAudioSession();
-
-  try {
-    if (context.state === "suspended" || context.state === "interrupted") {
-      await context.resume();
-    }
-  } catch {
-    // A later user gesture can try again.
-  }
-};
-
-const playClick = (): void => {
-  const now = performance.now();
-
-  const context = getSharedAudioContext();
-
-  if (!context || now - lastClickAt < CLICK_INTERVAL_MS) {
-    return;
-  }
-
-  lastClickAt = now;
-
-  void resumeContext(context);
-
-  const source = context.createBufferSource();
-
-  source.buffer = clickBuffer(context);
-  source.playbackRate.value =
-    1 + (Math.random() - 0.5) * CLICK_PITCH_SPREAD * 2;
-
-  const gain = context.createGain();
-
-  gain.gain.value = CLICK_VOLUME;
-
-  source.connect(gain).connect(context.destination);
-
-  source.addEventListener("ended", () => {
-    source.disconnect();
-    gain.disconnect();
-  });
-
-  source.start();
-};
-
 const knobVariants = cva(
   "group/knob inline-flex flex-col items-center gap-1.5 select-none data-disabled:opacity-50",
   {
@@ -505,7 +410,7 @@ export interface KnobProps extends Omit<
   children?: DivDOMProps["children"];
   class?: string;
   className?: string;
-  clickSound?: boolean;
+  clickSound?: boolean | ClickSound;
   defaultValue?: number;
   disabled?: boolean;
   dragDirection?: KnobDragDirection;
@@ -557,6 +462,7 @@ export const Knob = (props: KnobProps) => {
   const rest = omitProps(props, KNOB_OWN);
 
   const config = useAudioConfig();
+  const providedAudio = useProvidedAudioContext();
 
   const labelId = `knob-${createUniqueId()}-label`;
 
@@ -653,8 +559,21 @@ export const Knob = (props: KnobProps) => {
 
     props.onValueChange?.(next, details);
 
-    if (clicksBetween()?.(previous, next)) {
-      playClick();
+    const configuredClick = clickSound();
+
+    if (clicksBetween()?.(previous, next) && configuredClick) {
+      const sound =
+        configuredClick === true ? DEFAULT_KNOB_CLICK : configuredClick;
+
+      const context = providedAudio.context ?? getSharedAudioContext();
+
+      if (context) {
+        sound.play({
+          context,
+          destination: providedAudio.destination ?? context.destination,
+          resume: () => resumeAudioContext(context),
+        });
+      }
     }
 
     if (props.value !== undefined) {

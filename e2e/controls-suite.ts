@@ -36,6 +36,16 @@ const dialBounds = async (dial: Locator) => {
   };
 };
 
+declare global {
+  interface Window {
+    __knobAudioGraph?: { context: AudioContext; destination: GainNode };
+    __knobAudioConnections?: AudioNode[];
+    __knobAudioGains?: GainNode[];
+    __knobResumeEvents?: string[];
+    __resolveKnobResumes?: (() => void)[];
+  }
+}
+
 export const runControlsSuite = (runtime: string) => {
   const dragEvidence: unknown[] = [];
 
@@ -43,10 +53,21 @@ export const runControlsSuite = (runtime: string) => {
     for (const sessionType of ["auto", "play-and-record"] as const) {
       test(`standalone knob click routes ${sessionType} audio and recovers ${state} contexts`, async ({
         page,
+        browserName,
       }, info) => {
         await page.addInitScript(
-          ({ state, sessionType }) => {
+          ({ state, sessionType, browserName }) => {
             const events: { event: string; active: boolean }[] = [];
+
+            const record = (event: string) => {
+              events.push({
+                event,
+                active: navigator.userActivation.isActive,
+              });
+              document.documentElement.dataset.knobAudioEvents =
+                JSON.stringify(events);
+            };
+
             let type: string = sessionType;
             Object.defineProperty(navigator, "audioSession", {
               configurable: true,
@@ -74,13 +95,22 @@ export const runControlsSuite = (runtime: string) => {
                 });
                 const resume = this.resume.bind(this);
                 this.resume = () => {
-                  events.push({
-                    event: `resume:${this.state}`,
-                    active: navigator.userActivation.isActive,
-                  });
+                  record(`resume:${this.state}`);
                   Reflect.deleteProperty(this, "state");
+                  const nativeResume = resume();
 
-                  return resume();
+                  if (browserName !== "webkit") return nativeResume;
+
+                  void nativeResume.catch(() => {});
+                  // Headless WebKit can leave native contexts suspended after
+                  // a trusted key press. Model the accepted resume transition
+                  // so this test covers the call and click scheduling contract.
+                  Object.defineProperty(this, "state", {
+                    configurable: true,
+                    value: "running",
+                  });
+
+                  return Promise.resolve();
                 };
 
                 const createSource = this.createBufferSource.bind(this);
@@ -88,12 +118,7 @@ export const runControlsSuite = (runtime: string) => {
                   const source = createSource();
                   const start = source.start.bind(source);
                   source.start = () => {
-                    events.push({
-                      event: `start:${type}`,
-                      active: navigator.userActivation.isActive,
-                    });
-                    document.documentElement.dataset.knobAudioEvents =
-                      JSON.stringify(events);
+                    record(`start:${type}`);
                     start();
                   };
 
@@ -102,7 +127,7 @@ export const runControlsSuite = (runtime: string) => {
               }
             };
           },
-          { state, sessionType }
+          { state, sessionType, browserName }
         );
         await page.goto("/controls");
         const dial = section(page, "knob-click").getByRole("slider");
@@ -707,6 +732,186 @@ export const runControlsSuite = (runtime: string) => {
           )
         )
         .toBe(6);
+    });
+
+    test("silent knob does not create an AudioContext", async ({ page }) => {
+      await page.addInitScript(() => {
+        const NativeAudioContext = window.AudioContext;
+        let count = 0;
+
+        Object.defineProperty(window, "AudioContext", {
+          configurable: true,
+          value: class extends NativeAudioContext {
+            constructor(options?: AudioContextOptions) {
+              super(options);
+              count += 1;
+              document.documentElement.dataset.audioContextCount =
+                String(count);
+            }
+          },
+        });
+      });
+      await page.goto("/controls");
+
+      const before = await page
+        .locator("html")
+        .getAttribute("data-audio-context-count");
+
+      await section(page, "knob-quiet").getByRole("slider").press("PageUp");
+      expect(
+        await page.locator("html").getAttribute("data-audio-context-count")
+      ).toBe(before);
+    });
+
+    test("knob uses the audio context provider destination", async ({
+      page,
+      browserName,
+    }) => {
+      await page
+        .getByRole("button", { name: "Create custom click audio bus" })
+        .click();
+      const custom = section(page, "knob-custom-click").getByRole("slider");
+
+      await page.evaluate((browserName) => {
+        const connected: AudioNode[] = [];
+        const gains: GainNode[] = [];
+        const resumeCalls: string[] = [];
+        const context = window.__knobAudioGraph!.context;
+        const createGain = context.createGain.bind(context);
+        const resume = context.resume.bind(context);
+
+        if (browserName === "webkit") {
+          Object.defineProperty(context, "state", {
+            configurable: true,
+            value: "suspended",
+          });
+
+          context.resume = () => {
+            resumeCalls.push(
+              navigator.userActivation.isActive
+                ? "resume:active"
+                : "resume:inactive"
+            );
+            const nativeResume = resume();
+            void nativeResume.catch(() => {});
+            Object.defineProperty(context, "state", {
+              configurable: true,
+              value: "running",
+            });
+
+            return Promise.resolve();
+          };
+
+          window.__knobResumeEvents = resumeCalls;
+        }
+
+        context.createGain = () => {
+          const gain = createGain();
+          const connect = gain.connect.bind(gain);
+
+          gains.push(gain);
+          Object.defineProperty(gain, "connect", {
+            value: (target: AudioNode) => {
+              connected.push(target);
+
+              return connect(target);
+            },
+          });
+
+          return gain;
+        };
+
+        window.__knobAudioConnections = connected;
+        window.__knobAudioGains = gains;
+      }, browserName);
+      await custom.press("ArrowUp");
+      await custom.press("ArrowUp");
+
+      const result = await page.evaluate(() => {
+        const graph = window.__knobAudioGraph!;
+        const connected = window.__knobAudioConnections!;
+        const gains = window.__knobAudioGains!;
+
+        return {
+          resumeCalls: window.__knobResumeEvents ?? [],
+          providerDestinationUsed: connected.includes(graph.destination),
+          speakerDestinationUsed: connected.includes(graph.context.destination),
+          customVolumeUsed: gains.some(
+            (gain) => Math.abs(gain.gain.value - 0.2) < 1e-6
+          ),
+        };
+      });
+
+      expect(result).toEqual({
+        resumeCalls: browserName === "webkit" ? ["resume:active"] : [],
+        providerDestinationUsed: true,
+        speakerDestinationUsed: false,
+        customVolumeUsed: true,
+      });
+    });
+
+    test("knob keeps one click while audio resume is pending", async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        const NativeAudioContext = window.AudioContext;
+        const events: string[] = [];
+        const resolvers: (() => void)[] = [];
+
+        window.__knobResumeEvents = events;
+        window.__resolveKnobResumes = resolvers;
+        window.AudioContext = class extends NativeAudioContext {
+          constructor(options?: AudioContextOptions) {
+            super(options);
+            Object.defineProperty(this, "state", {
+              configurable: true,
+              value: "suspended",
+            });
+          }
+
+          override resume() {
+            events.push("resume");
+
+            return new Promise<void>((resolve) => {
+              resolvers.push(() => {
+                Object.defineProperty(this, "state", {
+                  configurable: true,
+                  value: "running",
+                });
+                resolve();
+              });
+            });
+          }
+
+          override createBufferSource() {
+            const source = super.createBufferSource();
+            source.start = () => {
+              events.push("start");
+            };
+
+            return source;
+          }
+        };
+      });
+      await page.goto("/controls");
+
+      const dial = section(page, "knob-click").getByRole("slider");
+
+      for (let index = 0; index < 12; index += 1) {
+        await dial.press("ArrowUp");
+      }
+
+      expect(await page.evaluate(() => window.__knobResumeEvents)).toEqual([
+        "resume",
+        "resume",
+      ]);
+
+      await page.evaluate(() => {
+        for (const resolve of window.__resolveKnobResumes ?? []) resolve();
+      });
+      await expect
+        .poll(() => page.evaluate(() => window.__knobResumeEvents))
+        .toEqual(["resume", "resume", "start"]);
     });
 
     test("typed knob and pan values parse and format through browser editors", async ({

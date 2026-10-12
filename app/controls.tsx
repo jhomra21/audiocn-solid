@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 
 import PanControlKnob from "@/components/examples/pan-control-knob";
 import { AudioDeviceSelect } from "@/components/ui/audio-device-select";
@@ -27,8 +27,16 @@ import {
 } from "@/components/ui/sound-pad";
 import { VolumeControl } from "@/components/ui/volume-control";
 import { AudioConfigProvider } from "@/hooks/use-audio-config";
+import { AudioContextProvider } from "@/hooks/use-audio-context";
 import type { AudioPlayerController } from "@/hooks/use-audio-player";
+import { createClickSound } from "@/lib/audio/click";
 import type { JSXElement } from "@/lib/solid/jsx-types";
+
+declare global {
+  interface Window {
+    __knobAudioGraph?: { context: AudioContext; destination: GainNode };
+  }
+}
 
 interface ControlEvent {
   value: string;
@@ -168,9 +176,45 @@ const ControlEffects = () => {
 export const ControlsApp = () => {
   const [revision, setRevision] = createSignal(0);
 
+  const customClickSound = createClickSound({
+    tone: { hz: 900 },
+    volume: 0.2,
+  });
+
+  const [customAudio, setCustomAudio] = createSignal<{
+    context: AudioContext;
+    destination: GainNode;
+  } | null>(null);
+
   return (
     <main class="mx-auto grid max-w-4xl grid-cols-2 gap-4 p-6">
       <h1 class="col-span-2">Control contracts</h1>
+      <button
+        onClick={() => {
+          const context = new AudioContext();
+          const destination = context.createGain();
+
+          destination.connect(context.destination);
+          window.__knobAudioGraph = { context, destination };
+          setCustomAudio({ context, destination });
+        }}
+      >
+        Create custom click audio bus
+      </button>
+      <Show when={customAudio()}>
+        {(audio) => (
+          <section data-testid="knob-custom-click">
+            <AudioContextProvider
+              context={audio().context}
+              destination={audio().destination}
+            >
+              <Knob clickSound={customClickSound} defaultValue={58}>
+                <KnobDial />
+              </Knob>
+            </AudioContextProvider>
+          </section>
+        )}
+      </Show>
       <ControlCase
         id="rtl-slider"
         render={(callbacks) => (

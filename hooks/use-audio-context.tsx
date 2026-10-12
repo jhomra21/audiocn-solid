@@ -5,7 +5,12 @@ import { createCompatEffect } from "@/lib/solid/effect";
 
 export type AudioContextStatus = AudioContextState | "unsupported";
 
-const ProvidedContext = createContext<AudioContext | null>(null);
+interface AudioContextProviderValue {
+  context: AudioContext;
+  destination?: AudioNode;
+}
+
+const ProvidedContext = createContext<AudioContextProviderValue | null>(null);
 
 let sharedContext: AudioContext | null = null;
 
@@ -25,12 +30,18 @@ export const getSharedAudioContext = (): AudioContext | null => {
 export interface AudioContextProviderProps {
   /** Use your own context instead of the shared one. */
   context: AudioContext;
+  /** Route Knob click sounds through this node instead of the speakers. */
+  destination?: AudioNode;
   children?: any;
 }
 
 /** Makes every audiocn hook below it use `context`. */
 export const AudioContextProvider = (props: AudioContextProviderProps) =>
-  provideContext(ProvidedContext, props.context, () => props.children);
+  provideContext(
+    ProvidedContext,
+    { context: props.context, destination: props.destination },
+    () => props.children
+  );
 
 const GESTURE_EVENTS = ["pointerdown", "keydown", "touchend"] as const;
 
@@ -65,13 +76,48 @@ export interface UseAudioContextResult {
   resume: () => Promise<void>;
 }
 
+export interface ProvidedAudioContext {
+  readonly context: AudioContext | null;
+  readonly destination: AudioNode | null;
+}
+
+/** Reads a provider without creating the shared page context. */
+export const useProvidedAudioContext = (): ProvidedAudioContext => {
+  const provided = useContext(ProvidedContext);
+  const context = provided?.context ?? null;
+
+  return {
+    context,
+    get destination() {
+      return provided?.destination ?? context?.destination ?? null;
+    },
+  };
+};
+
+/** Requests playback routing and resumes a context from a user gesture. */
+export const resumeAudioContext = async (
+  context: AudioContext | null
+): Promise<void> => {
+  if (!context || context.state === "closed") return;
+
+  requestPlaybackAudioSession();
+
+  if (context.state === "suspended" || context.state === "interrupted") {
+    try {
+      await context.resume();
+    } catch {
+      // A later user gesture can retry after the browser rejects resume.
+    }
+  }
+};
+
 /**
  * The shared or provided AudioContext. It resumes on the first user gesture,
  * which browsers require before audio can start.
  */
 export const useAudioContext = (): UseAudioContextResult => {
   const provided = useContext(ProvidedContext);
-  const context = provided ?? getSharedAudioContext();
+  const context = provided?.context ?? getSharedAudioContext();
 
   const [status, setStatus] = createSignal<AudioContextStatus>(
     context?.state ?? "unsupported"
@@ -88,12 +134,8 @@ export const useAudioContext = (): UseAudioContextResult => {
 
       const readStatus = () => setStatus(current.state);
 
-      const resumeOnGesture = async () => {
-        try {
-          await resume();
-        } catch {
-          // The next gesture tries again.
-        }
+      const resumeOnGesture = () => {
+        void resume();
       };
 
       readStatus();
@@ -115,16 +157,7 @@ export const useAudioContext = (): UseAudioContextResult => {
 
   // Safari uses "interrupted" after backgrounding or losing audio hardware.
   // A running context can still be silent in the default ambient session.
-  const resume = async () => {
-    if (!context || context.state === "closed") return;
-
-    requestPlaybackAudioSession();
-
-    // Invoke native resume synchronously, before yielding the user gesture.
-    if (context.state === "suspended" || context.state === "interrupted") {
-      await context.resume();
-    }
-  };
+  const resume = () => resumeAudioContext(context);
 
   return {
     get context() {
