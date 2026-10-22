@@ -48,7 +48,7 @@ test("desktop docs navigation preserves sidebar position across routes", async (
   ).toBeInViewport();
 
   await navigationViewport.evaluate((element) => {
-    element.scrollTop = 1300;
+    element.scrollTop = 1338;
   });
 
   const measurements = [
@@ -82,7 +82,7 @@ test("desktop docs navigation preserves sidebar position across routes", async (
   }
 
   await navigationViewport.evaluate((element) => {
-    element.scrollTop = 1400;
+    element.scrollTop = 1438;
   });
 
   const beforeRevisit = await measure();
