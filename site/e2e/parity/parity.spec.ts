@@ -65,6 +65,7 @@ const routes = [
   "/docs/components/fader",
   "/docs/components/parameter-slider",
   "/docs/components/knob",
+  "/docs/components/lcd-display",
   "/docs/components/pan-control",
   "/docs/components/channel-toggle",
   "/docs/components/volume-control",

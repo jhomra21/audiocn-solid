@@ -66,7 +66,7 @@ bun run registry:build
 bun run registry:test-install
 ```
 
-The install suite typechecks and builds all 130 item/runtime combinations, records their source, dependency and license plans in `artifacts/`, and excludes React packages. For installed-control and block browser acceptance, run `bun run registry:spike:3`.
+The install suite typechecks and builds all 132 item/runtime combinations, records their source, dependency and license plans in `artifacts/`, and excludes React packages. For installed-control and block browser acceptance, run `bun run registry:spike:3`.
 
 For a release candidate, run the full source-level checks in CI, both browser suites, and the site release checks:
 
@@ -161,4 +161,4 @@ Browser tests check gesture timing, category selection, native playback and inte
 
 The project is MIT licensed. Portions are adapted from audiocn/ui; see [`license.md`](./license.md). The Warcraft clip used in the docs is a site-only, non-MIT asset and is not included in registry items.
 
-Every independently installable registry item includes `lib/audiocn-license.txt`, retaining the upstream MIT and applicable Phosphor notices. Keep that file with redistributed source. The site brand-assets menu retains third-party notices in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md), including the Outfit wordmark's SIL Open Font License.
+Every independently installable registry item includes `lib/audiocn-license.txt`, retaining the upstream MIT and applicable Phosphor notices. Keep that file with redistributed source. The site brand-assets menu and docs-only fonts retain third-party notices in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md), including the Outfit and Doto SIL Open Font Licenses.

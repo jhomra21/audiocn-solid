@@ -1,0 +1,176 @@
+---
+title: LCD Display
+description: A dot-matrix screen for labelled readouts and settings, backlit in the light theme and glowing in the dark one, with dropdown values.
+---
+
+<ComponentPreview name="lcd-display-demo" />
+
+## Installation
+
+```npm
+npx shadcn@latest add @audiocn-solid/lcd-display
+```
+
+## Usage
+
+```tsx
+import {
+  LcdDisplay,
+  LcdDisplayLabel,
+  LcdDisplayRow,
+  LcdDisplayValue,
+} from "@/components/ui/lcd-display";
+```
+
+```tsx
+<LcdDisplay>
+  <LcdDisplayRow>
+    <LcdDisplayLabel>Tempo</LcdDisplayLabel>
+    <LcdDisplayValue>128.0</LcdDisplayValue>
+  </LcdDisplayRow>
+</LcdDisplay>
+```
+
+The ink follows your theme's `--primary`. In light mode the display is backlit with dark pixels; in dark mode its ink glows on dark glass. Set `appearance="light"` or `"dark"` to keep one look across themes. Values briefly dim when their text changes.
+
+## Anatomy
+
+```tsx
+<LcdDisplay>
+  <LcdDisplayRow>
+    <LcdDisplayLabel />
+    <LcdDisplaySelect items={items} value={value} onValueChange={setValue}>
+      <LcdDisplaySelectTrigger />
+      <LcdDisplaySelectContent />
+    </LcdDisplaySelect>
+  </LcdDisplayRow>
+  <LcdDisplaySeparator />
+  <LcdDisplayStatus />
+</LcdDisplay>
+```
+
+`LcdDisplaySelect` uses the local Kobalte Select, not Base UI. It accepts an `items` array of `{ value, label, disabled? }` objects. Kobalte renders these options from `items` inside `LcdDisplaySelectContent`; there is no per-option JSX child API. A controlled `value={null}` leaves the selection empty. The select also supports `defaultValue`, `onValueChange`, and `disabled`.
+
+The popup defaults to `placement="bottom-end"` and `gutter={8}`. Set `placement` or `gutter` on `LcdDisplaySelect` to adjust its position. Kobalte uses a combined placement value rather than Base UI's separate `side`, `align`, and offset props.
+
+## Examples
+
+### Inks
+
+The `primary` variant follows `--primary`. Fixed variants are `amber`, `green`, `cyan` and `red`.
+
+<ComponentPreview name="lcd-display-variants" />
+
+Override the ink with `[--lcd-display-ink:var(--chart-1)]`. The glass, pixels and glow derive from that variable. The portalled popup copies the display's shared variables when it opens.
+
+### Dot-matrix font
+
+The text is masked into dots by default. For a real dot-matrix face, use the docs-only Doto font and disable the mask with `matrix={false}`.
+
+<ComponentPreview name="lcd-display-font" />
+
+## Theming
+
+| Variable or attribute | Meaning |
+| --- | --- |
+| `--lcd-display-ink` | Display colour, normally set by `variant` |
+| `--lcd-display-lit` | Lit pixels |
+| `--lcd-display-ink-dim` | Labels and separators |
+| `--lcd-display-ink-unlit` | Unlit dots |
+| `--lcd-display-glass` | Screen glass |
+| `--lcd-display-glow` | Halo around lit text |
+| `--lcd-display-bezel`, `--lcd-display-bezel-edge` | Bezel gradient |
+| `--lcd-display-font` | Display font, defaults to `var(--font-mono)` |
+| `--lcd-display-pitch` | Dot grid spacing, defaults to `2px` |
+| `data-appearance` | Display appearance and popup appearance |
+| `data-size` | Display size |
+| `data-variant` | Display ink variant and popup variant |
+| `data-matrix` | Present while the dot mask is enabled |
+| `data-changed` | Briefly present after value or trigger text changes |
+| `data-state` | Status state: `idle`, `busy` or `off` |
+
+## Accessibility
+
+The display has `role="group"`. Each select trigger is labelled by its row's `LcdDisplayLabel`, including custom label IDs. Set `live` on `LcdDisplayValue` to announce changes politely. The status pixel is hidden from assistive technology.
+
+## API reference
+
+### LcdDisplay
+
+<PropsTable
+  rows={[
+    [
+      "variant",
+      '"primary" | "amber" | "green" | "cyan" | "red"',
+      '"primary"',
+      null,
+    ],
+    ["appearance", '"auto" | "light" | "dark"', '"auto"', null],
+    ["size", '"sm" | "default" | "lg"', '"default"', null],
+    ["matrix", "boolean", "true", "Break text into dots."],
+    ["scanlines", "boolean", "true", "Draw horizontal scanlines."],
+  ]}
+/>
+
+### LcdDisplayValue
+
+<PropsTable rows={[["live", "boolean", "false", 'Sets aria-live="polite".']]} />
+
+### LcdDisplayStatus
+
+<PropsTable rows={[["state", '"idle" | "busy" | "off"', '"idle"', null]]} />
+
+### LcdDisplaySelectTrigger
+
+`placeholder` is displayed when no option is selected. Children replace the selected value or placeholder text.
+
+<PropsTable
+  rows={[
+    ["placeholder", "string", null, "Shown while nothing is selected."],
+    [
+      "children",
+      "JSXElement",
+      null,
+      "Replaces the selected value and placeholder text.",
+    ],
+  ]}
+/>
+
+### LcdDisplaySelect
+
+<PropsTable
+  rows={[
+    [
+      "items",
+      "{ value: string; label: string; disabled?: boolean }[]",
+      "required",
+      "Kobalte renders these options automatically.",
+    ],
+    [
+      "value",
+      "string | null",
+      null,
+      "Controlled value; pass null for no selection.",
+    ],
+    ["defaultValue", "string", null, null],
+    [
+      "onValueChange",
+      "(value: string) => void",
+      null,
+      "Called when an option is picked.",
+    ],
+    ["disabled", "boolean", "false", null],
+    [
+      "placement",
+      "Kobalte placement",
+      '"bottom-end"',
+      "Positions the popup relative to its trigger.",
+    ],
+    [
+      "gutter",
+      "number",
+      "8",
+      "Distance between the popup and trigger in pixels.",
+    ],
+  ]}
+/>

@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/doto": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@fontsource-variable/outfit": "^5.3.0",
     "@kobalte/core-solid1": "https://github.com/jhomra21/kobalte/releases/download/kobalte-solid1-audiocn-e0e3bf095f05c7e61230a251b79181c6d834d408/kobalte-core-0.13.14-audiocn.0.e0e3bf09.tgz",

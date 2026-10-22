@@ -3,6 +3,7 @@ export type SocialPreviewName =
   | "mixer"
   | "meters"
   | "knobs"
+  | "lcd"
   | "waveform"
   | "electric-waveform"
   | "bars"
@@ -123,6 +124,7 @@ export const componentPreviews = {
   "electric-waveform": "electric-waveform",
   fader: "faders",
   knob: "knobs",
+  "lcd-display": "lcd",
   "level-meter": "meters",
   "live-waveform": "live-waveform",
   mixer: "mixer",
@@ -193,6 +195,7 @@ const previewDescriptions: Record<SocialPreviewName, string> = {
   faders: "three console faders at different gain settings",
   home: "a mixer, rotary knobs and a waveform",
   knobs: "gain, pan and frequency knobs with labelled values",
+  lcd: "an amber dot-matrix screen with model and effort settings",
   "live-waveform": "a live oscilloscope trace and scrolling signal history",
   meters: "solid and segmented stereo level meters with scales and peak hold",
   "mic-setup":

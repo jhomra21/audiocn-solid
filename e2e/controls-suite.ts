@@ -49,6 +49,106 @@ declare global {
 export const runControlsSuite = (runtime: string) => {
   const dragEvidence: unknown[] = [];
 
+  test(`lcd display renders its parts and selects an accessible option (${runtime})`, async ({
+    page,
+  }, info) => {
+    await page.goto("/controls");
+
+    const display = page
+      .getByTestId("lcd-display")
+      .locator('[data-slot="lcd-display"]');
+
+    await expect(display).toHaveAttribute("data-variant", "amber");
+    await expect(display).toHaveAttribute("data-size", "lg");
+    await expect(display).toHaveAttribute("data-appearance", "dark");
+
+    for (const slot of [
+      "lcd-display-screen",
+      "lcd-display-content",
+      "lcd-display-row",
+      "lcd-display-label",
+      "lcd-display-value",
+      "lcd-display-select-trigger",
+      "lcd-display-status",
+    ]) {
+      await expect(
+        display.locator(`[data-slot="${slot}"]`).first()
+      ).toBeVisible();
+    }
+
+    const trigger = display.locator('[data-slot="lcd-display-select-trigger"]');
+    await expect(trigger).toHaveAttribute("data-placeholder", "");
+    await expect(trigger).toContainText("Choose model");
+    await expect(trigger).toHaveAttribute(
+      "aria-labelledby",
+      /(^| )lcd-model-label( |$)/
+    );
+    await expect(trigger).not.toHaveAttribute("data-changed");
+    await trigger.click();
+    const popup = page.locator('[data-slot="lcd-display-select-content"]');
+    await expect(popup).toHaveAttribute("data-variant", "amber");
+    await expect(popup).toHaveAttribute("data-appearance", "dark");
+
+    const rootInk = await display.evaluate((element) =>
+      getComputedStyle(element).getPropertyValue("--lcd-display-ink")
+    );
+
+    expect(rootInk).not.toBe("");
+    await expect
+      .poll(() =>
+        popup.evaluate((element) =>
+          element.style.getPropertyValue("--lcd-display-ink")
+        )
+      )
+      .toBe(rootInk);
+    const triggerBounds = await trigger.boundingBox();
+    const popupBounds = await popup.boundingBox();
+    expect(triggerBounds).not.toBeNull();
+    expect(popupBounds).not.toBeNull();
+    expect(
+      Math.abs(
+        triggerBounds!.x +
+          triggerBounds!.width -
+          (popupBounds!.x + popupBounds!.width)
+      )
+    ).toBeLessThan(2);
+
+    const changed = trigger.evaluate(
+      (element) =>
+        new Promise<void>((resolve) => {
+          const observer = new MutationObserver(() => {
+            if (element.hasAttribute("data-changed")) {
+              observer.disconnect();
+              resolve();
+            }
+          });
+
+          observer.observe(element, {
+            attributes: true,
+            attributeFilter: ["data-changed"],
+          });
+        })
+    );
+
+    await page.getByRole("option", { name: "Sonnet" }).click();
+    await changed;
+    await expect(trigger).toContainText("Sonnet");
+    await expect(trigger).not.toHaveAttribute("data-placeholder");
+    await trigger.click();
+    const selectedSonnet = page.getByRole("option", { name: "Sonnet" });
+    await selectedSonnet.click();
+    await expect(trigger).toContainText("Sonnet");
+    await expect(trigger).not.toHaveAttribute("data-placeholder");
+    await info.attach(`lcd-display-${runtime}`, {
+      body: JSON.stringify({
+        appearance: await display.getAttribute("data-appearance"),
+        labelledBy: await trigger.getAttribute("aria-labelledby"),
+        variant: await display.getAttribute("data-variant"),
+      }),
+      contentType: "application/json",
+    });
+  });
+
   for (const state of ["suspended", "running", "interrupted"] as const) {
     for (const sessionType of ["auto", "play-and-record"] as const) {
       test(`standalone knob click routes ${sessionType} audio and recovers ${state} contexts`, async ({
