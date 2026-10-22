@@ -163,7 +163,7 @@ test("the manifest covers every public page with a committed 1200x630 card", asy
     .filter((route) => route !== "/404");
 
   expect(Object.keys(images).sort()).toEqual(routes.sort());
-  expect(Object.keys(images)).toHaveLength(57);
+  expect(Object.keys(images)).toHaveLength(58);
 
   const files = new Set(await readdir(join(siteRoot, "public/og")));
 

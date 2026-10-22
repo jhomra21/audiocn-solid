@@ -1,8 +1,13 @@
 @import "../../app/styles.css";
+@import "@fontsource-variable/doto/wght.css";
 
 @plugin "@fumadocs/tailwind/typography";
 
 @source ".";
+
+@theme inline {
+  --font-doto: "Doto Variable", ui-monospace, monospace;
+}
 
 .home-hero-pill:hover .home-hero-pill-arrow {
   transform: translateX(2px);

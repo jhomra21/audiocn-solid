@@ -44,13 +44,13 @@ export const readSitemapRoutes = (xml: string, origin: string): string[] => {
   if (
     new Set(routes).size !== routes.length ||
     routes.filter((route) => route.startsWith("/docs/") || route === "/docs")
-      .length !== 55 ||
-    routes.length !== 57 ||
+      .length !== 56 ||
+    routes.length !== 58 ||
     !routes.includes("/") ||
     !routes.includes("/contributors")
   ) {
     throw new Error(
-      `Sitemap must contain 57 unique routes (55 docs, home, contributors); received ${routes.length}.`
+      `Sitemap must contain 58 unique routes (56 docs, home, contributors); received ${routes.length}.`
     );
   }
 
@@ -58,8 +58,8 @@ export const readSitemapRoutes = (xml: string, origin: string): string[] => {
 };
 
 export const assertSearchIndexDocumentCount = (documents: number): void => {
-  if (documents !== 55) {
-    throw new Error("Search index must contain all 55 documentation pages.");
+  if (documents !== 56) {
+    throw new Error("Search index must contain all 56 documentation pages.");
   }
 };
 
@@ -305,15 +305,15 @@ export const checkHostedRelease = async (
 
     if (
       !Array.isArray(index.items) ||
-      index.items.length !== 65 ||
+      index.items.length !== 66 ||
       new Set(index.items.map((item: { name?: string }) => item.name)).size !==
-        65 ||
+        66 ||
       JSON.stringify(
         index.items.map((item: { name: string }) => item.name).sort()
       ) !== JSON.stringify(sourceNames)
     ) {
       throw new Error(
-        `${runtime}: registry inventory must contain 65 unique items.`
+        `${runtime}: registry inventory must contain 66 unique items.`
       );
     }
 
@@ -365,7 +365,7 @@ export const checkHostedRelease = async (
   return {
     markdownRoutes: markdownRoutes.length,
     ogImages: ogImages.size,
-    registryItems: 130,
+    registryItems: 132,
     routes: routes.length,
   };
 };

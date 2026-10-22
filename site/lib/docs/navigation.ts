@@ -82,6 +82,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
             label: "Parameter Slider",
           },
           { href: "/docs/components/knob", label: "Knob" },
+          { href: "/docs/components/lcd-display", label: "LCD Display" },
           { href: "/docs/components/pan-control", label: "Pan Control" },
           {
             href: "/docs/components/channel-toggle",

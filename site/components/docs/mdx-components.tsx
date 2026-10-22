@@ -53,6 +53,9 @@ import KnobDragDirections from "@/components/examples/knob-drag-directions";
 import KnobMetal from "@/components/examples/knob-metal";
 import KnobSizes from "@/components/examples/knob-sizes";
 import KnobVolume from "@/components/examples/knob-volume";
+import LcdDisplayDemo from "@/components/examples/lcd-display-demo";
+import LcdDisplayFont from "@/components/examples/lcd-display-font";
+import LcdDisplayVariants from "@/components/examples/lcd-display-variants";
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
 import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
 import { LevelMeterCustomColors } from "@/components/examples/level-meter-custom-colors";
@@ -449,6 +452,9 @@ const examples = {
   "knob-metal": KnobMetal,
   "knob-sizes": KnobSizes,
   "knob-volume": KnobVolume,
+  "lcd-display-demo": LcdDisplayDemo,
+  "lcd-display-font": LcdDisplayFont,
+  "lcd-display-variants": LcdDisplayVariants,
   "mixer-console": MixerConsole,
   "mixer-demo": MixerDemo,
   "mixer-empty": MixerEmptyDemo,

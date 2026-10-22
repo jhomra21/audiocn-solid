@@ -95,6 +95,7 @@ Copy, paste, make them yours.</p>
 | [Fader](https://audiocn-solid.jhonra121.workers.dev/docs/components/fader) | Decibel volume fader with tapers, detents, scale and reset |
 | [Parameter Slider](https://audiocn-solid.jhonra121.workers.dev/docs/components/parameter-slider) | Labelled slider with numeric input, unit, marks and reset |
 | [Knob](https://audiocn-solid.jhonra121.workers.dev/docs/components/knob) | Rotary control for dense layouts |
+| [LCD Display](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-display) | Themeable dot-matrix screen with dropdown rows |
 | [Pan Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/pan-control) | Left-right balance with centre detent |
 | [Channel Toggle](https://audiocn-solid.jhonra121.workers.dev/docs/components/channel-toggle) | Mute, solo and monitor buttons |
 | [Volume Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/volume-control) | Volume slider with mute button |

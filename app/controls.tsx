@@ -14,6 +14,16 @@ import {
   KnobValue,
   parseKnobValue,
 } from "@/components/ui/knob";
+import {
+  LcdDisplay,
+  LcdDisplayLabel,
+  LcdDisplayRow,
+  LcdDisplaySelect,
+  LcdDisplaySelectContent,
+  LcdDisplaySelectTrigger,
+  LcdDisplayStatus,
+  LcdDisplayValue,
+} from "@/components/ui/lcd-display";
 import { formatPan, PanControl, parsePan } from "@/components/ui/pan-control";
 import {
   ParameterSlider,
@@ -275,6 +285,33 @@ export const ControlsApp = () => {
           </ParameterSlider>
         )}
       />
+      <section data-testid="lcd-display">
+        <LcdDisplay
+          appearance="dark"
+          class="w-80"
+          size="lg"
+          style={{ "--lcd-display-ink": "var(--chart-1)" }}
+          variant="amber"
+        >
+          <LcdDisplayRow>
+            <LcdDisplayLabel id="lcd-model-label">Model</LcdDisplayLabel>
+            <LcdDisplaySelect
+              items={[
+                { label: "Opus", value: "opus" },
+                { label: "Sonnet", value: "sonnet" },
+              ]}
+            >
+              <LcdDisplaySelectTrigger placeholder="Choose model" />
+              <LcdDisplaySelectContent />
+            </LcdDisplaySelect>
+          </LcdDisplayRow>
+          <LcdDisplayRow>
+            <LcdDisplayLabel>Effort</LcdDisplayLabel>
+            <LcdDisplayValue live>High</LcdDisplayValue>
+          </LcdDisplayRow>
+          <LcdDisplayStatus state="busy" />
+        </LcdDisplay>
+      </section>
       <ControlCase
         id="volume-vertical-drag"
         render={(callbacks) => (

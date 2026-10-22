@@ -147,7 +147,7 @@ export const AudioDeviceSelectItem = (props: AudioDeviceSelectItemProps) => {
       data-slot="audio-device-select-item"
       {...rest}
     >
-      <SelectPrimitive.ItemLabel class="flex flex-1 shrink-0 gap-2 whitespace-nowrap">
+      <SelectPrimitive.ItemLabel class="flex flex-1 shrink-0 items-center gap-2 whitespace-nowrap">
         {props.children ?? (
           <span class="flex min-w-0 flex-col">
             <span class="flex items-center gap-2">

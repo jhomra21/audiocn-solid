@@ -151,3 +151,5 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
+
+The docs-only LCD Display example uses [Doto](https://fonts.google.com/specimen/Doto) from `@fontsource-variable/doto`, also licensed under the SIL Open Font License. Copyright 2024-2024 The Doto Project Authors (https://github.com/oliverlalan/Doto). The package includes its license.
