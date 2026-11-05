@@ -6,6 +6,7 @@ import { useAudioConfig } from "@/hooks/use-audio-config";
 import type { AudioSize } from "@/hooks/use-audio-config";
 import { useTapTempo } from "@/hooks/use-tap-tempo";
 import type { TempoChangeDetails } from "@/hooks/use-tap-tempo";
+import { clamp } from "@/lib/audio/decibels";
 import { provideContext } from "@/lib/solid/context";
 import { createCompatEffect } from "@/lib/solid/effect";
 import type {
@@ -90,6 +91,7 @@ export const TempoControlInput = (
   const [draft, setDraft] = createSignal<{
     text: string;
     value: number;
+    previousValue: number;
     revision: number;
   } | null>(null);
 
@@ -100,7 +102,8 @@ export const TempoControlInput = (
 
       if (
         current &&
-        (current.value !== value || current.revision !== revision)
+        ((current.value !== value && current.previousValue !== value) ||
+          current.revision !== revision)
       ) {
         setDraft(null);
       }
@@ -111,7 +114,8 @@ export const TempoControlInput = (
     const current = draft();
 
     return current &&
-      current.value === context.value() &&
+      (current.value === context.value() ||
+        current.previousValue === context.value()) &&
       current.revision === context.tapRevision()
       ? current.text
       : String(context.value());
@@ -122,6 +126,7 @@ export const TempoControlInput = (
       return;
     const text = event.currentTarget.value;
     const next = text.trim() === "" ? Number.NaN : Number(text);
+    const previousValue = context.value();
 
     if (Number.isFinite(next)) {
       context.setValue(next, { reason: "input", event });
@@ -131,7 +136,12 @@ export const TempoControlInput = (
 
     setDraft({
       text,
-      value: context.value(),
+      // Controlled writes settle after the event in Solid 2. Record the
+      // requested value and allow the previous value if the parent rejects it.
+      value: Number.isFinite(next)
+        ? clamp(Math.round(next), context.min(), context.max())
+        : context.value(),
+      previousValue,
       revision: context.tapRevision(),
     });
   };

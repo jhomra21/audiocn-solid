@@ -1,5 +1,5 @@
 import { buttonVariants } from "@/components/ui/button";
-import { InstallCommand } from "@/site/components/docs/mdx-components";
+import { InstallCommand } from "@/site/components/docs/install-command";
 import { PageMeta } from "@/site/components/docs/page-meta";
 import { SiteFooter } from "@/site/components/docs/site-footer";
 import { SiteHeader } from "@/site/components/docs/site-header";

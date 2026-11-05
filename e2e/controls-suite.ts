@@ -314,7 +314,10 @@ export const runControlsSuite = (runtime: string) => {
       { value: "100", reason: "tap", type: "change" },
       { value: "100", reason: "", type: "commit" },
     ]);
+    await controlledInput.fill("1");
+    await expect(controlledInput).toHaveValue("1");
     await controlledInput.fill("96.4");
+    await expect(controlledInput).toHaveValue("96.4");
     await controlledInput.press("Enter");
     await expect(controlledInput).toHaveValue("120");
 
