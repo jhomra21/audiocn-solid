@@ -27,6 +27,7 @@ import { createCompatEffect } from "@/lib/solid/effect";
 import type {
   DivDOMProps,
   GroupDOMProps,
+  JSXElement,
   LineDOMProps,
   PathDOMProps,
   SpanDOMProps,
@@ -150,9 +151,43 @@ interface KnobDialContextValue {
   taper: () => Taper;
 }
 
+export interface DialProviderProps {
+  /** The turn shown by the cap and pointer, in degrees clockwise from 12. */
+  angle: number;
+  onCapRadiusChange?: (radius: number | null) => void;
+  children?: JSXElement;
+}
+
+interface DialContextValue {
+  angle: () => number;
+  onCapRadiusChange?: (radius: number | null) => void;
+}
+
 const KnobContext = createContext<KnobContextValue | null>(null);
 
 const KnobDialContext = createContext<KnobDialContextValue | null>(null);
+
+const DialContext = createContext<DialContextValue | null>(null);
+
+const useDial = (part: string) => {
+  const context = useContext(DialContext);
+
+  if (!context) {
+    throw new Error(`${part} must be used inside a dial, like KnobDial.`);
+  }
+
+  return context;
+};
+
+export const DialProvider = (props: DialProviderProps) =>
+  provideContext(
+    DialContext,
+    {
+      angle: () => props.angle,
+      onCapRadiusChange: (radius) => props.onCapRadiusChange?.(radius),
+    },
+    () => props.children
+  );
 
 const useKnob = (part: string): KnobContextValue => {
   const context = useContext(KnobContext);
@@ -691,6 +726,7 @@ export const KnobDial = (props: KnobDialProps) => {
   const rest = omitProps(props, DIAL_OWN);
 
   const [dragging, setDragging] = createSignal(false);
+  const dialAngle = () => angleFor(context.position(), context.arc());
 
   let dialElement: HTMLDivElement | undefined;
 
@@ -892,7 +928,7 @@ export const KnobDial = (props: KnobDialProps) => {
       }}
       role="slider"
       style={mergeStyleVars(props.style, {
-        "--knob-angle": `${angleFor(context.position(), context.arc())}deg`,
+        "--knob-angle": `${dialAngle()}deg`,
       })}
       tabindex={context.disabled() ? -1 : 0}
       {...rest}
@@ -902,7 +938,11 @@ export const KnobDial = (props: KnobDialProps) => {
         class="size-full overflow-visible"
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
       >
-        {props.children}
+        {provideContext(
+          DialContext,
+          { angle: dialAngle },
+          () => props.children
+        )}
         <circle
           class="[pointer-events:all] cursor-grab touch-none group-aria-disabled/knob-dial:cursor-default group-data-dragging/knob-dial:cursor-[inherit]"
           cx={CENTER}
@@ -986,11 +1026,11 @@ export interface KnobPointerProps extends Omit<
 const POINTER_OWN = ["class", "className"] as const;
 
 export const KnobPointer = (props: KnobPointerProps) => {
-  const context = useKnob("KnobPointer");
+  const context = useDial("KnobPointer");
 
   const rest = omitProps(props, POINTER_OWN);
 
-  const angle = () => angleFor(context.position(), context.arc());
+  const angle = context.angle;
 
   const inner = () => pointAt(angle(), RADIUS * 0.3);
 
@@ -1253,7 +1293,7 @@ export interface KnobCapProps extends Omit<
 const CAP_OWN = ["class", "className", "variant"] as const;
 
 export const KnobCap = (props: KnobCapProps) => {
-  const context = useKnob("KnobCap");
+  const context = useDial("KnobCap");
 
   const rest = omitProps(props, CAP_OWN);
 
@@ -1261,9 +1301,18 @@ export const KnobCap = (props: KnobCapProps) => {
 
   const id = `knob${createUniqueId().replaceAll(/[^\w-]/gu, "")}`;
 
-  const angle = () => angleFor(context.position(), context.arc());
+  const angle = context.angle;
 
   const cap = () => CAP[variant()];
+
+  createCompatEffect(
+    () => [cap().bezel, context.onCapRadiusChange] as const,
+    ([radius, onCapRadiusChange]) => {
+      onCapRadiusChange?.(radius);
+
+      return () => onCapRadiusChange?.(null);
+    }
+  );
 
   return (
     <g

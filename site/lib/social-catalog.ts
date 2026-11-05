@@ -4,6 +4,8 @@ export type SocialPreviewName =
   | "meters"
   | "knobs"
   | "lcd"
+  | "lcd-meter"
+  | "tempo"
   | "waveform"
   | "electric-waveform"
   | "bars"
@@ -125,6 +127,7 @@ export const componentPreviews = {
   fader: "faders",
   knob: "knobs",
   "lcd-display": "lcd",
+  "lcd-meter": "lcd-meter",
   "level-meter": "meters",
   "live-waveform": "live-waveform",
   mixer: "mixer",
@@ -133,6 +136,7 @@ export const componentPreviews = {
   "smooth-waveform": "smooth-waveform",
   "sound-pad": "pads",
   spectrum: "spectrum",
+  "tempo-control": "tempo",
   "track-list": "tracks",
   "volume-control": "volume",
   waveform: "waveform",
@@ -170,6 +174,7 @@ const contextualPreviews = {
   "/docs/hooks/use-reduced-motion": "smooth-waveform",
   "/docs/hooks/use-sound": "pads",
   "/docs/hooks/use-system-audio": "system-settings",
+  "/docs/hooks/use-tap-tempo": "tempo",
   "/docs/hooks/use-visibility": "bars",
   "/docs/hooks/use-waveform-data": "waveform",
   "/docs/hooks/use-web-audio-mixer": "system-mixer",
@@ -196,6 +201,8 @@ const previewDescriptions: Record<SocialPreviewName, string> = {
   home: "a mixer, rotary knobs and a waveform",
   knobs: "gain, pan and frequency knobs with labelled values",
   lcd: "an amber dot-matrix screen with model and effort settings",
+  "lcd-meter":
+    "an amber dot-matrix screen with a stereo level meter in block segments",
   "live-waveform": "a live oscilloscope trace and scrolling signal history",
   meters: "solid and segmented stereo level meters with scales and peak hold",
   "mic-setup":
@@ -219,6 +226,7 @@ const previewDescriptions: Record<SocialPreviewName, string> = {
     "a complete system audio mixer with microphone, music, sound pads and master controls",
   "system-settings": "system audio settings with capture, volume and a meter",
   theming: "the same audio controls in light and dark themes",
+  tempo: "an editable BPM input and a tap tempo button",
   toggles: "mute, solo and monitor controls with their pressed states",
   tracks: "a track list with active and playing states",
   volume: "a volume slider with a mute control and numeric value",

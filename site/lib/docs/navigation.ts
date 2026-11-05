@@ -52,6 +52,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
         label: "Meters and visualizers",
         items: [
           { href: "/docs/components/level-meter", label: "Level Meter" },
+          { href: "/docs/components/lcd-meter", label: "LCD Meter" },
           { href: "/docs/components/db-scale", label: "dB Scale" },
           { href: "/docs/components/db-readout", label: "dB Readout" },
           { href: "/docs/components/clip-indicator", label: "Clip Indicator" },
@@ -81,6 +82,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
             href: "/docs/components/parameter-slider",
             label: "Parameter Slider",
           },
+          { href: "/docs/components/tempo-control", label: "Tempo Control" },
           { href: "/docs/components/knob", label: "Knob" },
           { href: "/docs/components/lcd-display", label: "LCD Display" },
           { href: "/docs/components/pan-control", label: "Pan Control" },
@@ -124,6 +126,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
           { href: "/docs/hooks/use-frame-source", label: "useFrameSource" },
           { href: "/docs/hooks/use-level", label: "useLevel" },
           { href: "/docs/hooks/use-clip-hold", label: "useClipHold" },
+          { href: "/docs/hooks/use-tap-tempo", label: "useTapTempo" },
           {
             href: "/docs/hooks/use-reduced-motion",
             label: "useReducedMotion",

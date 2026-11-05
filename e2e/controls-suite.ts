@@ -77,6 +77,11 @@ export const runControlsSuite = (runtime: string) => {
     }
 
     const trigger = display.locator('[data-slot="lcd-display-select-trigger"]');
+    await expect
+      .poll(() =>
+        trigger.evaluate((element) => getComputedStyle(element).cursor)
+      )
+      .not.toBe("pointer");
     await expect(trigger).toHaveAttribute("data-placeholder", "");
     await expect(trigger).toContainText("Choose model");
     await expect(trigger).toHaveAttribute(
@@ -145,6 +150,325 @@ export const runControlsSuite = (runtime: string) => {
         labelledBy: await trigger.getAttribute("aria-labelledby"),
         variant: await display.getAttribute("data-variant"),
       }),
+      contentType: "application/json",
+    });
+  });
+
+  test(`LCD meter renders channel segments and readouts (${runtime})`, async ({
+    page,
+  }) => {
+    await page.goto("/controls");
+    const meter = section(page, "lcd-meter").locator('[data-slot="lcd-meter"]');
+    await expect(meter).toBeVisible();
+    await expect(meter.locator('[data-slot="lcd-meter-channel"]')).toHaveCount(
+      2
+    );
+    await expect(meter.locator('[data-slot="lcd-meter-track"]')).toHaveCount(2);
+    await expect(meter.locator('[data-slot="lcd-meter-bar"]')).toHaveCount(2);
+    await expect(meter.locator('[data-slot="lcd-meter-scale"]')).toBeVisible();
+    await expect(meter.locator('[data-slot="lcd-meter-clip"]')).toBeVisible();
+    await expect
+      .poll(() =>
+        meter
+          .locator('[data-slot="lcd-meter-channel"]')
+          .first()
+          .evaluate((element) =>
+            Number(element.style.getPropertyValue("--meter-level"))
+          )
+      )
+      .toBeGreaterThan(0);
+    const channel = meter.locator('[data-slot="lcd-meter-channel"]').first();
+
+    const before = await channel.evaluate((element) =>
+      Number(element.style.getPropertyValue("--meter-level"))
+    );
+
+    await section(page, "lcd-meter")
+      .getByRole("button", { name: "Raise input" })
+      .click();
+    await expect
+      .poll(() =>
+        channel.evaluate((element) =>
+          Number(element.style.getPropertyValue("--meter-level"))
+        )
+      )
+      .toBeGreaterThan(before);
+    const mask = meter.locator('[data-slot="lcd-meter-segments"]').first();
+
+    expect(
+      await mask.evaluate((element) => getComputedStyle(element).maskImage)
+    ).toContain("repeating-linear-gradient");
+    await expect(mask.locator('[data-measure="peak"]')).toHaveCount(1);
+
+    const geometry = await meter
+      .locator('[data-slot="lcd-meter-bracket"]')
+      .evaluate((element) => ({
+        position: Number(
+          getComputedStyle(element).getPropertyValue(
+            "--lcd-meter-bracket-start"
+          )
+        ),
+        width: element.getBoundingClientRect().width,
+        left:
+          element.firstElementChild!.getBoundingClientRect().left -
+          element.getBoundingClientRect().left,
+        mask: getComputedStyle(
+          element
+            .closest('[data-slot="lcd-meter"]')!
+            .querySelector('[data-slot="lcd-meter-segments"]')!
+        ).maskImage,
+      }));
+
+    expect(geometry.position).toBeCloseTo(1 - Math.sqrt(9 / 60), 4);
+    expect(geometry.left).toBeGreaterThan(0);
+    expect(geometry.left).toBeLessThanOrEqual(
+      geometry.width * geometry.position + 0.1
+    );
+
+    const lengths = [...geometry.mask.matchAll(/([\d.]+)px/gu)].map((match) =>
+      Number(match[1])
+    );
+
+    const period = lengths.at(-1)!;
+
+    expect(period).toBeGreaterThan(0);
+    expect(geometry.left).toBeCloseTo(
+      Math.floor((geometry.width * geometry.position) / period) * period,
+      1
+    );
+    await expect(meter.locator('[data-slot="lcd-meter-label"]')).toHaveText([
+      "L",
+      "R",
+    ]);
+    await section(page, "lcd-meter")
+      .getByRole("button", { name: "Four channels" })
+      .click();
+    await expect(meter.locator('[data-slot="lcd-meter-label"]')).toHaveText([
+      "1",
+      "2",
+      "3",
+      "4",
+    ]);
+    await section(page, "lcd-meter")
+      .getByRole("button", { name: "Mono channel" })
+      .click();
+    await expect(meter.locator('[data-slot="lcd-meter-label"]')).toHaveCount(0);
+  });
+
+  test(`tempo control edits, clamps, steps and measures taps (${runtime})`, async ({
+    page,
+  }, info) => {
+    await page.addInitScript(() => {
+      performance.now = () =>
+        Number(document.documentElement.dataset.tapTime ?? "0");
+    });
+    await page.goto("/controls");
+    const root = section(page, "tempo-control");
+
+    const input = root.getByRole("spinbutton", {
+      name: "Tempo in beats per minute",
+    });
+
+    await input.fill("720");
+    await input.press("Tab");
+    await expect(input).toHaveValue("600");
+    await input.focus();
+    await input.press("ArrowDown");
+    await expect(input).toHaveValue("599");
+    const tap = root.getByRole("button", { name: "Tap tempo" });
+
+    const tapAt = async (time: number, trigger = tap) => {
+      await page.evaluate((next) => {
+        document.documentElement.dataset.tapTime = String(next);
+      }, time);
+      await trigger.click();
+    };
+
+    await tapAt(0);
+    await tapAt(500);
+    await tapAt(1000);
+    await expect(input).toHaveValue("120");
+    expect(
+      (await readJournal(page, "tempo-control")).filter(
+        (event) => event.reason === "tap"
+      )
+    ).toEqual([{ value: "120", reason: "tap", type: "change" }]);
+
+    const controlled = section(page, "tempo-controlled");
+
+    const controlledInput = controlled.getByRole("spinbutton", {
+      name: "Tempo in beats per minute",
+    });
+
+    const controlledTap = controlled.getByRole("button", {
+      name: "Tap tempo",
+    });
+
+    await tapAt(0, controlledTap);
+    await tapAt(600, controlledTap);
+    await expect(controlledInput).toHaveValue("120");
+    await expect(controlled.getByTestId("change-details")).toContainText(
+      '"reason":"tap"'
+    );
+    expect(await readJournal(page, "tempo-controlled")).toEqual([
+      { value: "100", reason: "tap", type: "change" },
+      { value: "100", reason: "", type: "commit" },
+    ]);
+    await controlledInput.fill("96.4");
+    await controlledInput.press("Enter");
+    await expect(controlledInput).toHaveValue("120");
+
+    const custom = section(page, "tempo-custom");
+    const customInput = custom.locator("input");
+    const customTap = custom.getByRole("button", { name: "Tap tempo" });
+
+    await expect(customInput).toHaveValue("96");
+    await expect(customInput).toHaveAttribute("name", "custom-bpm");
+    await expect(customInput).toHaveAttribute("data-custom", "input");
+    await expect(customTap).toHaveAttribute("id", "custom-tap");
+    await customInput.press("Shift+ArrowUp");
+    await expect(customInput).toHaveValue("106");
+    await page
+      .getByRole("button", { name: "External tempo", exact: true })
+      .click();
+    await expect(customInput).toHaveValue("110");
+    await customInput.fill("");
+    await expect(customInput).toHaveValue("");
+    await customInput.press("Tab");
+    await expect(customInput).toHaveValue("110");
+    await customInput.fill(".");
+    await expect(customInput).toHaveValue(".");
+    await customInput.press("Enter");
+    await expect(customInput).toHaveValue("110");
+    await customInput.fill("1");
+    await expect(customInput).toHaveValue("1");
+    await customInput.press("Enter");
+    await expect(customInput).toHaveValue("30");
+    await customInput.fill("96.4");
+    await customInput.press("Enter");
+    await expect(customInput).toHaveValue("96");
+    await tapAt(0, customTap);
+    await customInput.press("Home");
+    await expect(customInput).toHaveValue("30");
+    await tapAt(500, customTap);
+    await expect(customInput).toHaveValue("30");
+    await tapAt(1000, customTap);
+    await expect(customInput).toHaveValue("120");
+    await customInput.press("End");
+    await expect(customInput).toHaveValue("600");
+    await customInput.fill("");
+    await tapAt(1500, customTap);
+    await tapAt(2100, customTap);
+    await expect(customInput).toHaveValue("100");
+
+    for (const key of ["Enter", " "]) {
+      expect(
+        await customTap.evaluate(
+          (element, key) =>
+            !element.dispatchEvent(
+              new KeyboardEvent("keydown", {
+                key,
+                repeat: true,
+                bubbles: true,
+                cancelable: true,
+              })
+            ),
+          key
+        )
+      ).toBe(true);
+    }
+
+    const cancel = section(page, "tempo-cancel").getByRole("button");
+
+    await tapAt(0, cancel);
+    await tapAt(500, cancel);
+    expect(await readJournal(page, "tempo-cancel")).toEqual([]);
+    const pad = section(page, "tempo-pad");
+    const padTrigger = pad.getByRole("button", { name: "Tap tempo" });
+
+    await expect(pad.getByRole("button")).toHaveCount(1);
+    await expect(padTrigger).toHaveAttribute("data-sound-pad", "");
+    await tapAt(0, padTrigger);
+    await tapAt(600, padTrigger);
+    await expect(pad.getByRole("status", { name: "Tempo" })).toHaveText(
+      "100 BPM"
+    );
+    const tapJournal = info.outputPath("tap-journal.json");
+
+    await writeFile(
+      tapJournal,
+      JSON.stringify(
+        {
+          default: await readJournal(page, "tempo-control"),
+          controlled: await readJournal(page, "tempo-controlled"),
+          custom: await readJournal(page, "tempo-custom"),
+          cancelled: await readJournal(page, "tempo-cancel"),
+        },
+        null,
+        2
+      )
+    );
+    await info.attach(`tap-journal-${runtime}`, {
+      path: tapJournal,
+      contentType: "application/json",
+    });
+  });
+
+  test(`tap hook clears edits, evicts old intervals and counts accepted taps (${runtime})`, async ({
+    page,
+  }, info) => {
+    await page.addInitScript(() => {
+      performance.now = () =>
+        Number(document.documentElement.dataset.tapTime ?? "0");
+    });
+    await page.goto("/controls");
+    const hook = section(page, "tap-hook");
+    const value = hook.getByTestId("tap-value");
+    const count = hook.getByTestId("tap-count");
+
+    const samples: {
+      time: number;
+      bpm: string | null;
+      count: string | null;
+    }[] = [];
+
+    const tapAt = async (time: number, bpm: number, accepted: number) => {
+      await page.evaluate((next) => {
+        document.documentElement.dataset.tapTime = String(next);
+      }, time);
+      await hook.getByRole("button", { name: "Tap hook" }).click();
+      await expect(value).toHaveText(String(bpm));
+      await expect(count).toHaveText(String(accepted));
+      samples.push({
+        time,
+        bpm: await value.textContent(),
+        count: await count.textContent(),
+      });
+    };
+
+    await tapAt(0, 90, 1);
+    await tapAt(40, 90, 1);
+    await tapAt(500, 120, 2);
+    await hook.getByRole("button", { name: "Set 90" }).click();
+    await tapAt(1000, 90, 3);
+    await tapAt(1500, 120, 4);
+    await hook.getByRole("button", { name: "Reset history" }).click();
+    await tapAt(0, 120, 5);
+    await tapAt(1000, 60, 6);
+    await tapAt(1500, 80, 7);
+    await tapAt(2000, 90, 8);
+    await tapAt(2500, 96, 9);
+    await tapAt(3000, 120, 10);
+    await hook.getByRole("button", { name: "Reset history" }).click();
+    await tapAt(0, 120, 11);
+    await tapAt(2000, 30, 12);
+    await tapAt(4001, 30, 13);
+    await tapAt(4501, 120, 14);
+    const tapJournal = info.outputPath("tap-hook-journal.json");
+
+    await writeFile(tapJournal, JSON.stringify(samples, null, 2));
+    await info.attach(`tap-hook-journal-${runtime}`, {
+      path: tapJournal,
       contentType: "application/json",
     });
   });

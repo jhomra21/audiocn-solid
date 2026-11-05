@@ -75,12 +75,14 @@ export interface LevelMeterActions {
   reset: () => void;
 }
 
-interface LevelMeterContextValue {
+export interface LevelMeterContextValue {
   orientation: () => Orientation;
   variant: () => LevelMeterVariant;
   minDb: () => number;
   maxDb: () => number;
   taper: () => Taper;
+  zones: () => MeterZone[];
+  channelCount: () => number;
   frames: FrameSource<MeterFrame>;
   declared: () => MeterFrame | null;
   registerChannel: (index: number, element: HTMLElement | null) => void;
@@ -88,7 +90,7 @@ interface LevelMeterContextValue {
 
 const LevelMeterContext = createContext<LevelMeterContextValue | null>(null);
 
-const useLevelMeter = (part: string) => {
+export const useLevelMeter = (part: string) => {
   const context = useContext(LevelMeterContext);
 
   if (!context) {
@@ -930,6 +932,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
   );
 
   const context: LevelMeterContextValue = {
+    channelCount,
     declared,
     frames,
     maxDb,
@@ -938,6 +941,7 @@ export const LevelMeter = (props: LevelMeterProps) => {
     registerChannel,
     taper: taperFn,
     variant,
+    zones,
   };
 
   const setRootRef = (node: HTMLDivElement) => {

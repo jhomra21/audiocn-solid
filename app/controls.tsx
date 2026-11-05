@@ -1,6 +1,7 @@
 import { createSignal, Show } from "solid-js";
 
 import PanControlKnob from "@/components/examples/pan-control-knob";
+import { TempoControlPad } from "@/components/examples/tempo-control-pad";
 import { AudioDeviceSelect } from "@/components/ui/audio-device-select";
 import { AudioPlayer, AudioPlayerSeek } from "@/components/ui/audio-player";
 import { MuteToggle } from "@/components/ui/channel-toggle";
@@ -24,6 +25,7 @@ import {
   LcdDisplayStatus,
   LcdDisplayValue,
 } from "@/components/ui/lcd-display";
+import { LcdMeter } from "@/components/ui/lcd-meter";
 import { formatPan, PanControl, parsePan } from "@/components/ui/pan-control";
 import {
   ParameterSlider,
@@ -35,10 +37,16 @@ import {
   SoundPadGrid,
   SoundPadProgress,
 } from "@/components/ui/sound-pad";
+import {
+  TempoControl,
+  TempoControlInput,
+  TempoControlTap,
+} from "@/components/ui/tempo-control";
 import { VolumeControl } from "@/components/ui/volume-control";
 import { AudioConfigProvider } from "@/hooks/use-audio-config";
 import { AudioContextProvider } from "@/hooks/use-audio-context";
 import type { AudioPlayerController } from "@/hooks/use-audio-player";
+import { useTapTempo } from "@/hooks/use-tap-tempo";
 import { createClickSound } from "@/lib/audio/click";
 import type { JSXElement } from "@/lib/solid/jsx-types";
 
@@ -183,8 +191,25 @@ const ControlEffects = () => {
   );
 };
 
+const TapTempoCase = () => {
+  const tempo = useTapTempo({ defaultValue: 90 });
+
+  return (
+    <section data-testid="tap-hook">
+      <button onClick={() => tempo.tap()}>Tap hook</button>
+      <button onClick={() => tempo.setValue(90)}>Set 90</button>
+      <button onClick={tempo.resetTaps}>Reset history</button>
+      <output data-testid="tap-value">{tempo.value()}</output>
+      <output data-testid="tap-count">{tempo.tapCount()}</output>
+    </section>
+  );
+};
+
 export const ControlsApp = () => {
   const [revision, setRevision] = createSignal(0);
+  const [lcdMeterDb, setLcdMeterDb] = createSignal(-20);
+  const [lcdChannels, setLcdChannels] = createSignal(2);
+  const [customTempo, setCustomTempo] = createSignal(96);
 
   const customClickSound = createClickSound({
     tone: { hz: 900 },
@@ -311,6 +336,67 @@ export const ControlsApp = () => {
           </LcdDisplayRow>
           <LcdDisplayStatus state="busy" />
         </LcdDisplay>
+      </section>
+      <section data-testid="lcd-meter">
+        <LcdDisplay variant="amber">
+          <LcdMeter
+            aria-label="Input level"
+            channels={Array.from(
+              { length: lcdChannels() },
+              (_, index) =>
+                [
+                  { peakDb: lcdMeterDb(), rmsDb: -18 },
+                  { peakDb: -20, rmsDb: -24 },
+                ][index % 2]!
+            )}
+          />
+        </LcdDisplay>
+        <button onClick={() => setLcdMeterDb(-6)}>Raise input</button>
+        <button onClick={() => setLcdChannels(4)}>Four channels</button>
+        <button onClick={() => setLcdChannels(1)}>Mono channel</button>
+      </section>
+      <ControlCase
+        id="tempo-control"
+        render={(callbacks) => (
+          <TempoControl defaultValue={120} {...callbacks} />
+        )}
+      />
+      <ControlCase
+        id="tempo-controlled"
+        render={(callbacks) => <TempoControl value={120} {...callbacks} />}
+      />
+      <ControlCase
+        id="tempo-custom"
+        render={(callbacks) => (
+          <TempoControl
+            name="custom-bpm"
+            value={customTempo()}
+            onValueChange={(next, details) => {
+              setCustomTempo(next);
+              callbacks.onValueChange(next, details);
+            }}
+            onValueCommitted={callbacks.onValueCommitted}
+          >
+            <TempoControlTap id="custom-tap" style={{ color: "inherit" }}>
+              Measure custom
+            </TempoControlTap>
+            <TempoControlInput id="custom-input" data-custom="input" />
+          </TempoControl>
+        )}
+      />
+      <button onClick={() => setCustomTempo(110)}>External tempo</button>
+      <ControlCase
+        id="tempo-cancel"
+        render={(callbacks) => (
+          <TempoControl {...callbacks}>
+            <TempoControlInput />
+            <TempoControlTap onClick={(event) => event.preventDefault()} />
+          </TempoControl>
+        )}
+      />
+      <TapTempoCase />
+      <section data-testid="tempo-pad">
+        <TempoControlPad />
       </section>
       <ControlCase
         id="volume-vertical-drag"

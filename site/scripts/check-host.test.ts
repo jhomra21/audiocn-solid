@@ -42,7 +42,7 @@ describe("hosted release checker inputs", () => {
     const routes = [
       "/",
       "/contributors",
-      ...Array.from({ length: 56 }, (_, index) => `/docs/page-${index}`),
+      ...Array.from({ length: 59 }, (_, index) => `/docs/page-${index}`),
     ];
 
     const xml = `<urlset>${routes.map((route) => `<url><loc>https://example.workers.dev${route}</loc></url>`).join("")}</urlset>`;
@@ -55,7 +55,7 @@ describe("hosted release checker inputs", () => {
       "<urlset><url><loc>https://elsewhere.test/</loc></url></urlset>",
       "<urlset><url><loc>https://user@example.workers.dev/</loc></url></urlset>",
       "<urlset><url><loc>/docs/installation</loc></url></urlset>",
-      `<urlset>${Array.from({ length: 58 }, () => "<url><loc>https://example.workers.dev/docs/a</loc></url>").join("")}</urlset>`,
+      `<urlset>${Array.from({ length: 61 }, () => "<url><loc>https://example.workers.dev/docs/a</loc></url>").join("")}</urlset>`,
       "<urlset></urlset>",
     ]) {
       expect(() =>
@@ -68,7 +68,7 @@ describe("hosted release checker inputs", () => {
     const routes = [
       "/",
       "/contributors",
-      ...Array.from({ length: 56 }, (_, index) => `/docs/page-${index}`),
+      ...Array.from({ length: 59 }, (_, index) => `/docs/page-${index}`),
     ];
 
     const xml = `<urlset>${routes
@@ -83,13 +83,13 @@ describe("hosted release checker inputs", () => {
     ).toThrow();
   });
 
-  test("requires the shipped search index to contain all 56 docs", () => {
-    expect(assertSearchIndexDocumentCount(56)).toBeUndefined();
+  test("requires the shipped search index to contain all 59 docs", () => {
+    expect(assertSearchIndexDocumentCount(59)).toBeUndefined();
 
     for (const value of [
       null,
-      { version: 2, documents: 56, index: rawData },
-      { version: 1, documents: 56 },
+      { version: 2, documents: 59, index: rawData },
+      { version: 1, documents: 59 },
     ]) {
       expect(isSearchIndexPayload(value)).toBe(false);
     }
@@ -112,7 +112,7 @@ describe("hosted release checker requests", () => {
   const routes = [
     "/",
     "/contributors",
-    ...Array.from({ length: 56 }, (_, index) => `/docs/page-${index}`),
+    ...Array.from({ length: 59 }, (_, index) => `/docs/page-${index}`),
   ];
 
   const registry = JSON.parse(
@@ -136,7 +136,7 @@ describe("hosted release checker requests", () => {
       type = "application/json";
       body = JSON.stringify({
         version: 1,
-        documents: 56,
+        documents: 59,
         index: {
           docs: {},
           index: {},
@@ -219,12 +219,12 @@ describe("hosted release checker requests", () => {
         : responseFor(url);
     });
     expect(requested).toContain("/contributors/");
-    expect(requested.filter((path) => path.endsWith(".md"))).toHaveLength(56);
+    expect(requested.filter((path) => path.endsWith(".md"))).toHaveLength(59);
     expect(
       requested.filter((path) =>
         /^\/r\/solid[12]\/(?!registry\.json$)[^/]+\.json$/u.test(path)
       )
-    ).toHaveLength(132);
+    ).toHaveLength(138);
     expect(requested.at(-1)).toBe("/__audiocn-solid-host-check-not-found__");
   });
 

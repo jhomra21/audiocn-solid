@@ -53,6 +53,20 @@ The ink follows your theme's `--primary`. In light mode the display is backlit w
 
 The popup defaults to `placement="bottom-end"` and `gutter={8}`. Set `placement` or `gutter` on `LcdDisplaySelect` to adjust its position. Kobalte uses a combined placement value rather than Base UI's separate `side`, `align`, and offset props.
 
+### A level meter
+
+For a level meter on the same screen, add an [LCD Meter](/docs/components/lcd-meter). It takes the display's ink and size.
+
+```tsx
+<LcdDisplay>
+  <LcdDisplayRow>
+    <LcdDisplayLabel>Input</LcdDisplayLabel>
+    <LcdDisplayValue>USB Mic</LcdDisplayValue>
+  </LcdDisplayRow>
+  <LcdMeter aria-label="Input level" source={analyser.meter} />
+</LcdDisplay>
+```
+
 ## Examples
 
 ### Inks

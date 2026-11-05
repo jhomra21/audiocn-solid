@@ -30,6 +30,7 @@ import {
   LcdDisplayStatus,
   LcdDisplayValue,
 } from "@/components/ui/lcd-display";
+import { LcdMeter } from "@/components/ui/lcd-meter";
 import { LevelMeter } from "@/components/ui/level-meter";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import {
@@ -39,6 +40,7 @@ import {
   SoundPadProgress,
   SoundPadShortcut,
 } from "@/components/ui/sound-pad";
+import { TempoControl } from "@/components/ui/tempo-control";
 import type { MeterFrame } from "@/lib/audio/types";
 import EqTile from "@/site/components/home/tiles/eq-tile";
 import {
@@ -111,6 +113,28 @@ export const LcdPreview = () => (
     </LcdDisplayRow>
     <LcdDisplayStatus state="off" />
   </LcdDisplay>
+);
+
+export const LcdMeterPreview = () => (
+  <LcdDisplay class="w-[30rem]" size="lg" variant="amber">
+    <LcdDisplayRow>
+      <LcdDisplayLabel>Input</LcdDisplayLabel>
+      <LcdDisplayValue>Line In</LcdDisplayValue>
+    </LcdDisplayRow>
+    <LcdDisplaySeparator />
+    <LcdMeter
+      aria-label="Input level"
+      channels={[
+        { peakDb: -7, rmsDb: -14 },
+        { peakDb: -11, rmsDb: -17 },
+      ]}
+    />
+    <LcdDisplayStatus state="off" />
+  </LcdDisplay>
+);
+
+export const TempoControlPreview = () => (
+  <TempoControl defaultValue={120} size="lg" />
 );
 
 export const TracksPreview = () => (

@@ -56,6 +56,10 @@ import KnobVolume from "@/components/examples/knob-volume";
 import LcdDisplayDemo from "@/components/examples/lcd-display-demo";
 import LcdDisplayFont from "@/components/examples/lcd-display-font";
 import LcdDisplayVariants from "@/components/examples/lcd-display-variants";
+import { LcdMeterDemo } from "@/components/examples/lcd-meter-demo";
+import { LcdMeterInks } from "@/components/examples/lcd-meter-inks";
+import { LcdMeterMicrophone } from "@/components/examples/lcd-meter-microphone";
+import { LcdMeterSegments } from "@/components/examples/lcd-meter-segments";
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
 import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
 import { LevelMeterCustomColors } from "@/components/examples/level-meter-custom-colors";
@@ -94,6 +98,10 @@ import SpectrumVariants from "@/components/examples/spectrum-variants";
 import SystemAudioMixerConsole from "@/components/examples/system-audio-mixer-console";
 import SystemAudioMixerDemo from "@/components/examples/system-audio-mixer-demo";
 import SystemAudioSettingsDemo from "@/components/examples/system-audio-settings-demo";
+import { TempoControlControlled } from "@/components/examples/tempo-control-controlled";
+import { TempoControlDemo } from "@/components/examples/tempo-control-demo";
+import { TempoControlPad } from "@/components/examples/tempo-control-pad";
+import { TempoControlStates } from "@/components/examples/tempo-control-states";
 import TrackListDemo from "@/components/examples/track-list-demo";
 import VolumeControlDemo from "@/components/examples/volume-control-demo";
 import VolumeControlPopover from "@/components/examples/volume-control-popover";
@@ -455,6 +463,10 @@ const examples = {
   "lcd-display-demo": LcdDisplayDemo,
   "lcd-display-font": LcdDisplayFont,
   "lcd-display-variants": LcdDisplayVariants,
+  "lcd-meter-demo": LcdMeterDemo,
+  "lcd-meter-inks": LcdMeterInks,
+  "lcd-meter-microphone": LcdMeterMicrophone,
+  "lcd-meter-segments": LcdMeterSegments,
   "mixer-console": MixerConsole,
   "mixer-demo": MixerDemo,
   "mixer-empty": MixerEmptyDemo,
@@ -479,6 +491,10 @@ const examples = {
   "level-meter-values": LevelMeterValues,
   "level-meter-variants": LevelMeterVariants,
   "level-meter-vertical": LevelMeterVertical,
+  "tempo-control-controlled": TempoControlControlled,
+  "tempo-control-demo": TempoControlDemo,
+  "tempo-control-pad": TempoControlPad,
+  "tempo-control-states": TempoControlStates,
 };
 
 const isExampleName = (name: string): name is ExampleName => name in examples;

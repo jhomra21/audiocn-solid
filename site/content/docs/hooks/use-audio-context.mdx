@@ -39,6 +39,8 @@ effectsBus.connect(context.destination);
 
 ## Returns
 
+`useProvidedAudioContext()` reads only the nearest provider, without creating the shared context. In Solid it returns `{ context, destination }`, with `context: null` outside a provider. Use it for optional audio integrations that must not create an audio context just by rendering.
+
 <PropsTable
   rows={[
     [
