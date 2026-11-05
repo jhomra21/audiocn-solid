@@ -4,8 +4,8 @@ The current development and release instructions live in [`DEVELOPMENT.md`](./DE
 
 ## Click-sound follow-up
 
-- Upstream baseline: `audiocn/ui@521c03f636a4e2cf14a25b79c5838223a3fd6ae8`.
-- Adopted, unmerged click-sound PR #19 head: `d4f23c6e880661163b4b471cf3559f9caf62d448`.
+- Upstream baseline: `audiocn/ui@6689aa009f39a591523faa5b24673e2be75fcb72`.
+- Click-sound PR #19 merged upstream as `95e7510`; the local implementation was already ported from its PR head.
 - Outstanding React Activity parity cases: pause a retained player without reload; return capture to idle after retained hide/show; disconnect and reconnect a retained graph.
 
 ## Current state

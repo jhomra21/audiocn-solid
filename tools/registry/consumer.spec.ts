@@ -20,7 +20,7 @@ test("every item has an independent consumer install, build and license proof", 
   const fixtures = new Set<string>();
 
   for (const runtime of report.runtimes) {
-    expect(runtime.items).toHaveLength(66);
+    expect(runtime.items).toHaveLength(69);
 
     for (const item of runtime.items) {
       expect(item.installed, item.name).toBe(true);
@@ -48,7 +48,7 @@ test("every item has an independent consumer install, build and license proof", 
     }
   }
 
-  expect(fixtures.size).toBe(132);
+  expect(fixtures.size).toBe(138);
 });
 
 for (const runtime of ["solid1", "solid2"]) {

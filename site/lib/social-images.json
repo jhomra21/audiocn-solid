@@ -230,5 +230,17 @@
   "/docs/installation": {
     "alt": "Installation — audiocn: level meters, rotary knobs, faders and a waveform.",
     "url": "/og/installation-c3a702e1f030.png"
+  },
+  "/docs/components/lcd-meter": {
+    "alt": "LCD Meter — audiocn: an amber dot-matrix screen with a stereo level meter in block segments.",
+    "url": "/og/components-lcd-meter-4aab849d30e1.png"
+  },
+  "/docs/components/tempo-control": {
+    "alt": "Tempo Control — audiocn: an editable BPM input and a tap tempo button.",
+    "url": "/og/components-tempo-control-a32f78c829b2.png"
+  },
+  "/docs/hooks/use-tap-tempo": {
+    "alt": "useTapTempo — audiocn: an editable BPM input and a tap tempo button.",
+    "url": "/og/hooks-use-tap-tempo-89516818a1fd.png"
   }
 }

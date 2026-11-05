@@ -105,6 +105,11 @@
     "url": "/docs/components/lcd-display"
   },
   {
+    "title": "LCD Meter",
+    "description": "A level meter on an LCD Display's screen, with block segments, a held peak, readouts, a printed scale and a CLIP flag.",
+    "url": "/docs/components/lcd-meter"
+  },
+  {
     "title": "Level Meter",
     "description": "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
     "url": "/docs/components/level-meter"
@@ -143,6 +148,11 @@
     "title": "Spectrum",
     "description": "A frequency spectrum analyser with axes, a grid and peak hold.",
     "url": "/docs/components/spectrum"
+  },
+  {
+    "title": "Tempo Control",
+    "description": "An editable BPM input with tap tempo, keyboard stepping and a rolling average.",
+    "url": "/docs/components/tempo-control"
   },
   {
     "title": "Track List",
@@ -253,6 +263,11 @@
     "title": "useSystemAudio",
     "description": "Capture system or tab audio through the browser's screen-share picker.",
     "url": "/docs/hooks/use-system-audio"
+  },
+  {
+    "title": "useTapTempo",
+    "description": "Tap tempo with a rolling average and idle reset.",
+    "url": "/docs/hooks/use-tap-tempo"
   },
   {
     "title": "useVisibility",

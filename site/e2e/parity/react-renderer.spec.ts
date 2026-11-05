@@ -200,7 +200,7 @@ for (const width of [390, 1280]) {
       const upstreamSitemap = await fetch(`${referenceURL}/sitemap.xml`);
       expect(upstreamSitemap.ok).toBe(true);
       expect(sitemapRoutes(await upstreamSitemap.text())).toEqual(routes);
-      expect(routes).toHaveLength(58);
+      expect(routes).toHaveLength(61);
 
       const contexts = await Promise.all(
         [referenceURL!, baseURL!].map(() =>
@@ -318,7 +318,7 @@ for (const width of [390, 1280]) {
           join(artifacts, `measurements-${width}-${theme}.json`),
           JSON.stringify(
             {
-              sourceCommit: "521c03f636a4e2cf14a25b79c5838223a3fd6ae8",
+              sourceCommit: "6689aa009f39a591523faa5b24673e2be75fcb72",
               sourceRoot,
               referenceURL,
               localURL: baseURL,

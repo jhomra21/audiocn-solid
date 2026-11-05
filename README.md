@@ -68,7 +68,7 @@ Copy, paste, make them yours.</p>
 </table>
 
 <details>
-<summary><strong>All 23 components</strong></summary>
+<summary><strong>All 25 components</strong></summary>
 
 <br />
 
@@ -77,6 +77,7 @@ Copy, paste, make them yours.</p>
 | Component | What it does |
 | --- | --- |
 | [Level Meter](https://audiocn-solid.jhonra121.workers.dev/docs/components/level-meter) | Peak and RMS meter with zones, peak hold, a scale, readout and clip light |
+| [LCD Meter](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-meter) | Recorder-style segmented level meter inside an LCD Display |
 | [dB Scale](https://audiocn-solid.jhonra121.workers.dev/docs/components/db-scale) | Tick marks and labels for decibel ranges |
 | [dB Readout](https://audiocn-solid.jhonra121.workers.dev/docs/components/db-readout) | Numeric level label that updates at a readable rate |
 | [Clip Indicator](https://audiocn-solid.jhonra121.workers.dev/docs/components/clip-indicator) | Latched clip light with a count and reset |
@@ -94,6 +95,7 @@ Copy, paste, make them yours.</p>
 | --- | --- |
 | [Fader](https://audiocn-solid.jhonra121.workers.dev/docs/components/fader) | Decibel volume fader with tapers, detents, scale and reset |
 | [Parameter Slider](https://audiocn-solid.jhonra121.workers.dev/docs/components/parameter-slider) | Labelled slider with numeric input, unit, marks and reset |
+| [Tempo Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/tempo-control) | Editable BPM input with tap tempo |
 | [Knob](https://audiocn-solid.jhonra121.workers.dev/docs/components/knob) | Rotary control for dense layouts |
 | [LCD Display](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-display) | Themeable dot-matrix screen with dropdown rows |
 | [Pan Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/pan-control) | Left-right balance with centre detent |
@@ -153,8 +155,9 @@ Web Audio hooks provide levels and playback state to components. You can also pr
 | [`useWaveformData`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-waveform-data) | Decode an audio file into cached waveform peaks |
 | [`useAudioDevices`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-devices) | Audio devices with permission state and live updates |
 | [`useDemoSignal`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-demo-signal) | Synthetic signals for previews, prototypes and tests |
+| [`useTapTempo`](https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-tap-tempo) | Tap tempo with a rolling average and idle reset |
 
-Plus `useAudioContext`, `useAudioConfig`, `useFrameSource`, `useLevel`, `useClipHold`, `useGainNode`, `useVisibility` and `useReducedMotion`.
+Plus `useAudioContext`, `useAudioConfig`, `useFrameSource`, `useLevel`, `useClipHold`, `useTapTempo`, `useGainNode`, `useVisibility` and `useReducedMotion`.
 
 ## Quick start
 

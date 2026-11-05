@@ -51,7 +51,7 @@ const report = {
   pass: false,
   strategy:
     "isolated item sources and node_modules; documented Solid bootstrap",
-  upstreamSha: "521c03f636a4e2cf14a25b79c5838223a3fd6ae8",
+  upstreamSha: "6689aa009f39a591523faa5b24673e2be75fcb72",
   itemNames,
   runtimes,
 };

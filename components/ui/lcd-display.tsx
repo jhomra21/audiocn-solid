@@ -96,7 +96,9 @@ const DEFAULT_DISPLAY_CONTEXT: DisplayContext = {
   variant: (): LcdDisplayVariant => "primary",
 };
 
-const DisplayContext = createContext(DEFAULT_DISPLAY_CONTEXT);
+const DisplayContext = createContext<DisplayContext | null>(null);
+
+export const useLcdDisplay = () => useContext(DisplayContext);
 
 const RowContext = createContext<{
   labelId: () => string;
@@ -421,7 +423,7 @@ export const LcdDisplaySelectTrigger = (
     <SelectPrimitive.Trigger
       aria-labelledby={row?.labelId()}
       class={cn(
-        "-mx-1 inline-flex cursor-pointer items-center gap-3 rounded-sm px-1 py-0.5 text-(--lcd-display-lit) uppercase tabular-nums outline-none focus-visible:ring-1 focus-visible:ring-(--lcd-display-lit) disabled:cursor-default disabled:text-(--lcd-display-ink-dim) data-placeholder:text-(--lcd-display-ink-dim)",
+        "-mx-1 inline-flex items-center gap-3 rounded-sm px-1 py-0.5 text-(--lcd-display-lit) uppercase tabular-nums outline-none focus-visible:ring-1 focus-visible:ring-(--lcd-display-lit) disabled:text-(--lcd-display-ink-dim) data-placeholder:text-(--lcd-display-ink-dim)",
         FLICKER,
         props.class,
         props.className
@@ -478,7 +480,7 @@ export interface LcdDisplaySelectContentProps extends Omit<
 export const LcdDisplaySelectContent = (
   props: LcdDisplaySelectContentProps
 ) => {
-  const context = useContext(DisplayContext) ?? DEFAULT_DISPLAY_CONTEXT;
+  const context = useLcdDisplay() ?? DEFAULT_DISPLAY_CONTEXT;
 
   return (
     <SelectContent

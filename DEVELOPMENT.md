@@ -66,7 +66,7 @@ bun run registry:build
 bun run registry:test-install
 ```
 
-The install suite typechecks and builds all 132 item/runtime combinations, records their source, dependency and license plans in `artifacts/`, and excludes React packages. For installed-control and block browser acceptance, run `bun run registry:spike:3`.
+The install suite typechecks and builds all 138 item/runtime combinations, records their source, dependency and license plans in `artifacts/`, and excludes React packages. For installed-control and block browser acceptance, run `bun run registry:spike:3`.
 
 For a release candidate, run the full source-level checks in CI, both browser suites, and the site release checks:
 

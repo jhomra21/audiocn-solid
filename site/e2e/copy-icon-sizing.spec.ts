@@ -90,7 +90,7 @@ test("install command and code copy icons match upstream sizes", async ({
   await testInfo.attach("icon-copy-feedback-parity.json", {
     body: JSON.stringify(
       {
-        sourceCommit: "521c03f636a4e2cf14a25b79c5838223a3fd6ae8",
+        sourceCommit: "6689aa009f39a591523faa5b24673e2be75fcb72",
         upstreamRules: {
           installCommand: {
             source: "components/code-block-command.tsx:191",
