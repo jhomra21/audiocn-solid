@@ -95,11 +95,11 @@ const packageJsonFor = (runtime: RuntimeName): string => {
           dependencies: {
             "@kobalte/core":
               "https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz",
-            "@solidjs/web": "2.0.0-rc.14",
-            "solid-js": "2.0.0-rc.14",
+            "@solidjs/web": "2.0.3",
+            "solid-js": "2.0.3",
           },
           devDependencies: {
-            "@solidjs/vite-plugin": "3.0.0-next.47",
+            "@solidjs/vite-plugin": "3.0.1",
             typescript: "^7.0.2",
             vite: "^8.0.0",
           },
@@ -293,7 +293,7 @@ const report: Spike4Report = {
   versions: {
     solid1: "@kobalte/core@0.13.14 + solid-js@1.9.15",
     solid2:
-      "@kobalte/core@2.0.0-alpha.2-audiocn.2.b394be55 + solid-js/@solidjs/web@2.0.0-rc.14",
+      "@kobalte/core@2.0.0-alpha.2-audiocn.2.b394be55 + solid-js/@solidjs/web@2.0.3",
   },
   apiDifferences: [
     {
@@ -322,8 +322,7 @@ const report: Spike4Report = {
       surface: "Slider thumb editability",
       solid1:
         "0.13.14 marks registered thumbs editable during its mount lifecycle.",
-      solid2:
-        "2.0.0-alpha.2 leaves registered thumbs non-editable on Solid 2 rc.13.",
+      solid2: "2.0.0-alpha.2 leaves registered thumbs non-editable on Solid 2.",
       consequence:
         "Shared source re-applies editability from the registered thumb count and disabled state using lib/solid/effect.ts.",
     },
@@ -331,9 +330,9 @@ const report: Spike4Report = {
       surface: "Solid 2 peer range",
       solid1: "0.13.14 supports the Solid 1 runtime used by the fixture.",
       solid2:
-        "2.0.0-alpha.2 declares rc.3 peers, while the current Solid runtime is rc.13.",
+        "The fork declares exact 2.0.0-rc.14 peers, while the current Solid runtime is 2.0.3.",
       consequence:
-        "Bun reports peer warnings. Keep this as a prerelease compatibility caveat until Kobalte publishes an rc.13-compatible range.",
+        "Bun reports peer warnings. Keep this as a prerelease compatibility caveat until Kobalte publishes a release that declares a Solid 2.x range and includes the outside-touch fix.",
     },
   ],
   runtimes: [],

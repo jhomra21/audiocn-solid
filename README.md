@@ -176,7 +176,7 @@ audiocn Solid is a [shadcn registry](https://ui.shadcn.com/docs/registry). Start
 }
 ```
 
-For the experimental Solid 2 registry, use `/r/solid2/{name}.json`. It targets `solid-js` and `@solidjs/web` 2.0.0-rc.14.
+For the Solid 2 registry, use `/r/solid2/{name}.json`. It targets `solid-js` and `@solidjs/web` 2.0.3 and an AudioCN-patched Kobalte prerelease.
 
 **2. Add components.** The CLI copies each component with its audio core, compatibility helpers, theme tokens and hooks.
 
@@ -195,7 +195,7 @@ export const MicLevel = (props: { peakDb: number }) => (
 );
 ```
 
-The component API is shared between Solid 1 and Solid 2. The Solid 1 registry is stable. The Solid 2 registry is experimental and uses prerelease dependencies. The two registries use different JSX transforms, so configure the matching runtime before adding components. See the [installation guide](https://audiocn-solid.jhonra121.workers.dev/docs/installation) for setup details.
+The component API is shared between Solid 1 and Solid 2. The Solid 1 registry is stable. The Solid 2 registry targets stable Solid 2 but depends on a prerelease Kobalte build. The two registries use different JSX transforms, so configure the matching runtime before adding components. See the [installation guide](https://audiocn-solid.jhonra121.workers.dev/docs/installation) for setup details.
 
 ## Develop
 

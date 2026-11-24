@@ -42,8 +42,8 @@ describe("resolveInstall", () => {
       expect.arrayContaining(["card", "empty", "label", "switch", "toggle"])
     );
     expect(plan.shadcnItems).toEqual([]);
-    expect(plan.npmDependencies).toContain("solid-js@2.0.0-rc.14");
-    expect(plan.npmDependencies).toContain("@solidjs/web@2.0.0-rc.14");
+    expect(plan.npmDependencies).toContain("solid-js@2.0.3");
+    expect(plan.npmDependencies).toContain("@solidjs/web@2.0.3");
     expect(plan.npmDependencies).toContain(
       "@kobalte/core@https://github.com/jhomra21/kobalte/releases/download/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1/kobalte-core-2.0.0-alpha.2-audiocn.2.b394be55.tgz"
     );
@@ -69,8 +69,8 @@ describe("resolveInstall", () => {
     const plan = resolveInstall(item("use-reduced-motion"));
     expect(plan.registryItems).toEqual([]);
     expect(plan.npmDependencies).toEqual([
-      "solid-js@2.0.0-rc.14",
-      "@solidjs/web@2.0.0-rc.14",
+      "solid-js@2.0.3",
+      "@solidjs/web@2.0.3",
     ]);
     expect(plan.shadcnItems).toEqual([]);
   });
