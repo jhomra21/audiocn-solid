@@ -22,7 +22,7 @@ export default defineConfig({
 
         const layer = fileURLToPath(
           new URL(
-            "./node_modules/@kobalte/core-solid2/dist/dismissable-layer/CebVaFST.js",
+            "./node_modules/@kobalte/core-solid2/dist/dismissable-layer/Dinw3YCy.js",
             import.meta.url
           )
         );
