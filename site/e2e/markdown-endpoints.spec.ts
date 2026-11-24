@@ -63,7 +63,7 @@ test("every docs page has equal static Markdown twins and no executable MDX wrap
     verified.push(page.url);
   }
 
-  expect(verified).toHaveLength(59);
+  expect(verified).toHaveLength(62);
   await info.attach("markdown-endpoint-inventory", {
     body: JSON.stringify(verified, null, 2),
     contentType: "application/json",

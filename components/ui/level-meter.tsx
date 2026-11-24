@@ -100,6 +100,16 @@ export const useLevelMeter = (part: string) => {
   return context;
 };
 
+/**
+ * The meter's orientation and how many tracks it shows, for a custom skin
+ * that renders its own channels the way the default anatomy does.
+ */
+export const useLevelMeterLayout = (part = "useLevelMeterLayout") => {
+  const { channelCount, orientation } = useLevelMeter(part);
+
+  return { channelCount, orientation };
+};
+
 const byFromDb = (zones: MeterZone[]): MeterZone[] => {
   const sorted: MeterZone[] = [];
 

@@ -105,6 +105,14 @@ const RowContext = createContext<{
   setCustomId: (id: string | undefined) => void;
 }>();
 
+/**
+ * The id accessor of the surrounding row's `LcdDisplayLabel`, or undefined
+ * outside a row. Lets a value from another file, like a meter or a number
+ * field, be named by its row's label the way the select is.
+ */
+export const useLcdDisplayRowLabelId = (): (() => string) | undefined =>
+  useContext(RowContext)?.labelId;
+
 const LcdScreen = (props: {
   matrix: boolean;
   scanlines: boolean;
@@ -337,17 +345,21 @@ export interface LcdDisplayStatusProps extends SpanDOMProps {
 }
 
 export const LcdDisplayStatus = (props: LcdDisplayStatusProps) => (
-  <span
-    aria-hidden="true"
-    class={cn(
-      "absolute right-2 bottom-2 size-1.5 animate-pulse bg-(--lcd-display-lit) data-[state=busy]:[animation-duration:0.6s] data-[state=off]:animate-none data-[state=off]:bg-(--lcd-display-ink-unlit) motion-reduce:animate-none",
-      props.class,
-      props.className
+  <Show when={props.state}>
+    {(state) => (
+      <span
+        aria-hidden="true"
+        class={cn(
+          "absolute right-2 bottom-2 size-1.5 animate-pulse bg-(--lcd-display-lit) data-[state=busy]:[animation-duration:0.6s] data-[state=off]:animate-none data-[state=off]:bg-(--lcd-display-ink-unlit) motion-reduce:animate-none",
+          props.class,
+          props.className
+        )}
+        data-slot="lcd-display-status"
+        data-state={state()}
+        {...omitProps(props, ["class", "className", "state"])}
+      />
     )}
-    data-slot="lcd-display-status"
-    data-state={props.state ?? "idle"}
-    {...omitProps(props, ["class", "className", "state"])}
-  />
+  </Show>
 );
 
 export interface LcdDisplayOption {

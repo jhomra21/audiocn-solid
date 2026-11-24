@@ -72,6 +72,7 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
           { href: "/docs/components/live-waveform", label: "Live Waveform" },
           { href: "/docs/components/waveform", label: "Waveform" },
           { href: "/docs/components/spectrum", label: "Spectrum" },
+          { href: "/docs/components/lcd-vumeter", label: "LCD VU Meter" },
         ],
       },
       {
@@ -85,6 +86,11 @@ export const DOCS_NAVIGATION: readonly DocsNavArea[] = [
           { href: "/docs/components/tempo-control", label: "Tempo Control" },
           { href: "/docs/components/knob", label: "Knob" },
           { href: "/docs/components/lcd-display", label: "LCD Display" },
+          {
+            href: "/docs/components/lcd-number-field",
+            label: "LCD Number Field",
+          },
+          { href: "/docs/components/lcd-spectrum", label: "LCD Spectrum" },
           { href: "/docs/components/pan-control", label: "Pan Control" },
           {
             href: "/docs/components/channel-toggle",

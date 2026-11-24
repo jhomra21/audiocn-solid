@@ -26,6 +26,16 @@ import {
   LcdDisplayValue,
 } from "@/components/ui/lcd-display";
 import { LcdMeter } from "@/components/ui/lcd-meter";
+import {
+  LcdNumberField,
+  LcdNumberFieldGroup,
+  LcdNumberFieldInput,
+  LcdNumberFieldReset,
+  LcdNumberFieldScrubArea,
+  LcdNumberFieldStepper,
+  LcdNumberFieldUnit,
+} from "@/components/ui/lcd-number-field";
+import type { LcdNumberFieldProps } from "@/components/ui/lcd-number-field";
 import { formatPan, PanControl, parsePan } from "@/components/ui/pan-control";
 import {
   ParameterSlider,
@@ -49,6 +59,7 @@ import type { AudioPlayerController } from "@/hooks/use-audio-player";
 import { useTapTempo } from "@/hooks/use-tap-tempo";
 import { createClickSound } from "@/lib/audio/click";
 import type { JSXElement } from "@/lib/solid/jsx-types";
+import { omitProps } from "@/lib/solid/props";
 
 declare global {
   interface Window {
@@ -64,10 +75,13 @@ interface ControlEvent {
 
 interface ControlCallbacks {
   onValueChange: (
-    value: number | boolean,
+    value: number | boolean | null,
     details?: { reason: string }
   ) => void;
-  onValueCommitted: (value: number) => void;
+  onValueCommitted: (
+    value: number | null,
+    details?: { reason: string }
+  ) => void;
 }
 
 const ControlCase = (props: {
@@ -83,7 +97,7 @@ const ControlCase = (props: {
   const [details, setDetails] = createSignal("");
 
   const record = (
-    value: number | boolean,
+    value: number | boolean | null,
     reason: string,
     type: ControlEvent["type"]
   ) =>
@@ -97,7 +111,8 @@ const ControlCase = (props: {
       record(value, nextDetails?.reason ?? "", "change");
       setDetails(JSON.stringify(nextDetails));
     },
-    onValueCommitted: (value) => record(value, "", "commit"),
+    onValueCommitted: (value, nextDetails) =>
+      record(value, nextDetails?.reason ?? "", "commit"),
   };
 
   return (
@@ -191,6 +206,36 @@ const ControlEffects = () => {
   );
 };
 
+const NumberFieldRow = (
+  props: Omit<LcdNumberFieldProps, "children"> & {
+    blockScrub?: boolean;
+    showUnit?: boolean;
+  }
+) => (
+  <LcdDisplay class="w-96" variant="amber">
+    <LcdDisplayRow>
+      <LcdNumberField {...omitProps(props, ["blockScrub", "showUnit"])}>
+        <LcdNumberFieldScrubArea
+          data-testid="scrub"
+          onPointerMove={(event) => {
+            if (props.blockScrub) event.preventDefault();
+          }}
+        >
+          <LcdDisplayLabel>Tempo</LcdDisplayLabel>
+        </LcdNumberFieldScrubArea>
+        <LcdNumberFieldGroup>
+          <LcdNumberFieldReset />
+          <LcdNumberFieldInput />
+          <Show when={props.showUnit ?? true}>
+            <LcdNumberFieldUnit>Bpm</LcdNumberFieldUnit>
+          </Show>
+          <LcdNumberFieldStepper />
+        </LcdNumberFieldGroup>
+      </LcdNumberField>
+    </LcdDisplayRow>
+  </LcdDisplay>
+);
+
 const TapTempoCase = () => {
   const tempo = useTapTempo({ defaultValue: 90 });
 
@@ -210,6 +255,11 @@ export const ControlsApp = () => {
   const [lcdMeterDb, setLcdMeterDb] = createSignal(-20);
   const [lcdChannels, setLcdChannels] = createSignal(2);
   const [customTempo, setCustomTempo] = createSignal(96);
+  const [fieldValue, setFieldValue] = createSignal<number | null>(100);
+  const [fieldLock, setFieldLock] = createSignal<"disabled" | "readonly">();
+  const [blockScrub, setBlockScrub] = createSignal(false);
+  const [showUnit, setShowUnit] = createSignal(true);
+  const [statusState, setStatusState] = createSignal<"busy" | undefined>();
 
   const customClickSound = createClickSound({
     tone: { hz: 900 },
@@ -355,6 +405,103 @@ export const ControlsApp = () => {
         <button onClick={() => setLcdChannels(4)}>Four channels</button>
         <button onClick={() => setLcdChannels(1)}>Mono channel</button>
       </section>
+      <section data-testid="lcd-status">
+        <LcdDisplay variant="amber">
+          <LcdDisplayRow>
+            <LcdDisplayLabel>Link</LcdDisplayLabel>
+            <LcdDisplayValue>Ready</LcdDisplayValue>
+          </LcdDisplayRow>
+          <LcdDisplayStatus state={statusState()} />
+        </LcdDisplay>
+        <button onClick={() => setStatusState("busy")}>Set busy</button>
+        <button onClick={() => setStatusState(undefined)}>Clear status</button>
+      </section>
+      <ControlCase
+        id="number-field"
+        render={(callbacks) => (
+          <NumberFieldRow
+            defaultValue={120}
+            max={300}
+            min={20}
+            name="bpm"
+            onValueChange={callbacks.onValueChange}
+            onValueCommitted={callbacks.onValueCommitted}
+            resetValue={120}
+          />
+        )}
+      />
+      <ControlCase
+        id="number-field-controlled"
+        render={(callbacks) => (
+          <>
+            <NumberFieldRow
+              max={300}
+              min={20}
+              onValueChange={(next, details) => {
+                setFieldValue(next);
+                callbacks.onValueChange(next, details);
+              }}
+              onValueCommitted={callbacks.onValueCommitted}
+              resetValue={100}
+              value={fieldValue()}
+            />
+            <button onClick={() => setFieldValue(90)}>External field</button>
+          </>
+        )}
+      />
+      <ControlCase
+        id="number-field-rejected"
+        render={(callbacks) => (
+          <NumberFieldRow
+            onValueChange={callbacks.onValueChange}
+            onValueCommitted={callbacks.onValueCommitted}
+            value={50}
+          />
+        )}
+      />
+      <ControlCase
+        id="number-field-locked"
+        render={(callbacks) => (
+          <>
+            <NumberFieldRow
+              defaultValue={10}
+              disabled
+              onValueChange={callbacks.onValueChange}
+            />
+            <NumberFieldRow
+              defaultValue={10}
+              onValueChange={callbacks.onValueChange}
+              readOnly
+            />
+          </>
+        )}
+      />
+      <ControlCase
+        id="number-field-lockable"
+        render={(callbacks) => (
+          <>
+            <NumberFieldRow
+              blockScrub={blockScrub()}
+              defaultValue={100}
+              disabled={fieldLock() === "disabled"}
+              onValueChange={callbacks.onValueChange}
+              onValueCommitted={callbacks.onValueCommitted}
+              readOnly={fieldLock() === "readonly"}
+              showUnit={showUnit()}
+            />
+            <button onClick={() => setShowUnit((shown) => !shown)}>
+              Toggle unit
+            </button>
+            <button onClick={() => setFieldLock("disabled")}>
+              Disable field
+            </button>
+            <button onClick={() => setFieldLock("readonly")}>
+              Make field read-only
+            </button>
+            <button onClick={() => setBlockScrub(true)}>Block scrub</button>
+          </>
+        )}
+      />
       <ControlCase
         id="tempo-control"
         render={(callbacks) => (

@@ -250,7 +250,9 @@ export const DbReadout = (props: DbReadoutProps) => {
 
   const style = createMemo<StyleValue>(() =>
     mergeStyleVars(props.style, {
-      "--db-readout-width": `${widest()}ch`,
+      // Unset, the tracking inherits and the width reserves glyphs only.
+      // Set, both use it, so letter-spaced text keeps its width too.
+      "--db-readout-width": `calc(${widest()} * (1ch + var(--db-readout-tracking, 0px)))`,
     })
   );
 
@@ -262,7 +264,7 @@ export const DbReadout = (props: DbReadoutProps) => {
   const span = () => (
     <span
       class={cn(
-        "inline-block min-w-(--db-readout-width) text-end font-mono tabular-nums",
+        "inline-block min-w-(--db-readout-width) text-end font-mono tracking-(--db-readout-tracking) tabular-nums",
         props.class,
         props.className
       )}

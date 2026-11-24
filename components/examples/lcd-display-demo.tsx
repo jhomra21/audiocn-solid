@@ -53,7 +53,7 @@ const LcdDisplayDemo = () => {
           <LcdDisplaySelectContent />
         </LcdDisplaySelect>
       </LcdDisplayRow>
-      <LcdDisplayStatus />
+      <LcdDisplayStatus state="idle" />
     </LcdDisplay>
   );
 };

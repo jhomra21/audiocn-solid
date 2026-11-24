@@ -87,6 +87,104 @@ const settleVisibility = (target: Locator, visible: boolean) =>
     visible
   );
 
+interface Fill {
+  alpha: number;
+  fill: string;
+  x: number;
+  y: number;
+}
+
+declare global {
+  interface Window {
+    /** The cells a canvas has been asked to fill since its last clear. */
+    lcdFills: (canvas: HTMLCanvasElement) => Fill[];
+  }
+}
+
+/** Opens a case and records the cells its canvases fill. */
+const openRecording = async (page: Page, query: string) => {
+  await installFrameHarness(page);
+  await page.addInitScript(() => {
+    const prototype = CanvasRenderingContext2D.prototype;
+    const { clearRect, fillRect } = prototype;
+    const cells = new WeakMap<HTMLCanvasElement, Fill[]>();
+
+    prototype.clearRect = function recordClear(x, y, width, height) {
+      cells.set(this.canvas, []);
+      clearRect.call(this, x, y, width, height);
+    };
+
+    prototype.fillRect = function recordFill(x, y, width, height) {
+      cells.get(this.canvas)?.push({
+        alpha: this.globalAlpha,
+        fill: String(this.fillStyle),
+        x,
+        y,
+      });
+      fillRect.call(this, x, y, width, height);
+    };
+
+    window.lcdFills = (canvas) =>
+      cells.get(canvas)?.map((cell) => ({ ...cell })) ?? [];
+  });
+  await open(page, query);
+};
+
+const spectrumFrame = (page: Page, bands: number[]) =>
+  page.evaluate(
+    (values) =>
+      window.meters.emitVisual({
+        bands: Float32Array.from(values),
+        history: Float32Array.from(values),
+        historyLength: values.length,
+        historyStart: 0,
+        peakDb: -12,
+      }),
+    bands
+  );
+
+/**
+ * Each column's lit cells, bottom row first, with the unlit cells' count. The
+ * first cell painted after a clear is always an unlit one.
+ */
+const readSpectrum = async (page: Page) => {
+  const fills = await page
+    .locator("canvas")
+    .evaluate((canvas: HTMLCanvasElement) => window.lcdFills(canvas));
+
+  const unlit = fills[0]?.fill;
+
+  const columns = [...new Set(fills.map((cell) => cell.x))].sort(
+    (a, b) => a - b
+  );
+
+  return {
+    lit: columns.map((x) =>
+      fills
+        .filter((cell) => cell.x === x && cell.fill !== unlit)
+        .map((cell) => ({ alpha: cell.alpha, y: cell.y }))
+        .sort((a, b) => b.y - a.y)
+    ),
+    unlit: fills.filter((cell) => cell.fill === unlit).length,
+  };
+};
+
+/** Resolves a length that is a custom property times a thousand pixels. */
+const customNumber = (target: Locator, name: string) =>
+  target.evaluate((node, property) => {
+    const probe = document.createElement("div");
+
+    probe.style.width = `calc(var(${property}) * 1000px)`;
+    probe.style.position = "absolute";
+    node.append(probe);
+
+    const width = getComputedStyle(probe).width;
+
+    probe.remove();
+
+    return Number.parseFloat(width) / 1000;
+  }, name);
+
 const labelsOf = (scale: Locator, selector = '[data-slot="db-scale-label"]') =>
   scale
     .locator(selector)
@@ -152,6 +250,258 @@ export const runMetersSuite = (runtime: string) => {
       await advance(page, READOUT_DEADLINE_MS);
       await expect(live).toHaveText("−12.3 dB");
       await expect(live).toHaveAttribute("data-zone", "warn");
+    });
+
+    test("LCD VU meter lights whole segments and keeps its width as the readout changes", async ({
+      page,
+    }) => {
+      await openFrozen(page, "case=lcd-vumeter&segments=10");
+
+      const meter = page.getByRole("meter", { name: "Out" });
+      await expect(meter).toHaveAttribute("data-lcd-mode", "bar");
+      await expect(meter).toHaveAttribute("data-segments", "10");
+      await expect(
+        meter.locator('[data-slot="lcd-vumeter-track"]')
+      ).toHaveCount(2);
+      await expect(
+        meter.locator('[data-slot="lcd-vumeter-unlit"]')
+      ).toHaveCount(2);
+      await expect(meter.locator('[data-slot="lcd-vumeter-bar"]')).toHaveCount(
+        2
+      );
+      await expect(meter.locator('[data-slot="lcd-vumeter-hold"]')).toHaveCount(
+        2
+      );
+      await expect(meter.locator('[data-slot="db-scale"]')).toHaveCount(1);
+      await expect(
+        meter.locator('[data-slot="lcd-vumeter-clip-light"]')
+      ).toHaveCount(1);
+
+      const track = meter.locator('[data-slot="lcd-vumeter-track"]').first();
+      const widths: number[] = [];
+
+      for (const peaks of [
+        [-33, -21],
+        [-6, -6],
+        [-100, -100],
+      ]) {
+        await page.evaluate(
+          (levels) =>
+            window.meters.emitMeter({
+              channels: levels.map((peakDb) => ({ peakDb })),
+            }),
+          peaks
+        );
+        await advance(page, 1500);
+        widths.push(
+          await track.evaluate((node) => node.getBoundingClientRect().width)
+        );
+
+        if (peaks[0] === -33) {
+          // Whole segments: 0.45 and 0.65 of ten fall to 0.4 and 0.6.
+          expect(
+            await customNumber(channel(page, 0), "--lcd-vumeter-lit")
+          ).toBeCloseTo(0.4, 3);
+          expect(
+            await customNumber(channel(page, 1), "--lcd-vumeter-lit")
+          ).toBeCloseTo(0.6, 3);
+        }
+      }
+
+      expect(widths[0]).toBeGreaterThan(0);
+      expect(widths[1]).toBe(widths[0]);
+      expect(widths[2]).toBe(widths[0]);
+      await expect(meter.locator('[data-slot="db-readout"]')).toHaveText(
+        "−∞ dB"
+      );
+    });
+
+    test("LCD VU meter in dot mode lights only the top segment and lights its clip dot", async ({
+      page,
+    }) => {
+      await openFrozen(page, "case=lcd-vumeter&segments=10&mode=dot");
+      await page.evaluate(() =>
+        window.meters.emitMeter({ channels: [{ peakDb: -33 }, { peakDb: 0 }] })
+      );
+      await advance(page, 1500);
+
+      const meter = page.getByRole("meter", { name: "Out" });
+      await expect(meter).toHaveAttribute("data-lcd-mode", "dot");
+
+      const bar = meter.locator('[data-slot="lcd-vumeter-bar"]').first();
+      expect(await customNumber(bar, "--lcd-vumeter-from")).toBeCloseTo(0.3, 3);
+      expect(await customNumber(bar, "--lcd-vumeter-to")).toBeCloseTo(0.4, 3);
+      await expect(meter).toHaveAttribute("data-clipping", "");
+    });
+
+    test("LCD VU meter's default anatomy adds a track for each channel a source sends", async ({
+      page,
+    }) => {
+      await openFrozen(page, "case=lcd-vumeter-default&segments=10");
+
+      const meter = page.getByRole("meter", { name: "Out" });
+      const tracks = meter.locator('[data-slot="lcd-vumeter-track"]');
+
+      await expect(tracks).toHaveCount(1);
+      await emitPeak(page, -33);
+      await advance(page, 1500);
+      await expect(tracks).toHaveCount(1);
+      await page.evaluate(() =>
+        window.meters.emitMeter({
+          channels: [{ peakDb: -33 }, { peakDb: -21 }],
+        })
+      );
+      await advance(page, 1500);
+      await expect(tracks).toHaveCount(2);
+      await expect(meter.locator('[data-slot="lcd-vumeter-bar"]')).toHaveCount(
+        2
+      );
+      await expect(meter.locator('[data-slot="lcd-vumeter-hold"]')).toHaveCount(
+        2
+      );
+      expect(
+        await customNumber(channel(page, 1), "--lcd-vumeter-lit")
+      ).toBeCloseTo(0.6, 3);
+    });
+
+    test("LCD VU meter runs its segments up a vertical track", async ({
+      page,
+    }) => {
+      await openFrozen(page, "case=lcd-vumeter&orientation=vertical");
+
+      const meter = page.getByRole("meter", { name: "Out" });
+      await expect(meter).toHaveAttribute("data-orientation", "vertical");
+      await expect(
+        meter.locator('[data-slot="lcd-vumeter-track"]').first()
+      ).toHaveAttribute("data-orientation", "vertical");
+      expect(
+        await meter.evaluate((node) =>
+          node.style.getPropertyValue("--lcd-vumeter-mask")
+        )
+      ).toContain("to top");
+    });
+
+    test("LCD spectrum lights whole segments in every column", async ({
+      page,
+    }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=8");
+      await expect(page.locator('[data-slot="lcd-spectrum"]')).toHaveAttribute(
+        "data-lcd-mode",
+        "bar"
+      );
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.25, 1, 0]);
+      await advance(page, 50);
+
+      const { lit, unlit } = await readSpectrum(page);
+
+      expect(unlit).toBe(32);
+      expect(lit.map((cells) => cells.length)).toEqual([4, 2, 8, 0]);
+      await expect(page.locator("canvas")).toHaveAttribute(
+        "aria-hidden",
+        "true"
+      );
+    });
+
+    test("LCD spectrum's composed canvas takes its rows from the root", async ({
+      page,
+    }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=8&composed=1");
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.25, 1, 0]);
+      await advance(page, 50);
+
+      const { lit, unlit } = await readSpectrum(page);
+
+      await expect(page.locator("canvas")).toHaveCount(1);
+      expect(unlit).toBe(32);
+      expect(lit.map((cells) => cells.length)).toEqual([4, 2, 8, 0]);
+    });
+
+    test("LCD spectrum in dot mode lights only each column's top segment", async ({
+      page,
+    }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=6&mode=dot");
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.25, 1, 0]);
+      await advance(page, 50);
+
+      const { lit, unlit } = await readSpectrum(page);
+
+      expect(unlit).toBe(24);
+      expect(lit.map((cells) => cells.length)).toEqual([1, 1, 1, 0]);
+    });
+
+    test("LCD spectrum peak caps stick, then fall and fade into the bar", async ({
+      page,
+    }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=8&peakHold=1");
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.5, 0.5, 0.5]);
+      await advance(page, 50);
+      await spectrumFrame(page, [0.125, 0.5, 0.5, 0.5]);
+      await advance(page, 150);
+
+      // The cap still sits where the bar peaked, at full strength.
+      let { lit } = await readSpectrum(page);
+
+      expect(lit[0]).toHaveLength(2);
+      expect(lit[0]?.[1]?.alpha).toBe(1);
+      expect(lit[1]).toHaveLength(4);
+
+      const sticks = lit[0]?.[1]?.y;
+      const alphas: number[] = [];
+
+      for (let elapsed = 0; elapsed < 1200; elapsed += 16) {
+        await advance(page, 16);
+        ({ lit } = await readSpectrum(page));
+
+        const cap = lit[0]?.[1];
+
+        alphas.push(cap && lit[0]?.length === 2 ? cap.alpha : 0);
+
+        if (!cap || lit[0]?.length === 1) break;
+      }
+
+      // It fades as it falls, never brightens, and is gone by the end.
+      expect(alphas.some((alpha) => alpha > 0 && alpha < 1)).toBe(true);
+      expect(alphas.at(-1)).toBe(0);
+
+      for (const [index, alpha] of alphas.entries()) {
+        expect(alpha).toBeLessThanOrEqual(alphas[index - 1] ?? 1);
+      }
+
+      expect(sticks).toBeDefined();
+      ({ lit } = await readSpectrum(page));
+      expect(lit[0]).toHaveLength(1);
+      expect(lit[1]).toHaveLength(4);
+    });
+
+    test("LCD spectrum draws no caps without peak hold", async ({ page }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=8");
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.5, 0.5, 0.5]);
+      await advance(page, 50);
+      await spectrumFrame(page, [0.125, 0.5, 0.5, 0.5]);
+      await advance(page, 50);
+
+      const { lit } = await readSpectrum(page);
+
+      expect(lit[0]).toHaveLength(1);
+    });
+
+    test("LCD spectrum releases its frame loop when removed", async ({
+      page,
+    }) => {
+      await openRecording(page, "case=lcd-spectrum&rows=8&peakHold=1");
+      await advance(page, 100);
+      await spectrumFrame(page, [0.5, 0.25, 1, 0]);
+      await advance(page, 50);
+      expect(await pendingTimers(page)).toBeGreaterThan(0);
+      await page.evaluate(() => window.meters.setShown(false));
+      await advance(page, 50);
+      await expect(page.locator("canvas")).toHaveCount(0);
+      expect(await pendingTimers(page)).toBe(0);
     });
 
     test("clip indicator lights on a clip, counts it, resets on click and follows the controlled prop", async ({

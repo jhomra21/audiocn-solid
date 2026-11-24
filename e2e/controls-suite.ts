@@ -154,6 +154,459 @@ export const runControlsSuite = (runtime: string) => {
     });
   });
 
+  test(`LCD display status stays hidden until it has a state (${runtime})`, async ({
+    page,
+  }) => {
+    await page.goto("/controls");
+
+    const status = section(page, "lcd-status").locator(
+      '[data-slot="lcd-display-status"]'
+    );
+
+    await expect(status).toHaveCount(0);
+    await section(page, "lcd-status")
+      .getByRole("button", { name: "Set busy" })
+      .click();
+    await expect(status).toHaveAttribute("data-state", "busy");
+    await section(page, "lcd-status")
+      .getByRole("button", { name: "Clear status" })
+      .click();
+    await expect(status).toHaveCount(0);
+    await expect(
+      section(page, "lcd-display").locator('[data-slot="lcd-display-status"]')
+    ).toHaveAttribute("data-state", "busy");
+  });
+
+  test.describe("LCD number field", () => {
+    const fieldInput = (page: Page, id: string) =>
+      section(page, id).getByRole("textbox", { name: "Tempo" });
+
+    test(`is named by its row label, described by its unit and submits a value (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+
+      await expect(input).toHaveValue("120");
+      await expect(input).toHaveAttribute(
+        "aria-roledescription",
+        "Number field"
+      );
+      await expect(input).toHaveAccessibleDescription("Bpm");
+      await expect(
+        section(page, "number-field").locator('input[name="bpm"]')
+      ).toHaveValue("120");
+      await expect(
+        section(page, "number-field").getByRole("button", { name: "Reset" })
+      ).toBeDisabled();
+    });
+
+    test(`steps with the keyboard, jumps to the range and commits on key up (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+
+      await input.focus();
+      await page.keyboard.press("ArrowUp");
+      await expect(input).toHaveValue("121");
+      await page.keyboard.press("Shift+ArrowUp");
+      await expect(input).toHaveValue("131");
+      await page.keyboard.press("Alt+ArrowDown");
+      await expect(input).toHaveValue("130.9");
+      await page.keyboard.press("Home");
+      await expect(input).toHaveValue("20");
+      await page.keyboard.press("End");
+      await expect(input).toHaveValue("300");
+      await expect(
+        section(page, "number-field").locator('input[name="bpm"]')
+      ).toHaveValue("300");
+
+      const events = await readJournal(page, "number-field");
+
+      expect(events.slice(0, 2)).toEqual([
+        { reason: "keyboard", type: "change", value: "121" },
+        { reason: "keyboard", type: "commit", value: "121" },
+      ]);
+      expect(events.at(-1)).toEqual({
+        reason: "keyboard",
+        type: "commit",
+        value: "300",
+      });
+      expect(events.filter((event) => event.type === "commit")).toHaveLength(5);
+    });
+
+    test(`edits text, clamps on blur, restores invalid text and resets (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+
+      const reset = section(page, "number-field").getByRole("button", {
+        name: "Reset",
+      });
+
+      await input.fill("250");
+      await expect(input).toHaveValue("250");
+      await input.press("Enter");
+      await expect(reset).toBeEnabled();
+      await expect(reset).toHaveAttribute("data-modified", "");
+
+      await input.fill("999");
+      await expect(input).toHaveValue("999");
+      await input.blur();
+      await expect(input).toHaveValue("300");
+
+      await input.fill("abc");
+      await input.blur();
+      await expect(input).toHaveValue("300");
+
+      await input.fill("");
+      await expect(input).toHaveValue("");
+      await expect(
+        section(page, "number-field").locator('input[name="bpm"]')
+      ).toHaveValue("");
+      await reset.click();
+      await expect(input).toHaveValue("120");
+      await expect(reset).toBeDisabled();
+
+      const events = await readJournal(page, "number-field");
+
+      expect(
+        events.map(({ reason, type, value }) => `${type}:${reason}:${value}`)
+      ).toEqual([
+        "change:input-change:250",
+        "commit:keyboard:250",
+        "change:input-change:999",
+        "change:input-blur:300",
+        "commit:input-blur:300",
+        "change:input-clear:null",
+        "commit:input-blur:null",
+        "change:reset:120",
+        "commit:reset:120",
+      ]);
+    });
+
+    test(`steps with the pixel steppers and the wheel (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+      const field = section(page, "number-field");
+
+      await field.getByRole("button", { name: "Increase" }).click();
+      await expect(input).toHaveValue("121");
+      await field.getByRole("button", { name: "Decrease" }).click();
+      await field.getByRole("button", { name: "Decrease" }).click();
+      await expect(input).toHaveValue("119");
+
+      await input.focus();
+      await input.hover();
+      await page.mouse.wheel(0, -100);
+      await expect(input).toHaveValue("120");
+      await page.mouse.wheel(0, 100);
+      await expect(input).toHaveValue("119");
+
+      const events = await readJournal(page, "number-field");
+
+      expect(events.map(({ reason, type }) => `${type}:${reason}`)).toEqual([
+        "change:increment-press",
+        "commit:increment-press",
+        "change:decrement-press",
+        "commit:decrement-press",
+        "change:decrement-press",
+        "commit:decrement-press",
+        "change:wheel",
+        "commit:wheel",
+        "change:wheel",
+        "commit:wheel",
+      ]);
+    });
+
+    test(`repeats while a stepper is held and commits once on release (${runtime})`, async ({
+      page,
+    }) => {
+      await page.clock.install({ time: 0 });
+      await page.clock.pauseAt(1);
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+
+      await section(page, "number-field")
+        .getByRole("button", { name: "Increase" })
+        .hover();
+      await page.mouse.down();
+      await expect(input).toHaveValue("121");
+
+      // The repeat starts after 400 ms and then fires every 60 ms.
+      await page.clock.runFor(590);
+      await expect(input).toHaveValue("124");
+      await page.mouse.up();
+      await page.clock.runFor(600);
+      await expect(input).toHaveValue("124");
+
+      const events = await readJournal(page, "number-field");
+
+      expect(events.filter((event) => event.type === "commit")).toEqual([
+        { reason: "increment-press", type: "commit", value: "124" },
+      ]);
+    });
+
+    test(`scrubs by dragging the label and commits once on release (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field");
+      const scrub = section(page, "number-field").getByTestId("scrub");
+
+      await scrub.scrollIntoViewIfNeeded();
+
+      const bounds = await scrub.boundingBox();
+
+      if (!bounds) throw new Error("The scrub area has no browser bounds.");
+      await page.mouse.move(bounds.x + 4, bounds.y + bounds.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(bounds.x + 24, bounds.y + bounds.height / 2, {
+        steps: 4,
+      });
+      await expect(input).toHaveValue("130");
+      await expect(section(page, "number-field")).toBeVisible();
+      await page.mouse.up();
+
+      const events = await readJournal(page, "number-field");
+
+      expect(events.every((event) => event.reason === "scrub")).toBe(true);
+      expect(events.filter((event) => event.type === "commit")).toEqual([
+        { reason: "scrub", type: "commit", value: "130" },
+      ]);
+    });
+
+    test(`keeps the typed text while a controlled value settles and follows outside changes (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field-controlled");
+
+      await expect(input).toHaveValue("100");
+      await input.fill("070");
+      await expect(input).toHaveValue("070");
+      await expect
+        .poll(
+          async () =>
+            (await readJournal(page, "number-field-controlled")).length
+        )
+        .toBe(1);
+      await input.press("Enter");
+      await expect(input).toHaveValue("70");
+
+      await page.getByRole("button", { name: "External field" }).click();
+      await expect(input).toHaveValue("90");
+
+      // A value the parent rejects shows while typing and then returns.
+      const rejected = fieldInput(page, "number-field-rejected");
+
+      await rejected.fill("70");
+      await expect(rejected).toHaveValue("70");
+      await rejected.blur();
+      await expect(rejected).toHaveValue("50");
+    });
+
+    test(`ignores input while disabled or read-only (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const [disabled, readOnly] = await fieldInput(
+        page,
+        "number-field-locked"
+      ).all();
+
+      await expect(disabled).toBeDisabled();
+      await expect(readOnly).toHaveAttribute("readonly", "");
+      await readOnly.focus();
+      await page.keyboard.press("ArrowUp");
+      await expect(readOnly).toHaveValue("10");
+
+      for (const button of await section(page, "number-field-locked")
+        .getByRole("button", { name: /Increase|Decrease|Reset/ })
+        .all()) {
+        await expect(button).toBeDisabled();
+      }
+
+      expect(await readJournal(page, "number-field-locked")).toEqual([]);
+    });
+
+    for (const [id, start] of [
+      ["number-field", 120],
+      ["number-field-controlled", 100],
+    ] as const) {
+      test(`commits the value it changed to on a wheel step and an assistive click (${id}) (${runtime})`, async ({
+        page,
+      }) => {
+        await page.goto("/controls");
+
+        const input = fieldInput(page, id);
+        const field = section(page, id);
+
+        await input.focus();
+        await input.hover();
+        await page.mouse.wheel(0, -100);
+        await expect(input).toHaveValue(String(start + 1));
+
+        // A click with no pointer press, as assistive technology sends it.
+        await field
+          .getByRole("button", { name: "Decrease" })
+          .dispatchEvent("click");
+        await expect(input).toHaveValue(String(start));
+
+        expect(
+          (await readJournal(page, id)).map(
+            ({ reason, type, value }) => `${type}:${reason}:${value}`
+          )
+        ).toEqual([
+          `change:wheel:${start + 1}`,
+          `commit:wheel:${start + 1}`,
+          `change:decrement-press:${start}`,
+          `commit:decrement-press:${start}`,
+        ]);
+      });
+    }
+
+    for (const [lock, label] of [
+      ["disabled", "Disable field"],
+      ["readonly", "Make field read-only"],
+    ] as const) {
+      test(`stops a held stepper repeat when the field becomes ${lock} (${runtime})`, async ({
+        page,
+      }) => {
+        await page.clock.install({ time: 0 });
+        await page.clock.pauseAt(1);
+        await page.goto("/controls");
+
+        const input = fieldInput(page, "number-field-lockable");
+        const field = section(page, "number-field-lockable");
+
+        await field.getByRole("button", { name: "Increase" }).hover();
+        await page.mouse.down();
+        await page.clock.runFor(590);
+        await expect(input).toHaveValue("104");
+        await field.getByRole("button", { name: label }).dispatchEvent("click");
+        await expect(
+          field.getByRole("button", { name: "Increase" })
+        ).toBeDisabled();
+        await page.clock.runFor(600);
+        await page.mouse.up();
+        await page.clock.runFor(600);
+        await expect(input).toHaveValue("104");
+
+        const changes = (
+          await readJournal(page, "number-field-lockable")
+        ).filter((event) => event.type === "change");
+
+        expect(changes.map((event) => event.value)).toEqual([
+          "101",
+          "102",
+          "103",
+          "104",
+        ]);
+      });
+
+      test(`stops a scrub when the field becomes ${lock} (${runtime})`, async ({
+        page,
+      }) => {
+        await page.goto("/controls");
+
+        const input = fieldInput(page, "number-field-lockable");
+        const field = section(page, "number-field-lockable");
+        const scrub = field.getByTestId("scrub");
+
+        await scrub.scrollIntoViewIfNeeded();
+
+        const bounds = await scrub.boundingBox();
+
+        if (!bounds) throw new Error("The scrub area has no browser bounds.");
+
+        const y = bounds.y + bounds.height / 2;
+
+        await page.mouse.move(bounds.x + 4, y);
+        await page.mouse.down();
+        await page.mouse.move(bounds.x + 24, y, { steps: 4 });
+        await expect(input).toHaveValue("110");
+        await field.getByRole("button", { name: label }).dispatchEvent("click");
+        await expect(scrub).toHaveAttribute("data-" + lock, "");
+        await page.mouse.move(bounds.x + 60, y, { steps: 4 });
+        await page.mouse.up();
+        await expect(input).toHaveValue("110");
+
+        const events = await readJournal(page, "number-field-lockable");
+
+        expect(
+          events.filter((event) => event.type === "change").at(-1)?.value
+        ).toBe("110");
+        expect(events.filter((event) => event.type === "commit")).toEqual([
+          { reason: "scrub", type: "commit", value: "110" },
+        ]);
+      });
+    }
+
+    test(`drops the description when the unit goes away (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field-lockable");
+
+      const toggle = section(page, "number-field-lockable").getByRole(
+        "button",
+        { name: "Toggle unit" }
+      );
+
+      await expect(input).toHaveAccessibleDescription("Bpm");
+      await toggle.click();
+      await expect(input).toHaveAccessibleDescription("");
+      await toggle.click();
+      await expect(input).toHaveAccessibleDescription("Bpm");
+    });
+
+    test(`does not scrub when a pointer move handler prevents the default (${runtime})`, async ({
+      page,
+    }) => {
+      await page.goto("/controls");
+
+      const input = fieldInput(page, "number-field-lockable");
+      const field = section(page, "number-field-lockable");
+      const scrub = field.getByTestId("scrub");
+
+      await field
+        .getByRole("button", { name: "Block scrub" })
+        .dispatchEvent("click");
+      await scrub.scrollIntoViewIfNeeded();
+
+      const bounds = await scrub.boundingBox();
+
+      if (!bounds) throw new Error("The scrub area has no browser bounds.");
+
+      const y = bounds.y + bounds.height / 2;
+
+      await page.mouse.move(bounds.x + 4, y);
+      await page.mouse.down();
+      await page.mouse.move(bounds.x + 24, y, { steps: 4 });
+      await page.mouse.up();
+      await expect(input).toHaveValue("100");
+      expect(
+        (await readJournal(page, "number-field-lockable")).filter(
+          (event) => event.type === "change"
+        )
+      ).toEqual([]);
+    });
+  });
+
   test(`LCD meter renders channel segments and readouts (${runtime})`, async ({
     page,
   }) => {

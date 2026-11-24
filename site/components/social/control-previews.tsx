@@ -31,6 +31,20 @@ import {
   LcdDisplayValue,
 } from "@/components/ui/lcd-display";
 import { LcdMeter } from "@/components/ui/lcd-meter";
+import {
+  LcdNumberField,
+  LcdNumberFieldGroup,
+  LcdNumberFieldInput,
+  LcdNumberFieldStepper,
+  LcdNumberFieldUnit,
+} from "@/components/ui/lcd-number-field";
+import {
+  LcdVuMeter,
+  LcdVuMeterChannel,
+  LcdVuMeterChannels,
+  LcdVuMeterClip,
+  LcdVuMeterScale,
+} from "@/components/ui/lcd-vumeter";
 import { LevelMeter } from "@/components/ui/level-meter";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import {
@@ -130,6 +144,52 @@ export const LcdMeterPreview = () => (
       ]}
     />
     <LcdDisplayStatus state="off" />
+  </LcdDisplay>
+);
+
+const LCD_STEREO = [{ peakDb: -8 }, { peakDb: -14 }];
+
+export const LcdVuMeterPreview = () => (
+  <LcdDisplay class="w-[30rem]" size="lg" variant="amber">
+    <LcdDisplayRow>
+      <LcdDisplayLabel>Out</LcdDisplayLabel>
+      <LcdVuMeter channels={LCD_STEREO} segments={24}>
+        <LcdVuMeterChannels>
+          <LcdVuMeterChannel index={0} />
+          <LcdVuMeterChannel index={1} />
+          <LcdVuMeterScale />
+        </LcdVuMeterChannels>
+        <LcdVuMeterClip />
+      </LcdVuMeter>
+    </LcdDisplayRow>
+  </LcdDisplay>
+);
+
+const ONE_DECIMAL = { maximumFractionDigits: 1, minimumFractionDigits: 1 };
+
+export const LcdNumberFieldPreview = () => (
+  <LcdDisplay class="w-[30rem]" size="lg" variant="amber">
+    <LcdDisplayRow>
+      <LcdNumberField defaultValue={128} format={ONE_DECIMAL}>
+        <LcdDisplayLabel>Tempo</LcdDisplayLabel>
+        <LcdNumberFieldGroup>
+          <LcdNumberFieldInput />
+          <LcdNumberFieldUnit>Bpm</LcdNumberFieldUnit>
+          <LcdNumberFieldStepper />
+        </LcdNumberFieldGroup>
+      </LcdNumberField>
+    </LcdDisplayRow>
+    <LcdDisplaySeparator />
+    <LcdDisplayRow>
+      <LcdNumberField defaultValue={-3} format={ONE_DECIMAL}>
+        <LcdDisplayLabel>Gain</LcdDisplayLabel>
+        <LcdNumberFieldGroup>
+          <LcdNumberFieldInput />
+          <LcdNumberFieldUnit>dB</LcdNumberFieldUnit>
+          <LcdNumberFieldStepper />
+        </LcdNumberFieldGroup>
+      </LcdNumberField>
+    </LcdDisplayRow>
   </LcdDisplay>
 );
 

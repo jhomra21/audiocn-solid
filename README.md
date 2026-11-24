@@ -10,7 +10,7 @@ Copy, paste, make them yours.</p>
 <p>A Solid port of <a href="https://github.com/audiocn/ui">audiocn/ui</a>.</p>
 
 <p>
-  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/components"><img src="https://shieldcn.dev/badge/components-23.svg?logo=lu:AudioLines&amp;mode=light&amp;valueColor=10b981" alt="23 components" /></a>
+  <a href="https://audiocn-solid.jhonra121.workers.dev/docs/components"><img src="https://shieldcn.dev/badge/components-28.svg?logo=lu:AudioLines&amp;mode=light&amp;valueColor=10b981" alt="28 components" /></a>
   <a href="https://audiocn-solid.jhonra121.workers.dev/docs/blocks"><img src="https://shieldcn.dev/badge/blocks-6.svg?logo=lu:LayoutDashboard&amp;mode=light&amp;valueColor=10b981" alt="6 blocks" /></a>
   <a href="https://audiocn-solid.jhonra121.workers.dev/docs/hooks/use-audio-analyser"><img src="https://shieldcn.dev/badge/hooks-18.svg?logo=lu:Webhook&amp;mode=light&amp;valueColor=10b981" alt="18 hooks" /></a>
   <a href="./license.md"><img src="https://shieldcn.dev/badge/license-MIT.svg?logo=lu:Scale&amp;mode=light&amp;valueColor=10b981" alt="MIT license" /></a>
@@ -68,7 +68,7 @@ Copy, paste, make them yours.</p>
 </table>
 
 <details>
-<summary><strong>All 25 components</strong></summary>
+<summary><strong>All 28 components</strong></summary>
 
 <br />
 
@@ -88,6 +88,7 @@ Copy, paste, make them yours.</p>
 | [Live Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/live-waveform) | Canvas waveform of a live signal |
 | [Waveform](https://audiocn-solid.jhonra121.workers.dev/docs/components/waveform) | Clip waveform with playhead, seeking, regions and markers |
 | [Spectrum](https://audiocn-solid.jhonra121.workers.dev/docs/components/spectrum) | Frequency analyser with axes, grid and peak hold |
+| [LCD VU Meter](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-vumeter) | Dot-matrix bar-graph level meter for an LCD Display, with peak and RMS bars, peak hold, bar and dot modes and a clip light |
 
 **Controls**
 
@@ -98,6 +99,8 @@ Copy, paste, make them yours.</p>
 | [Tempo Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/tempo-control) | Editable BPM input with tap tempo |
 | [Knob](https://audiocn-solid.jhonra121.workers.dev/docs/components/knob) | Rotary control for dense layouts |
 | [LCD Display](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-display) | Themeable dot-matrix screen with dropdown rows |
+| [LCD Number Field](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-number-field) | Editable LCD value you type, step with keys, wheel or pixel arrows, or scrub by dragging its label, with a reset |
+| [LCD Spectrum](https://audiocn-solid.jhonra121.workers.dev/docs/components/lcd-spectrum) | Spectrum analyzer in LCD segments, with falling peak caps |
 | [Pan Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/pan-control) | Left-right balance with centre detent |
 | [Channel Toggle](https://audiocn-solid.jhonra121.workers.dev/docs/components/channel-toggle) | Mute, solo and monitor buttons |
 | [Volume Control](https://audiocn-solid.jhonra121.workers.dev/docs/components/volume-control) | Volume slider with mute button |

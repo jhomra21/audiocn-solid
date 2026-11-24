@@ -45,9 +45,11 @@ The ink follows your theme's `--primary`. In light mode the display is backlit w
     </LcdDisplaySelect>
   </LcdDisplayRow>
   <LcdDisplaySeparator />
-  <LcdDisplayStatus />
+  <LcdDisplayStatus state="idle" />
 </LcdDisplay>
 ```
+
+`LcdDisplayStatus` is the pixel in the screen's bottom-right corner. It is hidden until you give it a `state`.
 
 `LcdDisplaySelect` uses the local Kobalte Select, not Base UI. It accepts an `items` array of `{ value, label, disabled? }` objects. Kobalte renders these options from `items` inside `LcdDisplaySelectContent`; there is no per-option JSX child API. A controlled `value={null}` leaves the selection empty. The select also supports `defaultValue`, `onValueChange`, and `disabled`.
 
@@ -132,7 +134,16 @@ The display has `role="group"`. Each select trigger is labelled by its row's `Lc
 
 ### LcdDisplayStatus
 
-<PropsTable rows={[["state", '"idle" | "busy" | "off"', '"idle"', null]]} />
+<PropsTable
+  rows={[
+    [
+      "state",
+      '"idle" | "busy" | "off"',
+      null,
+      "idle blinks slowly, busy quickly, off stays unlit. Without a state the pixel is hidden.",
+    ],
+  ]}
+/>
 
 ### LcdDisplaySelectTrigger
 
