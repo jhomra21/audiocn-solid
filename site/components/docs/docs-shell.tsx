@@ -69,10 +69,14 @@ let sidebarScrollTop: number | undefined;
 let sidebarNavigationIntent: { from: string; to: string } | undefined;
 
 const revealCurrentLink = (
-  viewport: HTMLDivElement,
+  navigationViewport: () => HTMLDivElement | undefined,
   currentPath: () => string
 ) => {
   onSettled(() => {
+    const viewport = navigationViewport();
+
+    if (!viewport) return;
+
     const path = currentPath();
 
     if (sidebarScrollTop !== undefined) {
@@ -395,6 +399,11 @@ export const DocsShell = (props: DocsShellProps) => {
 
   let sidebar: HTMLElement | undefined;
   let navigationViewport: HTMLDivElement | undefined;
+
+  revealCurrentLink(
+    () => navigationViewport,
+    () => props.currentPath
+  );
   let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 
   onCleanup(() => {
@@ -609,7 +618,6 @@ export const DocsShell = (props: DocsShellProps) => {
               }}
               ref={(element) => {
                 navigationViewport = element;
-                revealCurrentLink(element, () => props.currentPath);
               }}
             >
               <DocsNavigation

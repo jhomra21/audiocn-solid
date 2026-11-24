@@ -53,10 +53,9 @@ const runtimeDependencies = (
     );
 
   const resolved = (dependencies ?? []).map((dependency) => {
-    if (dependency.startsWith("solid-js@")) return "solid-js@2.0.0-rc.14";
+    if (dependency.startsWith("solid-js@")) return "solid-js@2.0.3";
 
-    if (dependency.startsWith("@solidjs/web@"))
-      return "@solidjs/web@2.0.0-rc.14";
+    if (dependency.startsWith("@solidjs/web@")) return "@solidjs/web@2.0.3";
 
     if (dependency.startsWith("@kobalte/core@")) return SOLID2_KOBALTE;
 
@@ -64,7 +63,7 @@ const runtimeDependencies = (
   });
 
   if (!resolved.some((dependency) => dependency.startsWith("@solidjs/web@")))
-    resolved.push("@solidjs/web@2.0.0-rc.14");
+    resolved.push("@solidjs/web@2.0.3");
 
   return resolved;
 };

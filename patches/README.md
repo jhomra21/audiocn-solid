@@ -18,6 +18,6 @@ AudioCN consumes reviewed, immutable assets from public prereleases on AudioCN-o
 - SHA-256: `ff724287fa858fcb221354ecc71fa7ecdbca7934a9d0eee7080ef0a59fe035b0`
 - Archive includes Kobalte's Apache-2.0 license and MIT attribution notices for bundled code.
 
-The Solid 2 package bundles the required Solid Primitives and Kobalte utility code; it has no transitive release-URL dependencies or consumer overrides. Its peers are `solid-js@2.0.0-rc.14` and `@solidjs/web@2.0.0-rc.14`.
+The Solid 2 package bundles the required Solid Primitives and Kobalte utility code; it has no transitive release-URL dependencies or consumer overrides. It declares exact peers `solid-js@2.0.0-rc.14` and `@solidjs/web@2.0.0-rc.14` but is tested against `solid-js` and `@solidjs/web` 2.0.3. It adds one commit to upstream Kobalte: completed outside-touch dismissal for Solid 2 (`captureTouchOutside` and a layer-stack generation check). Upstream `@kobalte/core@2.0.0-alpha.5` (Solid `^2.0.0` peers) was tried and does not contain this fix: five Chromium touch-completion tests fail against it, so the fork stays until an upstream release includes it.
 
 The prerelease packages contain the outside-touch completion fixes used by this repository. They do not establish upstream adoption, physical Safari behavior, or server-side rendering support. Raw Node import of Kobalte Popover remains unsupported; the AudioCN site is separately validated through its actual Vite SSR and release-route guard.

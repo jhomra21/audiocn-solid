@@ -25,11 +25,11 @@
     "@rexa-developer/tiks": "^0.3.0",
     "@solidjs/meta": "1.0.0-next.2",
     "@solidjs/router": "2.0.0-next.35",
-    "@solidjs/web": "2.0.0-rc.14",
+    "@solidjs/web": "2.0.3",
     "filesystem-routing": "0.4.0",
     "framer-motion": "13.4.6",
     "ogl": "^1.0.11",
-    "solid-js": "2.0.0-rc.14"
+    "solid-js": "2.0.3"
   },
   "devDependencies": {
     "@fumadocs/tailwind": "0.1.2",
@@ -38,7 +38,7 @@
     "@playwright/test": "1.63.0",
     "@shikijs/rehype": "4.5.0",
     "@solidjs/prerender": "0.2.0",
-    "@solidjs/vite-plugin": "3.0.0-next.47",
+    "@solidjs/vite-plugin": "3.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.19.0",

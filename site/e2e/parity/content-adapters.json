@@ -83,7 +83,7 @@
     "local": [
       {
         "tag": "li",
-        "text": "Solid 1.9.15 or later. Solid 2.0.0-rc.14 is an experimental lane, tested with the AudioCN-patched Kobalte prerelease."
+        "text": "Solid 1.9.15 or later, or Solid 2.0.3. Kobalte for Solid 2 is still a prerelease, so the Solid 2 registry uses an AudioCN-patched Kobalte build."
       },
       {
         "tag": "li",
@@ -119,7 +119,7 @@
       },
       {
         "tag": "p",
-        "text": "The experimental Solid 2 setup:"
+        "text": "The Solid 2 setup:"
       },
       {
         "tag": "p",

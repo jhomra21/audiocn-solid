@@ -41,13 +41,13 @@ bunx playwright install chromium webkit
 bun run test:e2e:solid1
 ```
 
-The Solid 2 browser suite replaces the root project's installed Solid/Vite packages. Run it in an owned checkout or worktree, not alongside another task or dev server using that checkout's `node_modules`. The override below uses the prereleases pinned in CI:
+The Solid 2 browser suite replaces the root project's installed Solid/Vite packages. Run it in an owned checkout or worktree, not alongside another task or dev server using that checkout's `node_modules`. The override below uses the versions pinned in CI:
 
 ```sh
 git worktree add ../audiocn-solid-solid2 HEAD
 cd ../audiocn-solid-solid2
 bun install --frozen-lockfile
-bun add --no-save solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14 @solidjs/vite-plugin@3.0.0-next.47 vite@8.3.2
+bun add --no-save solid-js@2.0.3 @solidjs/web@2.0.3 @solidjs/vite-plugin@3.0.1 vite@8.3.2
 bunx tsc -p tsconfig.solid2.json --noEmit
 bunx playwright install chromium webkit
 bun run test:e2e:solid2
@@ -143,7 +143,7 @@ The unversioned registry URLs serve the source revision currently deployed. Cons
 
 The upstream React implementation is the behavior reference. Framework-neutral audio code remains framework-neutral; React lifecycle and state are translated at the Solid boundary. Solid 1 and Solid 2 have different effect and context provider contracts; `lib/solid/effect.ts` and `lib/solid/context.ts` keep those differences out of shared component implementations.
 
-Solid 2 and Kobalte 2 are prereleases. Select, Popover and Context Menu use Kobalte APIs; Context Menu defers collection unregister writes during disposal. Tabs are native Solid because Kobalte's current Solid 2 tabs lose event bindings during production hydration. The native tabs support controlled selection, keyboard navigation, disabled items and linked panels.
+Kobalte 2 is still a prerelease on Solid 2. Select, Popover and Context Menu use Kobalte APIs; Context Menu defers collection unregister writes during disposal. Tabs are native Solid because Kobalte's current Solid 2 tabs lose event bindings during production hydration. The native tabs support controlled selection, keyboard navigation, disabled items and linked panels.
 
 `lib/solid/kobalte-slider.ts` adapts Kobalte's slider context to the shared native slider implementation. Pinned two-runtime browser and fresh-install tests check this version-specific adapter. They do not guarantee compatibility with future Kobalte prereleases.
 

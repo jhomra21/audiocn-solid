@@ -21,7 +21,7 @@ These open `audiocn/ui` PRs are ported ahead of upstream. The baseline above is 
 - `origin/main` is the source baseline. Check `git status` and `git rev-parse HEAD` for the current checkout and local changes.
 - The repository contains the shared Solid 1/Solid 2 component and hook source, a Solid 2 docs site, and generated Solid 1 and Solid 2 shadcn registries.
 - Registry Directory PR #12221 is ready for maintainer review and remains unmerged. Check its live state before relying on that status.
-- Solid 2 and its Kobalte fork remain prerelease dependencies. The Kobalte archives and provenance are documented in [`patches/README.md`](./patches/README.md).
+- Solid 2 is stable (2.0.3), but its Kobalte fork remains a prerelease dependency. The Kobalte archives and provenance are documented in [`patches/README.md`](./patches/README.md).
 - No npm component package is published. Distribution uses copied source from the shadcn registries.
 
 ## Before release
