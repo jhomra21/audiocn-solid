@@ -103,7 +103,7 @@ export const useLcdDisplay = () => useContext(DisplayContext);
 const RowContext = createContext<{
   labelId: () => string;
   setCustomId: (id: string | undefined) => void;
-}>();
+} | null>(null);
 
 /**
  * The id accessor of the surrounding row's `LcdDisplayLabel`, or undefined
