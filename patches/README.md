@@ -10,14 +10,15 @@ AudioCN consumes reviewed, immutable assets from public prereleases on AudioCN-o
 - SHA-256: `32058fb0367a09187555e1d3a17e52a59162b9639440ba4592a4169d741f2e54`
 - Archive license: MIT.
 
-## Bundled Kobalte Solid 2
+## Kobalte Solid 2
 
-- Source: [`jhomra21/kobalte@b394be557e697ad4d3c28210df8a75aa3c300914`](https://github.com/jhomra21/kobalte/tree/b394be557e697ad4d3c28210df8a75aa3c300914)
-- Release: [`kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1`](https://github.com/jhomra21/kobalte/releases/tag/kobalte-solid2-audiocn-b394be557e697ad4d3c28210df8a75aa3c300914-bundled.1)
-- Package: `@kobalte/core@2.0.0-alpha.2-audiocn.2.b394be55`
-- SHA-256: `ff724287fa858fcb221354ecc71fa7ecdbca7934a9d0eee7080ef0a59fe035b0`
-- Archive includes Kobalte's Apache-2.0 license and MIT attribution notices for bundled code.
+- Source: [`jhomra21/kobalte@9f7acab017f2ba4b347ce0efd325c5eb1e6f9f4c`](https://github.com/jhomra21/kobalte/tree/9f7acab017f2ba4b347ce0efd325c5eb1e6f9f4c) (branch `fix/completed-touch-dismissal-solid2-alpha5`), based on upstream `@kobalte/core@2.0.0-alpha.5` (`e336494b8c2cffa4862eaac1673f54e133338d4e`)
+- Release: [`kobalte-solid2-audiocn-9f7acab017f2ba4b347ce0efd325c5eb1e6f9f4c-alpha5.1`](https://github.com/jhomra21/kobalte/releases/tag/kobalte-solid2-audiocn-9f7acab017f2ba4b347ce0efd325c5eb1e6f9f4c-alpha5.1)
+- Package: `@kobalte/core@2.0.0-alpha.5-audiocn.1.9f7acab0`
+- SHA-256: `b3a88fec239fc2f5fa0cf1da33cfebf6841c937f168bb46c38b639a4c3c80a94`
+- Peers: `solid-js@^2.0.0` and `@solidjs/web@^2.0.0` (tested against 2.0.3).
+- Bundled helper: `@solid-primitives/interaction@1.0.0-audiocn.1.94f99cb8` from [`jhomra21/solid-primitives@94f99cb8afd1b98cad4e0a96d7ad94fcea4dead2`](https://github.com/jhomra21/solid-primitives/tree/94f99cb8afd1b98cad4e0a96d7ad94fcea4dead2) (branch `fix/touch-outside-completion-1.0`, based on upstream interaction 1.0.0). Its license notice is in the archive.
 
-The Solid 2 package bundles the required Solid Primitives and Kobalte utility code; it has no transitive release-URL dependencies or consumer overrides. It declares exact peers `solid-js@2.0.0-rc.14` and `@solidjs/web@2.0.0-rc.14` but is tested against `solid-js` and `@solidjs/web` 2.0.3. It adds one commit to upstream Kobalte: completed outside-touch dismissal for Solid 2 (`captureTouchOutside` and a layer-stack generation check). Upstream `@kobalte/core@2.0.0-alpha.5` (Solid `^2.0.0` peers) was tried and does not contain this fix: five Chromium touch-completion tests fail against it, so the fork stays until an upstream release includes it.
+All other dependencies, including `@solid-primitives/utils` and `@kobalte/utils`, are normal npm registry dependencies; the manifest has no URL dependencies or consumer overrides. The fork adds one commit to upstream Kobalte: completed outside-touch dismissal for Solid 2 (`captureTouchOutside` and a layer-stack generation check), which the patched interaction package consumes. Upstream alpha.5 does not contain this fix, so the fork stays until an upstream release includes it.
 
 The prerelease packages contain the outside-touch completion fixes used by this repository. They do not establish upstream adoption, physical Safari behavior, or server-side rendering support. Raw Node import of Kobalte Popover remains unsupported; the AudioCN site is separately validated through its actual Vite SSR and release-route guard.
