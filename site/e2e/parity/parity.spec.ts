@@ -30,6 +30,7 @@ import {
   normalizeLocalNotFound,
 } from "./not-found";
 import {
+  PR_ONLY_ROUTES,
   inventoryDifferences,
   readLocalSitemap,
   readUpstreamSitemap,
@@ -602,10 +603,11 @@ test("compare upstream and local page structure: public route inventory", async 
   const upstream = sitemapRoutes(await readUpstreamSitemap(referenceURL));
   const local = sitemapRoutes(await readLocalSitemap());
 
+  // The routes from open upstream PRs are the only ones the baseline lacks.
   expect(
     inventoryDifferences(upstream, local),
     "routes only one site publishes"
-  ).toEqual({ extra: [], missing: [] });
+  ).toEqual({ extra: [...PR_ONLY_ROUTES], missing: [] });
 
   expect(
     inventoryDifferences(

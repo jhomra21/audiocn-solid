@@ -54,7 +54,7 @@ export const LcdMeterDemo = () => {
       </LcdDisplayRow>
       <LcdDisplaySeparator />
       <LcdMeter aria-label="Input level" source={signal.meter} />
-      <LcdDisplayStatus />
+      <LcdDisplayStatus state="idle" />
     </LcdDisplay>
   );
 };

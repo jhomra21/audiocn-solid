@@ -59,6 +59,21 @@ import { LcdMeterDemo } from "@/components/examples/lcd-meter-demo";
 import { LcdMeterInks } from "@/components/examples/lcd-meter-inks";
 import { LcdMeterMicrophone } from "@/components/examples/lcd-meter-microphone";
 import { LcdMeterSegments } from "@/components/examples/lcd-meter-segments";
+import { LcdNumberFieldDemo } from "@/components/examples/lcd-number-field-demo";
+import { LcdNumberFieldInks } from "@/components/examples/lcd-number-field-inks";
+import { LcdSpectrumDemo } from "@/components/examples/lcd-spectrum-demo";
+import { LcdSpectrumInks } from "@/components/examples/lcd-spectrum-inks";
+import { LcdSpectrumMicrophone } from "@/components/examples/lcd-spectrum-microphone";
+import { LcdSpectrumModes } from "@/components/examples/lcd-spectrum-modes";
+import { LcdSpectrumPeaks } from "@/components/examples/lcd-spectrum-peaks";
+import { LcdSpectrumRows } from "@/components/examples/lcd-spectrum-rows";
+import { LcdVuMeterDemo } from "@/components/examples/lcd-vumeter-demo";
+import { LcdVuMeterDual } from "@/components/examples/lcd-vumeter-dual";
+import { LcdVuMeterInks } from "@/components/examples/lcd-vumeter-inks";
+import { LcdVuMeterMicrophone } from "@/components/examples/lcd-vumeter-microphone";
+import { LcdVuMeterModes } from "@/components/examples/lcd-vumeter-modes";
+import { LcdVuMeterValues } from "@/components/examples/lcd-vumeter-values";
+import { LcdVuMeterVertical } from "@/components/examples/lcd-vumeter-vertical";
 import { LevelMeterBallistics } from "@/components/examples/level-meter-ballistics";
 import { LevelMeterCssLevel } from "@/components/examples/level-meter-css-level";
 import { LevelMeterCustomColors } from "@/components/examples/level-meter-custom-colors";
@@ -459,6 +474,21 @@ const examples = {
   "lcd-meter-inks": LcdMeterInks,
   "lcd-meter-microphone": LcdMeterMicrophone,
   "lcd-meter-segments": LcdMeterSegments,
+  "lcd-number-field-demo": LcdNumberFieldDemo,
+  "lcd-number-field-inks": LcdNumberFieldInks,
+  "lcd-spectrum-demo": LcdSpectrumDemo,
+  "lcd-spectrum-inks": LcdSpectrumInks,
+  "lcd-spectrum-microphone": LcdSpectrumMicrophone,
+  "lcd-spectrum-modes": LcdSpectrumModes,
+  "lcd-spectrum-peaks": LcdSpectrumPeaks,
+  "lcd-spectrum-rows": LcdSpectrumRows,
+  "lcd-vumeter-demo": LcdVuMeterDemo,
+  "lcd-vumeter-dual": LcdVuMeterDual,
+  "lcd-vumeter-inks": LcdVuMeterInks,
+  "lcd-vumeter-microphone": LcdVuMeterMicrophone,
+  "lcd-vumeter-modes": LcdVuMeterModes,
+  "lcd-vumeter-values": LcdVuMeterValues,
+  "lcd-vumeter-vertical": LcdVuMeterVertical,
   "mixer-console": MixerConsole,
   "mixer-demo": MixerDemo,
   "mixer-empty": MixerEmptyDemo,

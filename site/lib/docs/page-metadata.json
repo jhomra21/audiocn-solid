@@ -110,6 +110,21 @@
     "url": "/docs/components/lcd-meter"
   },
   {
+    "title": "LCD Number Field",
+    "description": "An editable number on the LCD Display, typed, stepped with keys, wheel or pixel arrows, or scrubbed by dragging its label.",
+    "url": "/docs/components/lcd-number-field"
+  },
+  {
+    "title": "LCD Spectrum",
+    "description": "A spectrum analyzer drawn as LCD segments, in the display's ink, with the Spectrum's axes, bar and dot modes, and sticky peak caps that fade and accelerate as they fall behind the bars.",
+    "url": "/docs/components/lcd-spectrum"
+  },
+  {
+    "title": "LCD VU Meter",
+    "description": "A dot-matrix bar-graph level meter for the LCD Display, lit in whole segments, with peak and RMS bars, peak hold, a dot mode, a scale, a readout and a clip light.",
+    "url": "/docs/components/lcd-vumeter"
+  },
+  {
     "title": "Level Meter",
     "description": "A peak and RMS level meter with zones, peak hold, a scale, a readout and a clip light.",
     "url": "/docs/components/level-meter"

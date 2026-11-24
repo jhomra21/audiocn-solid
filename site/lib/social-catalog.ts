@@ -5,6 +5,9 @@ export type SocialPreviewName =
   | "knobs"
   | "lcd"
   | "lcd-meter"
+  | "lcd-vumeter"
+  | "lcd-spectrum"
+  | "lcd-number-field"
   | "tempo"
   | "waveform"
   | "electric-waveform"
@@ -128,6 +131,9 @@ export const componentPreviews = {
   knob: "knobs",
   "lcd-display": "lcd",
   "lcd-meter": "lcd-meter",
+  "lcd-number-field": "lcd-number-field",
+  "lcd-spectrum": "lcd-spectrum",
+  "lcd-vumeter": "lcd-vumeter",
   "level-meter": "meters",
   "live-waveform": "live-waveform",
   mixer: "mixer",
@@ -203,6 +209,12 @@ const previewDescriptions: Record<SocialPreviewName, string> = {
   lcd: "an amber dot-matrix screen with model and effort settings",
   "lcd-meter":
     "an amber dot-matrix screen with a stereo level meter in block segments",
+  "lcd-number-field":
+    "an amber dot-matrix screen with editable tempo and gain values",
+  "lcd-spectrum":
+    "an amber LCD spectrum analyzer with sticky peak caps that fall behind the bars",
+  "lcd-vumeter":
+    "an amber dot-matrix stereo bar-graph meter with a scale and peak hold",
   "live-waveform": "a live oscilloscope trace and scrolling signal history",
   meters: "solid and segmented stereo level meters with scales and peak hold",
   "mic-setup":

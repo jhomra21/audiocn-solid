@@ -3,6 +3,18 @@ import { join } from "node:path";
 
 export const UPSTREAM_SITEMAP = "https://www.audiocn.dev/sitemap.xml";
 
+/**
+ * Routes ported from open upstream PRs (#28, #29, #30; see HANDOFF.md). The
+ * pinned React baseline, upstream main, has none of them, so they are excluded
+ * from every comparison against it. Remove each once its PR merges and the
+ * baseline moves past it.
+ */
+export const PR_ONLY_ROUTES = [
+  "/docs/components/lcd-number-field",
+  "/docs/components/lcd-spectrum",
+  "/docs/components/lcd-vumeter",
+] as const;
+
 const LOCATION = /<loc>([^<]+)<\/loc>/g;
 
 /** Public routes listed in a sitemap, as sorted paths, whichever origin wrote them. */

@@ -6,6 +6,20 @@ import { ClipIndicator } from "@/components/ui/clip-indicator";
 import type { ClipIndicatorActions } from "@/components/ui/clip-indicator";
 import { DbReadout } from "@/components/ui/db-readout";
 import { DbScale } from "@/components/ui/db-scale";
+import {
+  LcdDisplay,
+  LcdDisplayLabel,
+  LcdDisplayRow,
+} from "@/components/ui/lcd-display";
+import { LcdSpectrum, LcdSpectrumCanvas } from "@/components/ui/lcd-spectrum";
+import {
+  LcdVuMeter,
+  LcdVuMeterChannel,
+  LcdVuMeterChannels,
+  LcdVuMeterClip,
+  LcdVuMeterScale,
+  LcdVuMeterValue,
+} from "@/components/ui/lcd-vumeter";
 import { LevelMeter, LevelMeterValue } from "@/components/ui/level-meter";
 import type { LevelMeterActions } from "@/components/ui/level-meter";
 import type { BallisticsInput } from "@/lib/audio/ballistics";
@@ -26,6 +40,8 @@ export interface MetersHarness {
   setPeak: (peakDb: number | undefined) => void;
   /** A level shows the readout declaratively; `undefined` returns it to its source. */
   setReadout: (value: number | undefined) => void;
+  /** Mounts or removes the LCD meter and spectrum cases. */
+  setShown: (shown: boolean) => void;
   setStripMeter: (present: boolean) => void;
 }
 
@@ -89,6 +105,7 @@ export const MetersApp = () => {
   const [levels, setLevels] = createSignal<number[] | undefined>(undefined);
   const [readout, setReadout] = createSignal<number | undefined>(undefined);
   const [stripMeter, setStripMeter] = createSignal(true);
+  const [shown, setShown] = createSignal(true);
   const meter: MutableRef<LevelMeterActions | null> = { current: null };
   const countClip: MutableRef<ClipIndicatorActions | null> = { current: null };
   const holdClip: MutableRef<ClipIndicatorActions | null> = { current: null };
@@ -103,6 +120,7 @@ export const MetersApp = () => {
     setLevels,
     setPeak,
     setReadout,
+    setShown,
     setStripMeter,
   };
 
@@ -139,6 +157,74 @@ export const MetersApp = () => {
               <ClipIndicator clipping />
             </div>
           </div>
+        );
+      }
+
+      case "lcd-spectrum": {
+        return (
+          <Show when={shown()}>
+            <LcdDisplay class="w-96" matrix={false} variant="amber">
+              <LcdSpectrum
+                class="h-40"
+                grid={params.has("grid")}
+                mode={params.get("mode") === "dot" ? "dot" : "bar"}
+                peakHold={params.has("peakHold")}
+                rows={numberParam("rows")}
+                source={visualEmitter}
+              >
+                {params.has("composed") ? <LcdSpectrumCanvas /> : undefined}
+              </LcdSpectrum>
+            </LcdDisplay>
+          </Show>
+        );
+      }
+
+      case "lcd-vumeter-default": {
+        return (
+          <LcdDisplay class="w-96" variant="amber">
+            <LcdDisplayRow>
+              <LcdDisplayLabel>Out</LcdDisplayLabel>
+              <LcdVuMeter
+                segments={numberParam("segments")}
+                source={meterEmitter}
+              />
+            </LcdDisplayRow>
+          </LcdDisplay>
+        );
+      }
+
+      case "lcd-vumeter": {
+        return (
+          <Show when={shown()}>
+            <LcdDisplay class="w-96" variant="amber">
+              <LcdDisplayRow>
+                <LcdDisplayLabel>Out</LcdDisplayLabel>
+                <LcdVuMeter
+                  mode={params.get("mode") === "dot" ? "dot" : "bar"}
+                  orientation={
+                    params.get("orientation") === "vertical"
+                      ? "vertical"
+                      : undefined
+                  }
+                  class={
+                    params.get("orientation") === "vertical"
+                      ? "h-32"
+                      : undefined
+                  }
+                  segments={numberParam("segments")}
+                  source={meterEmitter}
+                >
+                  <LcdVuMeterChannels>
+                    <LcdVuMeterChannel index={0} />
+                    <LcdVuMeterChannel index={1} />
+                    <LcdVuMeterScale />
+                  </LcdVuMeterChannels>
+                  <LcdVuMeterValue />
+                  <LcdVuMeterClip />
+                </LcdVuMeter>
+              </LcdDisplayRow>
+            </LcdDisplay>
+          </Show>
         );
       }
 

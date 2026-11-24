@@ -1,0 +1,198 @@
+---
+title: LCD Number Field
+description: An editable number on the LCD Display, typed, stepped with keys, wheel or pixel arrows, or scrubbed by dragging its label.
+seoDescription: Build a hardware-style editable value for an LCD screen in Solid. Type it, step it with arrow keys, the wheel or pixel steppers, or drag the label like an encoder. Copy and customize the audiocn LCD Number Field.
+---
+
+<ComponentPreview name="lcd-number-field-demo" />
+
+## Installation
+
+```npm
+npx shadcn@latest add @audiocn-solid/lcd-number-field
+```
+
+The CLI also adds the [LCD Display](/docs/components/lcd-display).
+
+## Usage
+
+```tsx
+import {
+  LcdDisplay,
+  LcdDisplayLabel,
+  LcdDisplayRow,
+} from "@/components/ui/lcd-display";
+import {
+  LcdNumberField,
+  LcdNumberFieldGroup,
+  LcdNumberFieldInput,
+  LcdNumberFieldScrubArea,
+  LcdNumberFieldStepper,
+  LcdNumberFieldUnit,
+} from "@/components/ui/lcd-number-field";
+```
+
+```tsx
+<LcdDisplay>
+  <LcdDisplayRow>
+    <LcdNumberField defaultValue={128} max={300} min={20}>
+      <LcdNumberFieldScrubArea>
+        <LcdDisplayLabel>Tempo</LcdDisplayLabel>
+      </LcdNumberFieldScrubArea>
+      <LcdNumberFieldGroup>
+        <LcdNumberFieldInput />
+        <LcdNumberFieldUnit>Bpm</LcdNumberFieldUnit>
+        <LcdNumberFieldStepper />
+      </LcdNumberFieldGroup>
+    </LcdNumberField>
+  </LcdDisplayRow>
+</LcdDisplay>
+```
+
+`LcdNumberField` takes `value`, `defaultValue`, `onValueChange`, `onValueCommitted`, `min`, `max`, `step`, `smallStep`, `largeStep`, `format` and `locale`, the props of upstream's Base UI Number Field that matter on a screen. Its root lays out no box of its own, so the scrub area and the value sit in the row beside each other like a label and a value.
+
+This Solid port is built natively, with no Base UI or Kobalte dependency, because Kobalte's Number Field has no scrub area and no wheel control. A controlled `value` of `null` is an empty field.
+
+Drag the label to scrub the value, like turning an encoder: Shift for large steps, Alt for small ones. Or focus the value and type, press the arrow keys, or turn the wheel. The wheel only changes the value while the field is focused and the pointer is over it.
+
+## Anatomy
+
+```tsx
+<LcdNumberField>
+  <LcdNumberFieldScrubArea>
+    <LcdDisplayLabel />
+  </LcdNumberFieldScrubArea>
+  <LcdNumberFieldGroup>
+    <LcdNumberFieldReset />
+    <LcdNumberFieldInput />
+    <LcdNumberFieldUnit />
+    <LcdNumberFieldStepper>
+      <LcdNumberFieldIncrement />
+      <LcdNumberFieldDecrement />
+    </LcdNumberFieldStepper>
+  </LcdNumberFieldGroup>
+</LcdNumberField>
+```
+
+With no children, `LcdNumberField` renders the group with the input and the stepper, and `LcdNumberFieldStepper` with no children renders the increment over the decrement.
+
+`LcdNumberFieldReset` returns the value to `resetValue`, like the Parameter Slider's and the Fader's reset. It is hidden while there is nothing to reset.
+
+## Differences from upstream
+
+- **Scrub cursor.** Base UI locks the pointer while scrubbing and draws a pixel cursor. The Solid port captures the pointer instead and keeps the browser's resize cursor, so scrubbing stops at the screen's edge only if the pointer does.
+- **Reset.** `LcdNumberFieldReset` is a plain button. It has no `render` prop.
+- **Props.** There is no `required`, `id` or `allowOutOfRange`. `name` submits the number in a hidden input.
+- **Typing.** The input accepts any text while you type and keeps the number it parses. The value is clamped to `min` and `max` on blur or Enter, so a controlled parent sees the typed number until then.
+
+## Examples
+
+### Inks
+
+The field draws in its display's ink, so it follows the display's `variant`: the theme's `--primary` by default, or a fixed `amber`, `green`, `cyan` or `red`, in both appearances.
+
+<ComponentPreview name="lcd-number-field-inks" />
+
+### Formatting
+
+`format` takes `Intl.NumberFormat` options. Keep one decimal place with:
+
+```tsx
+<LcdNumberField
+  format={{ maximumFractionDigits: 1, minimumFractionDigits: 1 }}
+  smallStep={0.1}
+/>
+```
+
+Units go in `LcdNumberFieldUnit` rather than in the format, so they stay dim and the number stays editable on its own.
+
+## Theming
+
+The field uses the display's variables, so it follows the display's `variant`, `appearance` and `size`.
+
+| Variable or attribute | Meaning |
+| --- | --- |
+| `--lcd-display-lit` | The value, the caret, the focus ring and a hovered stepper |
+| `--lcd-display-ink-dim` | The unit, the steppers, and a disabled or invalid value |
+| `--lcd-display-glass` | Selected text, which inverts like an LCD cursor |
+| `data-scrubbing` | On the root, the scrub area, the group and the input while the value is being scrubbed |
+| `data-disabled`, `data-readonly` | On the root, the scrub area, the group and the input |
+| `data-modified` | On the reset button while the value differs from `resetValue` |
+
+The input sizes itself to its text with `field-sizing: content` between 3 and 12 characters. Browsers without it show it 12 characters wide.
+
+## Accessibility
+
+The input is named by its row's `LcdDisplayLabel` and described by `LcdNumberFieldUnit`, so a screen reader hears "Tempo, 128.0, Bpm". Outside a row, give `LcdNumberFieldInput` an `aria-label`. It is a text input with `inputmode="decimal"`; the steppers are named "Increase" and "Decrease" and stay out of the tab order, since the arrow keys do the same.
+
+The Up and Down arrow keys step by `step`, with Shift by `largeStep` and with Alt by `smallStep`. Home and End go to `min` and `max`. Enter or leaving the field commits what you typed.
+
+## API reference
+
+### LcdNumberField
+
+<PropsTable
+  rows={[
+    ["value", "number | null", null, "Controlled value. null is empty."],
+    ["defaultValue", "number", null, "Initial value when uncontrolled."],
+    [
+      "min / max",
+      "number",
+      null,
+      "The range. Typed values are clamped on blur.",
+    ],
+    ["step", "number", "1", "The arrow key and stepper step."],
+    ["smallStep", "number", "0.1", "The step with Alt held."],
+    ["largeStep", "number", "10", "The step with Shift held."],
+    ["format", "Intl.NumberFormatOptions", null, "How the value is shown."],
+    [
+      "locale",
+      "Intl.LocalesArgument",
+      null,
+      "The locale for formatting and parsing.",
+    ],
+    ["disabled / readOnly", "boolean", "false", null],
+    ["name", "string", null, "Submits the number in a hidden input."],
+    [
+      "allowWheelScrub",
+      "boolean",
+      "true",
+      "Change the value with the wheel while the field is focused and hovered.",
+    ],
+    ["resetValue", "number", "defaultValue ?? min", null],
+    [
+      "onValueChange",
+      "(value, details) => void",
+      null,
+      "details.reason: input-change, input-clear, input-blur, keyboard, increment-press, decrement-press, wheel, scrub or reset.",
+    ],
+    [
+      "onValueCommitted",
+      "(value, details) => void",
+      null,
+      "Called on blur, Enter, key release, the end of a press, scrub or wheel step, and reset.",
+    ],
+  ]}
+/>
+
+### LcdNumberFieldScrubArea
+
+<PropsTable
+  rows={[
+    [
+      "direction",
+      '"horizontal" | "vertical"',
+      '"horizontal"',
+      "The drag axis.",
+    ],
+    ["pixelSensitivity", "number", "2", "Pixels the pointer moves per step."],
+  ]}
+/>
+
+### LcdNumberFieldInput, LcdNumberFieldIncrement, LcdNumberFieldDecrement
+
+They take the DOM props of an `input` and of buttons. Children of a stepper button replace its pixel chevron.
+
+### LcdNumberFieldReset
+
+A button that returns the value to `resetValue`. Its children replace the word "Reset".

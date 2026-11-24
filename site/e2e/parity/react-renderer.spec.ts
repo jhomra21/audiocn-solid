@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-import { sitemapRoutes } from "./sitemap";
+import { PR_ONLY_ROUTES, sitemapRoutes } from "./sitemap";
 
 const referenceURL = process.env.AUDIOCN_REACT_BASELINE;
 
@@ -190,17 +190,22 @@ for (const width of [390, 1280]) {
       test.setTimeout(1_800_000);
       await mkdir(artifacts, { recursive: true });
 
-      const routes = sitemapRoutes(
+      const localRoutes = sitemapRoutes(
         await readFile(
           join(import.meta.dirname, "../../dist/client/sitemap.xml"),
           "utf8"
         )
       );
 
+      // The pinned baseline has no page for a route from an open upstream PR.
+      const prOnly: readonly string[] = PR_ONLY_ROUTES;
+      const routes = localRoutes.filter((route) => !prOnly.includes(route));
+
       const upstreamSitemap = await fetch(`${referenceURL}/sitemap.xml`);
       expect(upstreamSitemap.ok).toBe(true);
       expect(sitemapRoutes(await upstreamSitemap.text())).toEqual(routes);
       expect(routes).toHaveLength(61);
+      expect(localRoutes).toHaveLength(61 + PR_ONLY_ROUTES.length);
 
       const contexts = await Promise.all(
         [referenceURL!, baseURL!].map(() =>
